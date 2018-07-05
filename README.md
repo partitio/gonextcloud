@@ -89,19 +89,26 @@ func (c *Client) UserDisable(name string) error
 Update
 ```go
 func (c *Client) UserUpdateEmail(name string, email string) error
-
+```
+```go
 func (c *Client) UserUpdateDisplayName(name string, displayName string) error
-
+```
+```go
 func (c *Client) UserUpdatePhone(name string, phone string) error
-
+```
+```go
 func (c *Client) UserUpdateAddress(name string, address string) error
-
+```
+```go
 func (c *Client) UserUpdateWebSite(name string, website string) error
-
+```
+```go
 func (c *Client) UserUpdateTwitter(name string, twitter string) error
-
+```
+```go
 func (c *Client) UserUpdatePassword(name string, password string) error
-
+```
+```go
 func (c *Client) UserUpdateQuota(name string, quota string) error
 ```
 Groups
