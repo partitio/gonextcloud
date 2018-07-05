@@ -4,6 +4,7 @@ import (
 	"fmt"
 	req "github.com/levigross/grequests"
 	"github.com/partitio/gonextcloud/client/types"
+	"net/http"
 	"path"
 )
 
@@ -60,104 +61,35 @@ func (c *Client) UserSearch(search string) ([]string, error) {
 }
 
 func (c *Client) UserCreate(username string, password string) error {
-	if !c.loggedIn() {
-		return unauthorized
-	}
-	u := c.baseURL.ResolveReference(routes.users)
 	ro := &req.RequestOptions{
 		Data: map[string]string{
 			"userid":   username,
 			"password": password,
 		},
 	}
-	res, err := c.session.Post(u.String(), ro)
-	if err != nil {
-		return err
-	}
-	var r types.UserResponse
-	res.JSON(&r)
-	if r.Ocs.Meta.Statuscode != 100 {
-		return fmt.Errorf(r.Ocs.Meta.Message)
-	}
-	return nil
+	return c.userBaseRequest("", "", ro, http.MethodPost)
 }
 
 func (c *Client) UserDelete(name string) error {
-	if !c.loggedIn() {
-		return unauthorized
-	}
-	u := c.baseURL.ResolveReference(routes.users)
-	u.Path = path.Join(u.Path, name)
-	res, err := c.session.Delete(u.String(), nil)
-	if err != nil {
-		return err
-	}
-	var ur types.UserResponse
-	res.JSON(&ur)
-	if ur.Ocs.Meta.Statuscode != 100 {
-		return fmt.Errorf(ur.Ocs.Meta.Message)
-	}
-	return nil
+	return c.userBaseRequest(name, "", nil, http.MethodDelete)
 }
 
 func (c *Client) UserEnable(name string) error {
-	if !c.loggedIn() {
-		return unauthorized
-	}
-	u := c.baseURL.ResolveReference(routes.users)
-	u.Path = path.Join(u.Path, name, "enable")
 	ro := &req.RequestOptions{
 		Data: map[string]string{},
 	}
-	res, err := c.session.Put(u.String(), ro)
-	if err != nil {
-		return err
-	}
-	var ur types.UserResponse
-	res.JSON(&ur)
-	if ur.Ocs.Meta.Statuscode != 100 {
-		return fmt.Errorf(ur.Ocs.Meta.Message)
-	}
-	return nil
+	return c.userBaseRequest(name, "enable", ro, http.MethodPut)
 }
 
 func (c *Client) UserDisable(name string) error {
-	if !c.loggedIn() {
-		return unauthorized
-	}
-	u := c.baseURL.ResolveReference(routes.users)
-	u.Path = path.Join(u.Path, name, "disable")
 	ro := &req.RequestOptions{
 		Data: map[string]string{},
 	}
-	res, err := c.session.Put(u.String(), ro)
-	if err != nil {
-		return err
-	}
-	var ur types.UserResponse
-	res.JSON(&ur)
-	if ur.Ocs.Meta.Statuscode != 100 {
-		return fmt.Errorf(ur.Ocs.Meta.Message)
-	}
-	return nil
+	return c.userBaseRequest(name, "disable", ro, http.MethodPut)
 }
 
 func (c *Client) UserSendWelcomeEmail(name string) error {
-	if !c.loggedIn() {
-		return unauthorized
-	}
-	u := c.baseURL.ResolveReference(routes.users)
-	u.Path = path.Join(u.Path, name, "welcome")
-	res, err := c.session.Post(u.String(), nil)
-	if err != nil {
-		return err
-	}
-	var ur types.UserResponse
-	res.JSON(&ur)
-	if ur.Ocs.Meta.Statuscode != 100 {
-		return fmt.Errorf(ur.Ocs.Meta.Message)
-	}
-	return nil
+	return c.userBaseRequest(name, "welcome", nil, http.MethodPost)
 }
 
 func (c *Client) UserUpdateEmail(name string, email string) error {
@@ -193,18 +125,39 @@ func (c *Client) UserUpdateQuota(name string, quota string) error {
 }
 
 func (c *Client) userUpdateAttribute(name string, key string, value string) error {
-	if !c.loggedIn() {
-		return unauthorized
-	}
-	u := c.baseURL.ResolveReference(routes.users)
-	u.Path = path.Join(u.Path, name)
 	ro := &req.RequestOptions{
 		Data: map[string]string{
 			"key":   key,
 			"value": value,
 		},
 	}
-	res, err := c.session.Put(u.String(), ro)
+	return c.userBaseRequest(name, "", ro, http.MethodPut)
+}
+
+func (c *Client) userBaseRequest(name string, route string, ro *req.RequestOptions, method string) error {
+	if !c.loggedIn() {
+		return unauthorized
+	}
+	u := c.baseURL.ResolveReference(routes.users)
+	if name != "" {
+		u.Path = path.Join(u.Path, name)
+	}
+	if route != "" {
+		u.Path = path.Join(u.Path, route)
+	}
+	var (
+		res *req.Response
+		err error
+	)
+	if method == http.MethodGet {
+		res, err = c.session.Get(u.String(), ro)
+	} else if method == http.MethodPost {
+		res, err = c.session.Post(u.String(), ro)
+	} else if method == http.MethodPut {
+		res, err = c.session.Put(u.String(), ro)
+	} else if method == http.MethodDelete {
+		res, err = c.session.Delete(u.String(), ro)
+	}
 	if err != nil {
 		return err
 	}
