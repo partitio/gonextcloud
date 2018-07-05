@@ -41,6 +41,19 @@ type UserResponse struct {
 	} `json:"ocs"`
 }
 
+type SubAdminResponse struct {
+	Ocs struct {
+		Meta struct {
+			Status       string `json:"status"`
+			Statuscode   int    `json:"statuscode"`
+			Message      string `json:"message"`
+			Totalitems   string `json:"totalitems"`
+			Itemsperpage string `json:"itemsperpage"`
+		} `json:"meta"`
+		Data []string `json:"data"`
+	} `json:"ocs"`
+}
+
 type GroupListResponse struct {
 	Ocs struct {
 		Meta struct {

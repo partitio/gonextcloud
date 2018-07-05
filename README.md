@@ -15,12 +15,12 @@ A simple Client for Nextcloud's API in Go.
   - ~~delete~~
   - ~~enable~~
   - ~~disable~~
-  - get groups
-  - add to group
-  - remove from group
-  - get subadmin group
-  - promote subadmin
-  - demote subadmin
+  - ~~get groups~~
+  - ~~add to group~~
+  - ~~remove from group~~
+  - ~~get subadmin group~~
+  - ~~promote subadmin~~
+  - ~~demote subadmin~~
   - ~~send welcome mail~~ 
 - [Groups](#groups)
   - create
@@ -103,6 +103,29 @@ func (c *Client) UserUpdateTwitter(name string, twitter string) error
 func (c *Client) UserUpdatePassword(name string, password string) error
 
 func (c *Client) UserUpdateQuota(name string, quota string) error
+```
+Groups
+```go
+func (c *Client) UserGroupList(name string) ([]string, error)
+```
+```go
+func (c *Client) UserGroupAdd(name string, group string) error 
+```
+```go
+func (c *Client) UserGroupRemove(name string, group string) error 
+```
+```go
+func (c *Client) UserGroupPromote(name string, group string) error 
+```
+```go
+func (c *Client) UserGroupDemote(name string, group string) error 
+```
+```go
+func (c *Client) UserGroupSubAdminList(name string) ([]string, error) 
+```
+Welcome Mail
+```go
+func (c *Client) UserSendWelcomeEmail(name string) error 
 ```
 ## Groups
 TODO

@@ -124,6 +124,78 @@ func (c *Client) UserUpdateQuota(name string, quota string) error {
 	return c.userUpdateAttribute(name, "quota", quota)
 }
 
+func (c *Client) UserGroupList(name string) ([]string, error) {
+	if !c.loggedIn() {
+		return nil, unauthorized
+	}
+	u := c.baseURL.ResolveReference(routes.users)
+	u.Path = path.Join(u.Path, name, "groups")
+	res, err := c.session.Get(u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	var r types.GroupListResponse
+	res.JSON(&r)
+	if r.Ocs.Meta.Statuscode != 100 {
+		return nil, fmt.Errorf(r.Ocs.Meta.Message)
+	}
+	return r.Ocs.Data.Groups, nil
+}
+
+func (c *Client) UserGroupAdd(name string, group string) error {
+	ro := &req.RequestOptions{
+		Data: map[string]string{
+			"groupid": group,
+		},
+	}
+	return c.userBaseRequest(name, "groups", ro, http.MethodPost)
+}
+
+func (c *Client) UserGroupRemove(name string, group string) error {
+	ro := &req.RequestOptions{
+		Data: map[string]string{
+			"groupid": group,
+		},
+	}
+	return c.userBaseRequest(name, "groups", ro, http.MethodDelete)
+}
+
+func (c *Client) UserGroupPromote(name string, group string) error {
+	ro := &req.RequestOptions{
+		Data: map[string]string{
+			"groupid": group,
+		},
+	}
+	return c.userBaseRequest(name, "subadmins", ro, http.MethodPost)
+}
+
+func (c *Client) UserGroupDemote(name string, group string) error {
+	ro := &req.RequestOptions{
+		Data: map[string]string{
+			"groupid": group,
+		},
+	}
+	return c.userBaseRequest(name, "subadmins", ro, http.MethodDelete)
+}
+
+func (c *Client) UserGroupSubAdminList(name string) ([]string, error) {
+	if !c.loggedIn() {
+		return nil, unauthorized
+	}
+	u := c.baseURL.ResolveReference(routes.users)
+	u.Path = path.Join(u.Path, name, "subadmins")
+	res, err := c.session.Get(u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	var r types.SubAdminResponse
+	res.JSON(&r)
+	if r.Ocs.Meta.Statuscode != 100 {
+		return nil, fmt.Errorf(r.Ocs.Meta.Message)
+	}
+	return r.Ocs.Data, nil
+}
+
 func (c *Client) userUpdateAttribute(name string, key string, value string) error {
 	ro := &req.RequestOptions{
 		Data: map[string]string{
