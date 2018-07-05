@@ -57,7 +57,7 @@ func main() {
 	defer c.Logout()
 }
 ````
-##Users
+## Users
 List :
 ```go
 func (c *Client) UserList() ([]string, error)
