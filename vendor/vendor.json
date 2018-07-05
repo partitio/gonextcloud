@@ -1,0 +1,25 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "p3IB18uJRs4dL2K5yx24MrLYE9A=",
+			"path": "github.com/google/go-querystring/query",
+			"revision": "53e6ce116135b80d037921a7fdd5138cf32d7a8a",
+			"revisionTime": "2017-01-11T10:11:55Z"
+		},
+		{
+			"checksumSHA1": "e3krTtxeGeDTyWRkZC7BOYfexCw=",
+			"path": "github.com/levigross/grequests",
+			"revision": "bf9788368aa04abf510962fd0fb0d8e4b74396cc",
+			"revisionTime": "2017-10-09T01:03:47Z"
+		},
+		{
+			"checksumSHA1": "bMhIYx4Cgl6jit4Y2PW+dKsrFuU=",
+			"path": "golang.org/x/net/publicsuffix",
+			"revision": "4cb1c02c05b0e749b0365f61ae859a8e0cfceed9",
+			"revisionTime": "2018-06-28T17:19:52Z"
+		}
+	],
+	"rootPath": "github.com/partitio/gonextcloud"
+}
