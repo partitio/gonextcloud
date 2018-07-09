@@ -1,6 +1,8 @@
 # client
 --
+```go
     import "github.com/partitio/gonextcloud/client"
+```
 
 
 ## Usage

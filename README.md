@@ -35,7 +35,9 @@ A simple Client for Nextcloud's API in Go.
 
 # client
 --
+```go
     import "github.com/partitio/gonextcloud/client"
+```
 
 
 ## Usage
