@@ -20,7 +20,7 @@ func (c *Client) GroupList() ([]string, error) {
 	return gr.Ocs.Data.Groups, nil
 }
 
-func (c *Client) Group(name string) ([]string, error) {
+func (c *Client) GroupUsers(name string) ([]string, error) {
 	res, err := c.baseRequest(routes.groups, name, "", nil, http.MethodGet)
 	if err != nil {
 		return nil, err
@@ -31,6 +31,22 @@ func (c *Client) Group(name string) ([]string, error) {
 		return nil, fmt.Errorf("%d : %s", r.Ocs.Meta.Statuscode, r.Ocs.Meta.Message)
 	}
 	return r.Ocs.Data.Users, nil
+}
+
+func (c *Client) GroupSearch(search string) ([]string, error) {
+	ro := &req.RequestOptions{
+		Params: map[string]string{"search": search},
+	}
+	res, err := c.baseRequest(routes.groups, "", "", ro, http.MethodGet)
+	if err != nil {
+		return nil, err
+	}
+	var r types.GroupListResponse
+	res.JSON(&r)
+	if r.Ocs.Meta.Statuscode != 100 {
+		return nil, fmt.Errorf("%d : %s", r.Ocs.Meta.Statuscode, r.Ocs.Meta.Message)
+	}
+	return r.Ocs.Data.Groups, nil
 }
 
 func (c *Client) GroupCreate(name string) error {

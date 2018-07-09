@@ -1,44 +1,10 @@
-# [WIP] Nextcloud Go API Client
-
-A simple Client for Nextcloud's API in Go.
-
-## TODO
-- [Auth](#authentication)
-  - ~~login~~
-  - ~~logout~~
-- [Users](#users)
-  - ~~search~~
-  - ~~list~~
-  - ~~get infos~~
-  - ~~create~~
-  - ~~update~~
-  - ~~delete~~
-  - ~~enable~~
-  - ~~disable~~
-  - ~~get groups~~
-  - ~~add to group~~
-  - ~~remove from group~~
-  - ~~get subadmin group~~
-  - ~~promote subadmin~~
-  - ~~demote subadmin~~
-  - ~~send welcome mail~~ 
-- [Groups](#groups)
-  - ~~create~~
-  - ~~delete~~
-  - ~~get members~~
-  - ~~get subadmins~~
-- [Apps](#apps)
-  - list
-  - get infos
-  - enable
-  - disable
-
 # client
 --
     import "github.com/partitio/gonextcloud/client"
 
 
 ## Usage
+
 ```go
 package main
 
@@ -62,13 +28,56 @@ func main() {
 }
 ```
 
+#### type Client
+
+```go
+type Client struct {
+}
+```
+
+
 #### func  NewClient
 
 ```go
 func NewClient(hostname string) (*Client, error)
 ```
 
-## Authentication
+#### func (*Client) GroupCreate
+
+```go
+func (c *Client) GroupCreate(name string) error
+```
+
+#### func (*Client) GroupDelete
+
+```go
+func (c *Client) GroupDelete(name string) error
+```
+
+#### func (*Client) GroupList
+
+```go
+func (c *Client) GroupList() ([]string, error)
+```
+
+#### func (*Client) GroupSearch
+
+```go
+func (c *Client) GroupSearch(search string) ([]string, error)
+```
+
+#### func (*Client) GroupSubAdminList
+
+```go
+func (c *Client) GroupSubAdminList(name string) ([]string, error)
+```
+
+#### func (*Client) GroupUsers
+
+```go
+func (c *Client) GroupUsers(name string) ([]string, error)
+```
+
 #### func (*Client) Login
 
 ```go
@@ -76,10 +85,11 @@ func (c *Client) Login(username string, password string) error
 ```
 
 #### func (*Client) Logout
+
 ```go
 func (c *Client) Logout() error
 ```
-## Users
+
 #### func (*Client) User
 
 ```go
@@ -208,43 +218,13 @@ func (c *Client) UserUpdateTwitter(name string, twitter string) error
 
 #### func (*Client) UserUpdateWebSite
 
-## Groups
-
 ```go
 func (c *Client) UserUpdateWebSite(name string, website string) error
 ```
-#### func (*Client) GroupCreate
+
+#### type Routes
 
 ```go
-func (c *Client) GroupCreate(name string) error
-```
-
-#### func (*Client) GroupDelete
-
-```go
-func (c *Client) GroupDelete(name string) error
-```
-
-#### func (*Client) GroupList
-
-```go
-func (c *Client) GroupList() ([]string, error)
-```
-
-#### func (*Client) GroupSearch
-
-```go
-func (c *Client) GroupSearch(search string) ([]string, error)
-```
-
-#### func (*Client) GroupSubAdminList
-
-```go
-func (c *Client) GroupSubAdminList(name string) ([]string, error)
-```
-
-#### func (*Client) GroupUsers
-
-```go
-func (c *Client) GroupUsers(name string) ([]string, error)
+type Routes struct {
+}
 ```

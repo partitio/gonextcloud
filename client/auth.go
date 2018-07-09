@@ -16,6 +16,7 @@ func (c *Client) Login(username string, password string) error {
 		Auth:    []string{c.username, c.password},
 	}
 	c.session = req.NewSession(&options)
+	// TODO What to do with capabilities ? (other thant connection validation)
 	u := c.baseURL.ResolveReference(routes.capabilities)
 	r, err := c.session.Get(u.String(), nil)
 	if err != nil {
