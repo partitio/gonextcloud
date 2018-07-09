@@ -35,7 +35,7 @@ func (c *Client) User(name string) (*types.User, error) {
 	var ur types.UserResponse
 	res.JSON(&ur)
 	if ur.Ocs.Meta.Statuscode != 100 {
-		return nil, fmt.Errorf(ur.Ocs.Meta.Message)
+		return nil, fmt.Errorf("%d : %s", ur.Ocs.Meta.Statuscode, ur.Ocs.Meta.Message)
 	}
 	return &ur.Ocs.Data, nil
 }
@@ -55,7 +55,7 @@ func (c *Client) UserSearch(search string) ([]string, error) {
 	var r types.UserListResponse
 	res.JSON(&r)
 	if r.Ocs.Meta.Statuscode != 100 {
-		return nil, fmt.Errorf(r.Ocs.Meta.Message)
+		return nil, fmt.Errorf("%d : %s", r.Ocs.Meta.Statuscode, r.Ocs.Meta.Message)
 	}
 	return r.Ocs.Data.Users, nil
 }
@@ -137,7 +137,7 @@ func (c *Client) UserGroupList(name string) ([]string, error) {
 	var r types.GroupListResponse
 	res.JSON(&r)
 	if r.Ocs.Meta.Statuscode != 100 {
-		return nil, fmt.Errorf(r.Ocs.Meta.Message)
+		return nil, fmt.Errorf("%d : %s", r.Ocs.Meta.Statuscode, r.Ocs.Meta.Message)
 	}
 	return r.Ocs.Data.Groups, nil
 }
@@ -188,10 +188,10 @@ func (c *Client) UserGroupSubAdminList(name string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	var r types.SubAdminResponse
+	var r types.BaseResponse
 	res.JSON(&r)
 	if r.Ocs.Meta.Statuscode != 100 {
-		return nil, fmt.Errorf(r.Ocs.Meta.Message)
+		return nil, fmt.Errorf("%d : %s", r.Ocs.Meta.Statuscode, r.Ocs.Meta.Message)
 	}
 	return r.Ocs.Data, nil
 }
@@ -207,36 +207,14 @@ func (c *Client) userUpdateAttribute(name string, key string, value string) erro
 }
 
 func (c *Client) userBaseRequest(name string, route string, ro *req.RequestOptions, method string) error {
-	if !c.loggedIn() {
-		return unauthorized
-	}
-	u := c.baseURL.ResolveReference(routes.users)
-	if name != "" {
-		u.Path = path.Join(u.Path, name)
-	}
-	if route != "" {
-		u.Path = path.Join(u.Path, route)
-	}
-	var (
-		res *req.Response
-		err error
-	)
-	if method == http.MethodGet {
-		res, err = c.session.Get(u.String(), ro)
-	} else if method == http.MethodPost {
-		res, err = c.session.Post(u.String(), ro)
-	} else if method == http.MethodPut {
-		res, err = c.session.Put(u.String(), ro)
-	} else if method == http.MethodDelete {
-		res, err = c.session.Delete(u.String(), ro)
-	}
+	res, err := c.baseRequest(routes.users, name, route, ro, method)
 	if err != nil {
 		return err
 	}
 	var ur types.UserResponse
 	res.JSON(&ur)
 	if ur.Ocs.Meta.Statuscode != 100 {
-		return fmt.Errorf(ur.Ocs.Meta.Message)
+		return fmt.Errorf("%d : %s", ur.Ocs.Meta.Statuscode, ur.Ocs.Meta.Message)
 	}
 	return nil
 }

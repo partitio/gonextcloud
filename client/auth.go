@@ -23,6 +23,9 @@ func (c *Client) Login(username string, password string) error {
 	}
 	var cs types.CapabilitiesResponse
 	r.JSON(&cs)
+	if cs.Ocs.Meta.Statuscode != 100 {
+		return fmt.Errorf("%d : %s", cs.Ocs.Meta.Statuscode, cs.Ocs.Meta.Message)
+	}
 	c.capabilities = &cs.Ocs.Data.Capabilities
 	return nil
 }

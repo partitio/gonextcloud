@@ -41,7 +41,7 @@ type UserResponse struct {
 	} `json:"ocs"`
 }
 
-type SubAdminResponse struct {
+type BaseResponse struct {
 	Ocs struct {
 		Meta struct {
 			Status       string `json:"status"`
