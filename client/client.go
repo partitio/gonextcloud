@@ -56,10 +56,14 @@ type Client struct {
 }
 
 func NewClient(hostname string) (*Client, error) {
-	baseURL, err := url.Parse(hostname)
+	baseURL, err := url.ParseRequestURI(hostname)
 	if err != nil {
-		return nil, err
+		baseURL, err = url.ParseRequestURI("https://" + hostname)
+		if err != nil {
+			return nil, err
+		}
 	}
+
 	c := Client{
 		baseURL: baseURL,
 		headers: map[string]string{
