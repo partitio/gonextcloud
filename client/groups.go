@@ -1,7 +1,6 @@
 package client
 
 import (
-	"fmt"
 	req "github.com/levigross/grequests"
 	"github.com/partitio/gonextcloud/client/types"
 	"net/http"
@@ -12,12 +11,13 @@ func (c *Client) GroupList() ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	var gr types.GroupListResponse
-	res.JSON(&gr)
-	if gr.Ocs.Meta.Statuscode != 100 {
-		return nil, fmt.Errorf("%d : %s", gr.Ocs.Meta.Statuscode, gr.Ocs.Meta.Message)
+	var r types.GroupListResponse
+	res.JSON(&r)
+	if r.Ocs.Meta.Statuscode != 100 {
+		e := types.ErrorFromMeta(r.Ocs.Meta)
+		return nil, &e
 	}
-	return gr.Ocs.Data.Groups, nil
+	return r.Ocs.Data.Groups, nil
 }
 
 func (c *Client) GroupUsers(name string) ([]string, error) {
@@ -28,7 +28,8 @@ func (c *Client) GroupUsers(name string) ([]string, error) {
 	var r types.UserListResponse
 	res.JSON(&r)
 	if r.Ocs.Meta.Statuscode != 100 {
-		return nil, fmt.Errorf("%d : %s", r.Ocs.Meta.Statuscode, r.Ocs.Meta.Message)
+		e := types.ErrorFromMeta(r.Ocs.Meta)
+		return nil, &e
 	}
 	return r.Ocs.Data.Users, nil
 }
@@ -44,7 +45,8 @@ func (c *Client) GroupSearch(search string) ([]string, error) {
 	var r types.GroupListResponse
 	res.JSON(&r)
 	if r.Ocs.Meta.Statuscode != 100 {
-		return nil, fmt.Errorf("%d : %s", r.Ocs.Meta.Statuscode, r.Ocs.Meta.Message)
+		e := types.ErrorFromMeta(r.Ocs.Meta)
+		return nil, &e
 	}
 	return r.Ocs.Data.Groups, nil
 }
@@ -76,7 +78,8 @@ func (c *Client) GroupSubAdminList(name string) ([]string, error) {
 	var r types.UserListResponse
 	res.JSON(&r)
 	if r.Ocs.Meta.Statuscode != 100 {
-		return nil, fmt.Errorf("%d : %s", r.Ocs.Meta.Statuscode, r.Ocs.Meta.Message)
+		e := types.ErrorFromMeta(r.Ocs.Meta)
+		return nil, &e
 	}
 	return r.Ocs.Data.Users, nil
 }
@@ -86,10 +89,11 @@ func (c *Client) groupBaseRequest(name string, route string, ro *req.RequestOpti
 	if err != nil {
 		return err
 	}
-	var ur types.GroupListResponse
-	res.JSON(&ur)
-	if ur.Ocs.Meta.Statuscode != 100 {
-		return fmt.Errorf("%d : %s", ur.Ocs.Meta.Statuscode, ur.Ocs.Meta.Message)
+	var r types.GroupListResponse
+	res.JSON(&r)
+	if r.Ocs.Meta.Statuscode != 100 {
+		e := types.ErrorFromMeta(r.Ocs.Meta)
+		return &e
 	}
 	return nil
 }

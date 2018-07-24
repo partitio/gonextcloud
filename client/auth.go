@@ -18,16 +18,22 @@ func (c *Client) Login(username string, password string) error {
 	c.session = req.NewSession(&options)
 	// TODO What to do with capabilities ? (other thant connection validation)
 	u := c.baseURL.ResolveReference(routes.capabilities)
-	r, err := c.session.Get(u.String(), nil)
+	res, err := c.session.Get(u.String(), nil)
 	if err != nil {
 		return err
 	}
-	var cs types.CapabilitiesResponse
-	r.JSON(&cs)
-	if cs.Ocs.Meta.Statuscode != 100 {
-		return fmt.Errorf("%d : %s", cs.Ocs.Meta.Statuscode, cs.Ocs.Meta.Message)
+	var r types.CapabilitiesResponse
+	res.JSON(&r)
+	if r.Ocs.Meta.Statuscode != 100 {
+		e := types.ErrorFromMeta(r.Ocs.Meta)
+		return &e
 	}
-	c.capabilities = &cs.Ocs.Data.Capabilities
+	c.capabilities = &r.Ocs.Data.Capabilities
+	// Check if authentication failed
+	if !c.loggedIn() {
+		e := types.APIError{Message: "authentication failed"}
+		return &e
+	}
 	return nil
 }
 
@@ -37,5 +43,6 @@ func (c *Client) Logout() error {
 }
 
 func (c *Client) loggedIn() bool {
-	return c.capabilities != nil
+	// When authentication failed, capabilities doesn't contains core information
+	return c.capabilities.Core.WebdavRoot != ""
 }

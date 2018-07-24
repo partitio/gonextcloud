@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"strings"
 )
 
 func (c *Client) baseRequest(route *url.URL, name string, subroute string, ro *req.RequestOptions, method string) (*req.Response, error) {
@@ -35,4 +36,13 @@ func (c *Client) baseRequest(route *url.URL, name string, subroute string, ro *r
 		return nil, err
 	}
 	return res, nil
+}
+
+func reformatJSON(json string) string {
+	// Nextcloud encode boolean as string
+	json = strings.Replace(json, "\"true\"", "true", -1)
+	json = strings.Replace(json, "\"false\"", "false", -1)
+	// Nextcloud encode quota as an empty array for never connected users
+	json = strings.Replace(json, "\"quota\":[],", "", -1)
+	return json
 }

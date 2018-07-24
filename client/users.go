@@ -1,11 +1,12 @@
 package client
 
 import (
-	"fmt"
+	"encoding/json"
 	req "github.com/levigross/grequests"
 	"github.com/partitio/gonextcloud/client/types"
 	"net/http"
 	"path"
+	"strconv"
 )
 
 func (c *Client) UserList() ([]string, error) {
@@ -17,12 +18,15 @@ func (c *Client) UserList() ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	var ul types.UserListResponse
-	res.JSON(&ul)
-	return ul.Ocs.Data.Users, nil
+	var r types.UserListResponse
+	res.JSON(&r)
+	return r.Ocs.Data.Users, nil
 }
 
 func (c *Client) User(name string) (*types.User, error) {
+	if name == "" {
+		return nil, &types.APIError{Message: "name cannot be empty"}
+	}
 	if !c.loggedIn() {
 		return nil, unauthorized
 	}
@@ -32,12 +36,18 @@ func (c *Client) User(name string) (*types.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	var ur types.UserResponse
-	res.JSON(&ur)
-	if ur.Ocs.Meta.Statuscode != 100 {
-		return nil, fmt.Errorf("%d : %s", ur.Ocs.Meta.Statuscode, ur.Ocs.Meta.Message)
+	var r types.UserResponse
+	js := res.String()
+	// Nextcloud does not encode JSON properly
+	js = reformatJSON(js)
+	if err := json.Unmarshal([]byte(js), &r); err != nil {
+		return nil, err
 	}
-	return &ur.Ocs.Data, nil
+	if r.Ocs.Meta.Statuscode != 100 {
+		e := types.ErrorFromMeta(r.Ocs.Meta)
+		return nil, &e
+	}
+	return &r.Ocs.Data, nil
 }
 
 func (c *Client) UserSearch(search string) ([]string, error) {
@@ -55,7 +65,8 @@ func (c *Client) UserSearch(search string) ([]string, error) {
 	var r types.UserListResponse
 	res.JSON(&r)
 	if r.Ocs.Meta.Statuscode != 100 {
-		return nil, fmt.Errorf("%d : %s", r.Ocs.Meta.Statuscode, r.Ocs.Meta.Message)
+		e := types.ErrorFromMeta(r.Ocs.Meta)
+		return nil, &e
 	}
 	return r.Ocs.Data.Users, nil
 }
@@ -120,8 +131,8 @@ func (c *Client) UserUpdatePassword(name string, password string) error {
 	return c.userUpdateAttribute(name, "password", password)
 }
 
-func (c *Client) UserUpdateQuota(name string, quota string) error {
-	return c.userUpdateAttribute(name, "quota", quota)
+func (c *Client) UserUpdateQuota(name string, quota int) error {
+	return c.userUpdateAttribute(name, "quota", strconv.Itoa(quota))
 }
 
 func (c *Client) UserGroupList(name string) ([]string, error) {
@@ -137,7 +148,8 @@ func (c *Client) UserGroupList(name string) ([]string, error) {
 	var r types.GroupListResponse
 	res.JSON(&r)
 	if r.Ocs.Meta.Statuscode != 100 {
-		return nil, fmt.Errorf("%d : %s", r.Ocs.Meta.Statuscode, r.Ocs.Meta.Message)
+		e := types.ErrorFromMeta(r.Ocs.Meta)
+		return nil, &e
 	}
 	return r.Ocs.Data.Groups, nil
 }
@@ -191,7 +203,8 @@ func (c *Client) UserGroupSubAdminList(name string) ([]string, error) {
 	var r types.BaseResponse
 	res.JSON(&r)
 	if r.Ocs.Meta.Statuscode != 100 {
-		return nil, fmt.Errorf("%d : %s", r.Ocs.Meta.Statuscode, r.Ocs.Meta.Message)
+		e := types.ErrorFromMeta(r.Ocs.Meta)
+		return nil, &e
 	}
 	return r.Ocs.Data, nil
 }
@@ -211,10 +224,11 @@ func (c *Client) userBaseRequest(name string, route string, ro *req.RequestOptio
 	if err != nil {
 		return err
 	}
-	var ur types.UserResponse
-	res.JSON(&ur)
-	if ur.Ocs.Meta.Statuscode != 100 {
-		return fmt.Errorf("%d : %s", ur.Ocs.Meta.Statuscode, ur.Ocs.Meta.Message)
+	var r types.UserResponse
+	res.JSON(&r)
+	if r.Ocs.Meta.Statuscode != 100 {
+		e := types.ErrorFromMeta(r.Ocs.Meta)
+		return &e
 	}
 	return nil
 }

@@ -38,4 +38,9 @@ type BaseClient interface {
 	GroupCreate(name string) error
 	GroupDelete(name string) error
 	GroupSubAdminList(name string) ([]string, error)
+
+	AppList() ([]string, error)
+	App(name string) (types.App, error)
+	AppEnable(name string) error
+	AppDisable(name string) error
 }

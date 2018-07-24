@@ -1,7 +1,7 @@
 package types
 
 type User struct {
-	Enabled string `json:"enabled"`
+	Enabled bool   `json:"enabled"`
 	ID      string `json:"id"`
 	Quota   struct {
 		Free     int64   `json:"free"`
