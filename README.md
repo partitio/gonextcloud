@@ -6,7 +6,7 @@ A simple Client for Nextcloud's Provisioning API in Go.
 
 
 ```go
-    import "github.com/partitio/gonextcloud/client"
+    import "github.com/partitio/gonextcloud"
 ```
 
 
