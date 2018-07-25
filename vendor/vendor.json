@@ -3,6 +3,19 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "dvabztWVQX8f6oMLRyv4dLH+TGY=",
+			"origin": "github.com/stretchr/testify/vendor/github.com/davecgh/go-spew/spew",
+			"path": "github.com/davecgh/go-spew/spew",
+			"revision": "ef2d0154048f21662542b56ba1d1bd9f82278d2b",
+			"revisionTime": "2018-05-26T10:32:01Z"
+		},
+		{
+			"checksumSHA1": "5BP5xofo0GoFi6FtgqFFbmHyUKI=",
+			"path": "github.com/fatih/structs",
+			"revision": "ebf56d35bba727c68ac77f56f2fcf90b181851aa",
+			"revisionTime": "2018-01-23T06:50:59Z"
+		},
+		{
 			"checksumSHA1": "p3IB18uJRs4dL2K5yx24MrLYE9A=",
 			"path": "github.com/google/go-querystring/query",
 			"revision": "53e6ce116135b80d037921a7fdd5138cf32d7a8a",
@@ -15,10 +28,29 @@
 			"revisionTime": "2017-10-09T01:03:47Z"
 		},
 		{
+			"checksumSHA1": "LuFv4/jlrmFNnDb/5SCSEPAM9vU=",
+			"origin": "github.com/stretchr/testify/vendor/github.com/pmezard/go-difflib/difflib",
+			"path": "github.com/pmezard/go-difflib/difflib",
+			"revision": "ef2d0154048f21662542b56ba1d1bd9f82278d2b",
+			"revisionTime": "2018-05-26T10:32:01Z"
+		},
+		{
+			"checksumSHA1": "6LwXZI7kXm1C0h4Ui0Y52p9uQhk=",
+			"path": "github.com/stretchr/testify/assert",
+			"revision": "ef2d0154048f21662542b56ba1d1bd9f82278d2b",
+			"revisionTime": "2018-05-26T10:32:01Z"
+		},
+		{
 			"checksumSHA1": "bMhIYx4Cgl6jit4Y2PW+dKsrFuU=",
 			"path": "golang.org/x/net/publicsuffix",
 			"revision": "4cb1c02c05b0e749b0365f61ae859a8e0cfceed9",
 			"revisionTime": "2018-06-28T17:19:52Z"
+		},
+		{
+			"checksumSHA1": "ZSWoOPUNRr5+3dhkLK3C4cZAQPk=",
+			"path": "gopkg.in/yaml.v2",
+			"revision": "5420a8b6744d3b0345ab293f6fcba19c978f1183",
+			"revisionTime": "2018-03-28T19:50:20Z"
 		}
 	],
 	"rootPath": "github.com/partitio/gonextcloud"
