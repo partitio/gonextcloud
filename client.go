@@ -38,11 +38,11 @@ For example, to list all the Nextcloud's instance users:
 	}
 */
 
-package client
+package gonextcloud
 
 import (
 	req "github.com/levigross/grequests"
-	"github.com/partitio/gonextcloud/client/types"
+	"github.com/partitio/gonextcloud/types"
 	"net/url"
 )
 

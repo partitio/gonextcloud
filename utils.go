@@ -1,7 +1,9 @@
-package client
+package gonextcloud
 
 import (
+	"encoding/json"
 	req "github.com/levigross/grequests"
+	"github.com/partitio/gonextcloud/types"
 	"net/http"
 	"net/url"
 	"path"
@@ -33,6 +35,14 @@ func (c *Client) baseRequest(route *url.URL, name string, subroute string, ro *r
 		res, err = c.session.Delete(u.String(), ro)
 	}
 	if err != nil {
+		return nil, err
+	}
+	// As we cannot read the ReaderCloser twice, we use the string content
+	js := res.String()
+	var r types.BaseResponse
+	json.Unmarshal([]byte(js), &r)
+	if r.Ocs.Meta.Statuscode != 100 {
+		err := types.ErrorFromMeta(r.Ocs.Meta)
 		return nil, err
 	}
 	return res, nil

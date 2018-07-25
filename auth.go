@@ -1,9 +1,9 @@
-package client
+package gonextcloud
 
 import (
 	"fmt"
 	req "github.com/levigross/grequests"
-	"github.com/partitio/gonextcloud/client/types"
+	"github.com/partitio/gonextcloud/types"
 )
 
 var unauthorized = fmt.Errorf("login first")
@@ -24,10 +24,7 @@ func (c *Client) Login(username string, password string) error {
 	}
 	var r types.CapabilitiesResponse
 	res.JSON(&r)
-	if r.Ocs.Meta.Statuscode != 100 {
-		e := types.ErrorFromMeta(r.Ocs.Meta)
-		return &e
-	}
+	// No need to check for Ocs.Meta.StatusCode as capabilities are always returned
 	c.capabilities = &r.Ocs.Data.Capabilities
 	// Check if authentication failed
 	if !c.loggedIn() {
@@ -39,10 +36,16 @@ func (c *Client) Login(username string, password string) error {
 
 func (c *Client) Logout() error {
 	c.session.CloseIdleConnections()
+	c.session.HTTPClient.Jar = nil
+	// Clear capabilities as it is used to check for valid authentication
+	c.capabilities = nil
 	return nil
 }
 
 func (c *Client) loggedIn() bool {
 	// When authentication failed, capabilities doesn't contains core information
+	if c.capabilities == nil {
+		return false
+	}
 	return c.capabilities.Core.WebdavRoot != ""
 }

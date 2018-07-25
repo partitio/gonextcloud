@@ -1,6 +1,6 @@
-package client
+package gonextcloud
 
-import "github.com/partitio/gonextcloud/client/types"
+import "github.com/partitio/gonextcloud/types"
 
 type BaseClient interface {
 	NewClient(hostname string) (*Client, error)

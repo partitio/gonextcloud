@@ -1,0 +1,663 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/partitio/gonextcloud/apps.go (0.0%)</option>
+				
+				<option value="file1">github.com/partitio/gonextcloud/auth.go (100.0%)</option>
+				
+				<option value="file2">github.com/partitio/gonextcloud/client.go (85.7%)</option>
+				
+				<option value="file3">github.com/partitio/gonextcloud/groups.go (39.5%)</option>
+				
+				<option value="file4">github.com/partitio/gonextcloud/users.go (79.2%)</option>
+				
+				<option value="file5">github.com/partitio/gonextcloud/utils.go (100.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">no coverage</span>
+				<span class="cov1">low coverage</span>
+				<span class="cov2">*</span>
+				<span class="cov3">*</span>
+				<span class="cov4">*</span>
+				<span class="cov5">*</span>
+				<span class="cov6">*</span>
+				<span class="cov7">*</span>
+				<span class="cov8">*</span>
+				<span class="cov9">*</span>
+				<span class="cov10">high coverage</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package gonextcloud
+
+import (
+        req "github.com/levigross/grequests"
+        "github.com/partitio/gonextcloud/types"
+)
+
+func (c *Client) AppList() ([]string, error) <span class="cov0" title="0">{
+        if !c.loggedIn() </span><span class="cov0" title="0">{
+                return nil, unauthorized
+        }</span>
+        <span class="cov0" title="0">u := c.baseURL.ResolveReference(routes.apps)
+        res, err := c.session.Get(u.String(), nil)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">var r types.AppListResponse
+        res.JSON(&amp;r)
+        return r.Ocs.Data.Apps, nil
+        return nil, nil</span>
+}
+
+func (c *Client) appsBaseRequest(name string, route string, ro *req.RequestOptions, method string) error <span class="cov0" title="0">{
+        res, err := c.baseRequest(routes.apps, name, route, ro, method)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">var r types.UserResponse
+        res.JSON(&amp;r)
+        if r.Ocs.Meta.Statuscode != 100 </span><span class="cov0" title="0">{
+                e := types.ErrorFromMeta(r.Ocs.Meta)
+                return &amp;e
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package gonextcloud
+
+import (
+        "fmt"
+        req "github.com/levigross/grequests"
+        "github.com/partitio/gonextcloud/types"
+)
+
+var unauthorized = fmt.Errorf("login first")
+
+func (c *Client) Login(username string, password string) error <span class="cov3" title="3">{
+        c.username = username
+        c.password = password
+        options := req.RequestOptions{
+                Headers: c.headers,
+                Auth:    []string{c.username, c.password},
+        }
+        c.session = req.NewSession(&amp;options)
+        // TODO What to do with capabilities ? (other thant connection validation)
+        u := c.baseURL.ResolveReference(routes.capabilities)
+        res, err := c.session.Get(u.String(), nil)
+        if err != nil </span><span class="cov1" title="1">{
+                return err
+        }</span>
+        <span class="cov2" title="2">var r types.CapabilitiesResponse
+        res.JSON(&amp;r)
+        // No need to check for Ocs.Meta.StatusCode as capabilities are always returned
+        c.capabilities = &amp;r.Ocs.Data.Capabilities
+        // Check if authentication failed
+        if !c.loggedIn() </span><span class="cov1" title="1">{
+                e := types.APIError{Message: "authentication failed"}
+                return &amp;e
+        }</span>
+        <span class="cov1" title="1">return nil</span>
+}
+
+func (c *Client) Logout() error <span class="cov1" title="1">{
+        c.session.CloseIdleConnections()
+        c.session.HTTPClient.Jar = nil
+        // Clear capabilities as it is used to check for valid authentication
+        c.capabilities = nil
+        return nil
+}</span>
+
+func (c *Client) loggedIn() bool <span class="cov10" title="39">{
+        // When authentication failed, capabilities doesn't contains core information
+        if c.capabilities == nil </span><span class="cov1" title="1">{
+                return false
+        }</span>
+        <span class="cov9" title="38">return c.capabilities.Core.WebdavRoot != ""</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">/*
+Package client is a Go client for the Nextcloud Provisioning API.
+
+For more information about the Provisioning API, see the documentation:
+https://docs.nextcloud.com/server/13/admin_manual/configuration_user/user_provisioning_api.html
+
+Usage
+
+You use the library by creating a client object and calling methods on it.
+
+For example, to list all the Nextcloud's instance users:
+
+        package main
+
+        import (
+                "fmt"
+                "github.com/partitio/gonextcloud/client"
+        )
+
+        func main() {
+                url := "https://www.mynextcloud.com"
+                username := "admin"
+                password := "password"
+                c, err := client.NewClient(url)
+                if err != nil {
+                        panic(err)
+                }
+                if err := c.Login(username, password); err != nil {
+                        panic(err)
+                }
+                defer c.Logout()
+
+                users, err := c.UserList()
+                if err != nil {
+                        panic(err)
+                }
+                fmt.Println("Users :", users)
+        }
+*/
+
+package gonextcloud
+
+import (
+        req "github.com/levigross/grequests"
+        "github.com/partitio/gonextcloud/types"
+        "net/url"
+)
+
+type Client struct {
+        baseURL      *url.URL
+        username     string
+        password     string
+        session      *req.Session
+        headers      map[string]string
+        capabilities *types.Capabilities
+}
+
+func NewClient(hostname string) (*Client, error) <span class="cov10" title="3">{
+        baseURL, err := url.ParseRequestURI(hostname)
+        if err != nil </span><span class="cov6" title="2">{
+                baseURL, err = url.ParseRequestURI("https://" + hostname)
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+        }
+
+        <span class="cov10" title="3">c := Client{
+                baseURL: baseURL,
+                headers: map[string]string{
+                        "OCS-APIREQUEST": "true",
+                        "Accept":         "application/json",
+                },
+        }
+        return &amp;c, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package gonextcloud
+
+import (
+        req "github.com/levigross/grequests"
+        "github.com/partitio/gonextcloud/types"
+        "net/http"
+)
+
+func (c *Client) GroupList() ([]string, error) <span class="cov1" title="1">{
+        res, err := c.baseRequest(routes.groups, "", "", nil, http.MethodGet)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov1" title="1">var r types.GroupListResponse
+        res.JSON(&amp;r)
+        return r.Ocs.Data.Groups, nil</span>
+}
+
+func (c *Client) GroupUsers(name string) ([]string, error) <span class="cov0" title="0">{
+        res, err := c.baseRequest(routes.groups, name, "", nil, http.MethodGet)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">var r types.UserListResponse
+        res.JSON(&amp;r)
+        return r.Ocs.Data.Users, nil</span>
+}
+
+func (c *Client) GroupSearch(search string) ([]string, error) <span class="cov0" title="0">{
+        ro := &amp;req.RequestOptions{
+                Params: map[string]string{"search": search},
+        }
+        res, err := c.baseRequest(routes.groups, "", "", ro, http.MethodGet)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">var r types.GroupListResponse
+        res.JSON(&amp;r)
+        return r.Ocs.Data.Groups, nil</span>
+}
+
+func (c *Client) GroupCreate(name string) error <span class="cov1" title="1">{
+        ro := &amp;req.RequestOptions{
+                Data: map[string]string{
+                        "groupid": name,
+                },
+        }
+        if err := c.groupBaseRequest("", "", ro, http.MethodPost); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov1" title="1">return nil</span>
+}
+
+func (c *Client) GroupDelete(name string) error <span class="cov1" title="1">{
+        if err := c.groupBaseRequest(name, "", nil, http.MethodDelete); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov1" title="1">return nil</span>
+}
+
+func (c *Client) GroupSubAdminList(name string) ([]string, error) <span class="cov0" title="0">{
+        res, err := c.baseRequest(routes.groups, name, "subadmins", nil, http.MethodGet)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">var r types.UserListResponse
+        res.JSON(&amp;r)
+        return r.Ocs.Data.Users, nil</span>
+}
+
+func (c *Client) groupBaseRequest(name string, route string, ro *req.RequestOptions, method string) error <span class="cov10" title="2">{
+        res, err := c.baseRequest(routes.groups, name, route, ro, method)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov10" title="2">var r types.GroupListResponse
+        res.JSON(&amp;r)
+        return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package gonextcloud
+
+import (
+        "encoding/json"
+        req "github.com/levigross/grequests"
+        "github.com/partitio/gonextcloud/types"
+        "net/http"
+        "path"
+        "strconv"
+)
+
+func (c *Client) UserList() ([]string, error) <span class="cov1" title="1">{
+        if !c.loggedIn() </span><span class="cov0" title="0">{
+                return nil, unauthorized
+        }</span>
+        <span class="cov1" title="1">u := c.baseURL.ResolveReference(routes.users)
+        res, err := c.session.Get(u.String(), nil)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov1" title="1">var r types.UserListResponse
+        res.JSON(&amp;r)
+        return r.Ocs.Data.Users, nil</span>
+}
+
+func (c *Client) User(name string) (*types.User, error) <span class="cov8" title="11">{
+        if name == "" </span><span class="cov1" title="1">{
+                return nil, &amp;types.APIError{Message: "name cannot be empty"}
+        }</span>
+        <span class="cov8" title="10">if !c.loggedIn() </span><span class="cov0" title="0">{
+                return nil, unauthorized
+        }</span>
+        <span class="cov8" title="10">u := c.baseURL.ResolveReference(routes.users)
+        u.Path = path.Join(u.Path, name)
+        res, err := c.session.Get(u.String(), nil)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="10">var r types.UserResponse
+        js := res.String()
+        // Nextcloud does not encode JSON properly
+        js = reformatJSON(js)
+        if err := json.Unmarshal([]byte(js), &amp;r); err != nil </span><span class="cov1" title="1">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="9">if r.Ocs.Meta.Statuscode != 100 </span><span class="cov0" title="0">{
+                e := types.ErrorFromMeta(r.Ocs.Meta)
+                return nil, &amp;e
+        }</span>
+        <span class="cov8" title="9">return &amp;r.Ocs.Data, nil</span>
+}
+
+func (c *Client) UserSearch(search string) ([]string, error) <span class="cov1" title="1">{
+        if !c.loggedIn() </span><span class="cov0" title="0">{
+                return nil, unauthorized
+        }</span>
+        <span class="cov1" title="1">u := c.baseURL.ResolveReference(routes.users)
+        ro := &amp;req.RequestOptions{
+                Params: map[string]string{"search": search},
+        }
+        res, err := c.session.Get(u.String(), ro)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov1" title="1">var r types.UserListResponse
+        res.JSON(&amp;r)
+        if r.Ocs.Meta.Statuscode != 100 </span><span class="cov0" title="0">{
+                e := types.ErrorFromMeta(r.Ocs.Meta)
+                return nil, &amp;e
+        }</span>
+        <span class="cov1" title="1">return r.Ocs.Data.Users, nil</span>
+}
+
+func (c *Client) UserCreate(username string, password string) error <span class="cov3" title="2">{
+        ro := &amp;req.RequestOptions{
+                Data: map[string]string{
+                        "userid":   username,
+                        "password": password,
+                },
+        }
+        return c.userBaseRequest("", "", ro, http.MethodPost)
+}</span>
+
+func (c *Client) UserDelete(name string) error <span class="cov1" title="1">{
+        return c.userBaseRequest(name, "", nil, http.MethodDelete)
+}</span>
+
+func (c *Client) UserEnable(name string) error <span class="cov1" title="1">{
+        ro := &amp;req.RequestOptions{
+                Data: map[string]string{},
+        }
+        return c.userBaseRequest(name, "enable", ro, http.MethodPut)
+}</span>
+
+func (c *Client) UserDisable(name string) error <span class="cov1" title="1">{
+        ro := &amp;req.RequestOptions{
+                Data: map[string]string{},
+        }
+        return c.userBaseRequest(name, "disable", ro, http.MethodPut)
+}</span>
+
+func (c *Client) UserSendWelcomeEmail(name string) error <span class="cov0" title="0">{
+        return c.userBaseRequest(name, "welcome", nil, http.MethodPost)
+}</span>
+
+func (c *Client) UserUpdateEmail(name string, email string) error <span class="cov1" title="1">{
+        return c.userUpdateAttribute(name, "email", email)
+}</span>
+
+func (c *Client) UserUpdateDisplayName(name string, displayName string) error <span class="cov1" title="1">{
+        return c.userUpdateAttribute(name, "displayname", displayName)
+}</span>
+
+func (c *Client) UserUpdatePhone(name string, phone string) error <span class="cov1" title="1">{
+        return c.userUpdateAttribute(name, "phone", phone)
+}</span>
+
+func (c *Client) UserUpdateAddress(name string, address string) error <span class="cov1" title="1">{
+        return c.userUpdateAttribute(name, "address", address)
+}</span>
+
+func (c *Client) UserUpdateWebSite(name string, website string) error <span class="cov1" title="1">{
+        return c.userUpdateAttribute(name, "website", website)
+}</span>
+
+func (c *Client) UserUpdateTwitter(name string, twitter string) error <span class="cov1" title="1">{
+        return c.userUpdateAttribute(name, "twitter", twitter)
+}</span>
+
+func (c *Client) UserUpdatePassword(name string, password string) error <span class="cov1" title="1">{
+        return c.userUpdateAttribute(name, "password", password)
+}</span>
+
+func (c *Client) UserUpdateQuota(name string, quota int) error <span class="cov1" title="1">{
+        return c.userUpdateAttribute(name, "quota", strconv.Itoa(quota))
+}</span>
+
+func (c *Client) UserGroupList(name string) ([]string, error) <span class="cov1" title="1">{
+        if !c.loggedIn() </span><span class="cov0" title="0">{
+                return nil, unauthorized
+        }</span>
+        <span class="cov1" title="1">u := c.baseURL.ResolveReference(routes.users)
+        u.Path = path.Join(u.Path, name, "groups")
+        res, err := c.session.Get(u.String(), nil)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov1" title="1">var r types.GroupListResponse
+        res.JSON(&amp;r)
+        if r.Ocs.Meta.Statuscode != 100 </span><span class="cov0" title="0">{
+                e := types.ErrorFromMeta(r.Ocs.Meta)
+                return nil, &amp;e
+        }</span>
+        <span class="cov1" title="1">return r.Ocs.Data.Groups, nil</span>
+}
+
+func (c *Client) UserGroupAdd(name string, group string) error <span class="cov1" title="1">{
+        ro := &amp;req.RequestOptions{
+                Data: map[string]string{
+                        "groupid": group,
+                },
+        }
+        return c.userBaseRequest(name, "groups", ro, http.MethodPost)
+}</span>
+
+func (c *Client) UserGroupRemove(name string, group string) error <span class="cov0" title="0">{
+        ro := &amp;req.RequestOptions{
+                Data: map[string]string{
+                        "groupid": group,
+                },
+        }
+        return c.userBaseRequest(name, "groups", ro, http.MethodDelete)
+}</span>
+
+func (c *Client) UserGroupPromote(name string, group string) error <span class="cov1" title="1">{
+        ro := &amp;req.RequestOptions{
+                Data: map[string]string{
+                        "groupid": group,
+                },
+        }
+        return c.userBaseRequest(name, "subadmins", ro, http.MethodPost)
+}</span>
+
+func (c *Client) UserGroupDemote(name string, group string) error <span class="cov1" title="1">{
+        ro := &amp;req.RequestOptions{
+                Data: map[string]string{
+                        "groupid": group,
+                },
+        }
+        return c.userBaseRequest(name, "subadmins", ro, http.MethodDelete)
+}</span>
+
+func (c *Client) UserGroupSubAdminList(name string) ([]string, error) <span class="cov3" title="2">{
+        if !c.loggedIn() </span><span class="cov0" title="0">{
+                return nil, unauthorized
+        }</span>
+        <span class="cov3" title="2">u := c.baseURL.ResolveReference(routes.users)
+        u.Path = path.Join(u.Path, name, "subadmins")
+        res, err := c.session.Get(u.String(), nil)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov3" title="2">var r types.BaseResponse
+        res.JSON(&amp;r)
+        if r.Ocs.Meta.Statuscode != 100 </span><span class="cov1" title="1">{
+                e := types.ErrorFromMeta(r.Ocs.Meta)
+                return nil, &amp;e
+        }</span>
+        <span class="cov1" title="1">return r.Ocs.Data, nil</span>
+}
+
+func (c *Client) userUpdateAttribute(name string, key string, value string) error <span class="cov7" title="8">{
+        ro := &amp;req.RequestOptions{
+                Data: map[string]string{
+                        "key":   key,
+                        "value": value,
+                },
+        }
+        return c.userBaseRequest(name, "", ro, http.MethodPut)
+}</span>
+
+func (c *Client) userBaseRequest(name string, route string, ro *req.RequestOptions, method string) error <span class="cov10" title="16">{
+        res, err := c.baseRequest(routes.users, name, route, ro, method)
+        if err != nil </span><span class="cov1" title="1">{
+                return err
+        }</span>
+        <span class="cov9" title="15">var r types.UserResponse
+        res.JSON(&amp;r)
+        if r.Ocs.Meta.Statuscode != 100 </span><span class="cov0" title="0">{
+                e := types.ErrorFromMeta(r.Ocs.Meta)
+                return &amp;e
+        }</span>
+        <span class="cov9" title="15">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package gonextcloud
+
+import (
+        "encoding/json"
+        req "github.com/levigross/grequests"
+        "github.com/partitio/gonextcloud/types"
+        "net/http"
+        "net/url"
+        "path"
+        "strings"
+)
+
+func (c *Client) baseRequest(route *url.URL, name string, subroute string, ro *req.RequestOptions, method string) (*req.Response, error) <span class="cov10" title="21">{
+        if !c.loggedIn() </span><span class="cov1" title="1">{
+                return nil, unauthorized
+        }</span>
+        <span class="cov9" title="20">u := c.baseURL.ResolveReference(route)
+        if name != "" </span><span class="cov9" title="16">{
+                u.Path = path.Join(u.Path, name)
+        }</span>
+        <span class="cov9" title="20">if subroute != "" </span><span class="cov6" title="6">{
+                u.Path = path.Join(u.Path, subroute)
+        }</span>
+        <span class="cov9" title="20">var (
+                res *req.Response
+                err error
+        )
+        if method == http.MethodGet </span><span class="cov3" title="2">{
+                res, err = c.session.Get(u.String(), ro)
+        }</span> else<span class="cov9" title="18"> if method == http.MethodPost </span><span class="cov5" title="5">{
+                res, err = c.session.Post(u.String(), ro)
+        }</span> else<span class="cov8" title="13"> if method == http.MethodPut </span><span class="cov7" title="10">{
+                res, err = c.session.Put(u.String(), ro)
+        }</span> else<span class="cov4" title="3"> if method == http.MethodDelete </span><span class="cov4" title="3">{
+                res, err = c.session.Delete(u.String(), ro)
+        }</span>
+        <span class="cov9" title="20">if err != nil </span><span class="cov1" title="1">{
+                return nil, err
+        }</span>
+        // As we cannot read the ReaderCloser twice, we use the string content
+        <span class="cov9" title="19">js := res.String()
+        var r types.BaseResponse
+        json.Unmarshal([]byte(js), &amp;r)
+        if r.Ocs.Meta.Statuscode != 100 </span><span class="cov1" title="1">{
+                err := types.ErrorFromMeta(r.Ocs.Meta)
+                return nil, &amp;err
+        }</span>
+        <span class="cov9" title="18">return res, nil</span>
+}
+
+func reformatJSON(json string) string <span class="cov7" title="10">{
+        // Nextcloud encode boolean as string
+        json = strings.Replace(json, "\"true\"", "true", -1)
+        json = strings.Replace(json, "\"false\"", "false", -1)
+        // Nextcloud encode quota as an empty array for never connected users
+        json = strings.Replace(json, "\"quota\":[],", "", -1)
+        return json
+}</span>
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

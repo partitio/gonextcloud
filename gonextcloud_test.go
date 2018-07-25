@@ -1,16 +1,23 @@
 package gonextcloud
 
 import (
-	"github.com/partitio/gonextcloud/client"
+	"fmt"
+	"github.com/fatih/structs"
+	"github.com/partitio/gonextcloud/types"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
+	"net/http"
+	"net/url"
 	"os"
+	"strings"
 	"testing"
 )
 
 var config = Config{}
-var c *client.Client
+var c *Client
+
+const password = "somecomplicatedpassword"
 
 type Config struct {
 	URL              string   `yaml:"url"`
@@ -37,10 +44,6 @@ func LoadConfig() error {
 	return nil
 }
 
-func TestTruth(t *testing.T) {
-	assert.Equal(t, true, true, "seriously ??!")
-}
-
 func TestLoadConfig(t *testing.T) {
 	err := LoadConfig()
 	assert.Nil(t, err)
@@ -48,13 +51,13 @@ func TestLoadConfig(t *testing.T) {
 
 func TestClient(t *testing.T) {
 	var err error
-	c, err = client.NewClient(config.URL)
+	c, err = NewClient(config.URL)
 	assert.Nil(t, err, "aie")
 }
 
 func TestLoginFail(t *testing.T) {
 	err := c.Login("", "")
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 }
 
 func TestLogin(t *testing.T) {
@@ -77,13 +80,13 @@ func TestExistingUser(t *testing.T) {
 
 func TestEmptyUser(t *testing.T) {
 	u, err := c.User("")
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	assert.Empty(t, u)
 }
 
 func TestNonExistingUser(t *testing.T) {
 	_, err := c.User(config.NotExistingUser)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 }
 
 func TestUserSearch(t *testing.T) {
@@ -93,12 +96,76 @@ func TestUserSearch(t *testing.T) {
 }
 
 func TestUserCreate(t *testing.T) {
-	err := c.UserCreate(config.NotExistingUser, "somecomplicatedpassword")
+	err := c.UserCreate(config.NotExistingUser, password, nil)
+	assert.Nil(t, err)
+}
+
+func TestUserCreateFull(t *testing.T) {
+	if err := initClient(); err != nil {
+		return
+	}
+	username := fmt.Sprintf("%s-2", config.NotExistingUser)
+	user := &types.User{
+		ID:          username,
+		Displayname: strings.ToUpper(username),
+		Email:       "some@address.com",
+		Address:     "Main Street, City",
+		Twitter:     "@me",
+		Phone:       "42 42 242 424",
+		Website:     "my.site.com",
+	}
+	err := c.UserCreate(username, password, user)
+	assert.Nil(t, err)
+	u, err := c.User(username)
+	assert.Nil(t, err)
+	o := structs.Map(user)
+	r := structs.Map(u)
+	for k := range o {
+		if ignoredUserField(k) {
+			continue
+		}
+		assert.Equal(t, o[k], r[k])
+	}
+	// Clean up
+	err = c.UserDelete(u.ID)
+	assert.Nil(t, err)
+}
+
+func TestUserUpdate(t *testing.T) {
+	if err := initClient(); err != nil {
+		return
+	}
+	username := fmt.Sprintf("%s-2", config.NotExistingUser)
+	err := c.UserCreate(username, password, nil)
+	assert.Nil(t, err)
+	user := &types.User{
+		ID:          username,
+		Displayname: strings.ToUpper(username),
+		Email:       "some@address.com",
+		Address:     "Main Street, City",
+		Twitter:     "@me",
+		Phone:       "42 42 242 424",
+		Website:     "my.site.com",
+	}
+	err = c.UserUpdate(user)
+	assert.Nil(t, err)
+	u, err := c.User(username)
+	assert.Nil(t, err)
+	o := structs.Map(user)
+	r := structs.Map(u)
+	for k := range o {
+		if ignoredUserField(k) {
+			continue
+		}
+		assert.Equal(t, o[k], r[k])
+	}
+	// Clean up
+	err = c.UserDelete(u.ID)
 	assert.Nil(t, err)
 }
 
 func TestUserCreateExisting(t *testing.T) {
-	err := c.UserCreate(config.NotExistingUser, "somecomplicatedpassword")
+	err := c.UserCreate(config.NotExistingUser, password, nil)
 	assert.NotNil(t, err)
 }
 
@@ -193,7 +260,7 @@ func TestUserGroupAdd(t *testing.T) {
 
 func TestUserGroupSubAdminList(t *testing.T) {
 	gs, err := c.UserGroupSubAdminList(config.NotExistingUser)
-	assert.NotNil(t, err)
+	assert.Nil(t, err)
 	assert.Empty(t, gs)
 }
 
@@ -239,7 +306,49 @@ func TestUserDelete(t *testing.T) {
 	assert.Nil(t, err)
 }
 
+func TestInvalidBaseRequest(t *testing.T) {
+	c.baseURL = &url.URL{}
+	_, err := c.baseRequest(routes.capabilities, "admin", "invalid", nil, http.MethodGet)
+	assert.Error(t, err)
+}
+
 func TestLogout(t *testing.T) {
 	err := c.Logout()
 	assert.Nil(t, err)
+	assert.Nil(t, c.session.HTTPClient.Jar)
+}
+
+func TestLoggedIn(t *testing.T) {
+	c := &Client{}
+	c.capabilities = &types.Capabilities{}
+	assert.False(t, c.loggedIn())
+}
+
+func TestLoginInvalidURL(t *testing.T) {
+	c, _ = NewClient("")
+	err := c.Login("", "")
+	assert.Error(t, err)
+}
+
+func TestBaseRequest(t *testing.T) {
+	c, _ = NewClient("")
+	_, err := c.baseRequest(routes.capabilities, "admin", "invalid", nil, http.MethodGet)
+	assert.Error(t, err)
+}
+
+func initClient() error {
+	if c == nil {
+		if err := LoadConfig(); err != nil {
+			return err
+		}
+		var err error
+		c, err = NewClient(config.URL)
+		if err != nil {
+			return err
+		}
+		if err = c.Login(config.Login, config.Password); err != nil {
+			return err
+		}
+	}
+	return nil
 }

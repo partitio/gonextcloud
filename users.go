@@ -1,20 +1,20 @@
-package client
+package gonextcloud
 
 import (
 	"encoding/json"
+	"github.com/fatih/structs"
 	req "github.com/levigross/grequests"
-	"github.com/partitio/gonextcloud/client/types"
+	"github.com/partitio/gonextcloud/types"
 	"net/http"
 	"path"
 	"strconv"
+	"strings"
+	"sync"
 )
 
 func (c *Client) UserList() ([]string, error) {
-	if !c.loggedIn() {
-		return nil, unauthorized
-	}
-	u := c.baseURL.ResolveReference(routes.users)
-	res, err := c.session.Get(u.String(), nil)
+	res, err := c.baseRequest(routes.users, "", "", nil, http.MethodGet)
+	//res, err := c.session.Get(u.String(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -27,12 +27,7 @@ func (c *Client) User(name string) (*types.User, error) {
 	if name == "" {
 		return nil, &types.APIError{Message: "name cannot be empty"}
 	}
-	if !c.loggedIn() {
-		return nil, unauthorized
-	}
-	u := c.baseURL.ResolveReference(routes.users)
-	u.Path = path.Join(u.Path, name)
-	res, err := c.session.Get(u.String(), nil)
+	res, err := c.baseRequest(routes.users, name, "", nil, http.MethodGet)
 	if err != nil {
 		return nil, err
 	}
@@ -43,42 +38,36 @@ func (c *Client) User(name string) (*types.User, error) {
 	if err := json.Unmarshal([]byte(js), &r); err != nil {
 		return nil, err
 	}
-	if r.Ocs.Meta.Statuscode != 100 {
-		e := types.ErrorFromMeta(r.Ocs.Meta)
-		return nil, &e
-	}
 	return &r.Ocs.Data, nil
 }
 
 func (c *Client) UserSearch(search string) ([]string, error) {
-	if !c.loggedIn() {
-		return nil, unauthorized
-	}
-	u := c.baseURL.ResolveReference(routes.users)
 	ro := &req.RequestOptions{
 		Params: map[string]string{"search": search},
 	}
-	res, err := c.session.Get(u.String(), ro)
+	res, err := c.baseRequest(routes.users, "", "", ro, http.MethodGet)
 	if err != nil {
 		return nil, err
 	}
 	var r types.UserListResponse
 	res.JSON(&r)
-	if r.Ocs.Meta.Statuscode != 100 {
-		e := types.ErrorFromMeta(r.Ocs.Meta)
-		return nil, &e
-	}
 	return r.Ocs.Data.Users, nil
 }
 
-func (c *Client) UserCreate(username string, password string) error {
+func (c *Client) UserCreate(username string, password string, user *types.User) error {
 	ro := &req.RequestOptions{
 		Data: map[string]string{
 			"userid":   username,
 			"password": password,
 		},
 	}
-	return c.userBaseRequest("", "", ro, http.MethodPost)
+	if err := c.userBaseRequest("", "", ro, http.MethodPost); err != nil {
+		return err
+	}
+	if user == nil {
+		return nil
+	}
+	return c.UserUpdate(user)
 }
 
 func (c *Client) UserDelete(name string) error {
@@ -101,6 +90,31 @@ func (c *Client) UserDisable(name string) error {
 
 func (c *Client) UserSendWelcomeEmail(name string) error {
 	return c.userBaseRequest(name, "welcome", nil, http.MethodPost)
+}
+
+func (c *Client) UserUpdate(user *types.User) error {
+	m := structs.Map(user)
+	errs := make(chan types.UpdateError)
+	var wg sync.WaitGroup
+	for k := range m {
+		if !ignoredUserField(k) && m[k].(string) != "" {
+			wg.Add(1)
+			go func(key string, value string) {
+				defer wg.Done()
+				if err := c.userUpdateAttribute(user.ID, strings.ToLower(key), value); err != nil {
+					errs <- types.UpdateError{
+						Field: key,
+						Error: err,
+					}
+				}
+			}(k, m[k].(string))
+		}
+	}
+	go func() {
+		wg.Wait()
+		close(errs)
+	}()
+	return types.NewUpdateError(errs)
 }
 
 func (c *Client) UserUpdateEmail(name string, email string) error {
@@ -136,21 +150,12 @@ func (c *Client) UserUpdateQuota(name string, quota int) error {
 }
 
 func (c *Client) UserGroupList(name string) ([]string, error) {
-	if !c.loggedIn() {
-		return nil, unauthorized
-	}
-	u := c.baseURL.ResolveReference(routes.users)
-	u.Path = path.Join(u.Path, name, "groups")
-	res, err := c.session.Get(u.String(), nil)
+	res, err := c.baseRequest(routes.users, name, "groups", nil, http.MethodGet)
 	if err != nil {
 		return nil, err
 	}
 	var r types.GroupListResponse
 	res.JSON(&r)
-	if r.Ocs.Meta.Statuscode != 100 {
-		e := types.ErrorFromMeta(r.Ocs.Meta)
-		return nil, &e
-	}
 	return r.Ocs.Data.Groups, nil
 }
 
@@ -202,10 +207,6 @@ func (c *Client) UserGroupSubAdminList(name string) ([]string, error) {
 	}
 	var r types.BaseResponse
 	res.JSON(&r)
-	if r.Ocs.Meta.Statuscode != 100 {
-		e := types.ErrorFromMeta(r.Ocs.Meta)
-		return nil, &e
-	}
 	return r.Ocs.Data, nil
 }
 
@@ -220,15 +221,16 @@ func (c *Client) userUpdateAttribute(name string, key string, value string) erro
 }
 
 func (c *Client) userBaseRequest(name string, route string, ro *req.RequestOptions, method string) error {
-	res, err := c.baseRequest(routes.users, name, route, ro, method)
-	if err != nil {
-		return err
+	_, err := c.baseRequest(routes.users, name, route, ro, method)
+	return err
+}
+
+func ignoredUserField(key string) bool {
+	keys := []string{"ID", "Quota", "Enabled", "Groups", "Language"}
+	for _, k := range keys {
+		if key == k {
+			return true
+		}
 	}
-	var r types.UserResponse
-	res.JSON(&r)
-	if r.Ocs.Meta.Statuscode != 100 {
-		e := types.ErrorFromMeta(r.Ocs.Meta)
-		return &e
-	}
-	return nil
+	return false
 }

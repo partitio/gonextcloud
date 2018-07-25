@@ -1,4 +1,4 @@
-package client
+package gonextcloud
 
 import "net/url"
 

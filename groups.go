@@ -1,8 +1,8 @@
-package client
+package gonextcloud
 
 import (
 	req "github.com/levigross/grequests"
-	"github.com/partitio/gonextcloud/client/types"
+	"github.com/partitio/gonextcloud/types"
 	"net/http"
 )
 
@@ -13,10 +13,6 @@ func (c *Client) GroupList() ([]string, error) {
 	}
 	var r types.GroupListResponse
 	res.JSON(&r)
-	if r.Ocs.Meta.Statuscode != 100 {
-		e := types.ErrorFromMeta(r.Ocs.Meta)
-		return nil, &e
-	}
 	return r.Ocs.Data.Groups, nil
 }
 
@@ -27,10 +23,6 @@ func (c *Client) GroupUsers(name string) ([]string, error) {
 	}
 	var r types.UserListResponse
 	res.JSON(&r)
-	if r.Ocs.Meta.Statuscode != 100 {
-		e := types.ErrorFromMeta(r.Ocs.Meta)
-		return nil, &e
-	}
 	return r.Ocs.Data.Users, nil
 }
 
@@ -44,10 +36,6 @@ func (c *Client) GroupSearch(search string) ([]string, error) {
 	}
 	var r types.GroupListResponse
 	res.JSON(&r)
-	if r.Ocs.Meta.Statuscode != 100 {
-		e := types.ErrorFromMeta(r.Ocs.Meta)
-		return nil, &e
-	}
 	return r.Ocs.Data.Groups, nil
 }
 
@@ -77,23 +65,10 @@ func (c *Client) GroupSubAdminList(name string) ([]string, error) {
 	}
 	var r types.UserListResponse
 	res.JSON(&r)
-	if r.Ocs.Meta.Statuscode != 100 {
-		e := types.ErrorFromMeta(r.Ocs.Meta)
-		return nil, &e
-	}
 	return r.Ocs.Data.Users, nil
 }
 
 func (c *Client) groupBaseRequest(name string, route string, ro *req.RequestOptions, method string) error {
-	res, err := c.baseRequest(routes.groups, name, route, ro, method)
-	if err != nil {
-		return err
-	}
-	var r types.GroupListResponse
-	res.JSON(&r)
-	if r.Ocs.Meta.Statuscode != 100 {
-		e := types.ErrorFromMeta(r.Ocs.Meta)
-		return &e
-	}
-	return nil
+	_, err := c.baseRequest(routes.groups, name, route, ro, method)
+	return err
 }
