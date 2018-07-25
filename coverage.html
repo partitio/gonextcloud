@@ -60,9 +60,9 @@
 				
 				<option value="file2">github.com/partitio/gonextcloud/client.go (85.7%)</option>
 				
-				<option value="file3">github.com/partitio/gonextcloud/groups.go (39.5%)</option>
+				<option value="file3">github.com/partitio/gonextcloud/groups.go (35.3%)</option>
 				
-				<option value="file4">github.com/partitio/gonextcloud/users.go (79.2%)</option>
+				<option value="file4">github.com/partitio/gonextcloud/users.go (89.0%)</option>
 				
 				<option value="file5">github.com/partitio/gonextcloud/utils.go (100.0%)</option>
 				
@@ -92,36 +92,79 @@
 import (
         req "github.com/levigross/grequests"
         "github.com/partitio/gonextcloud/types"
+        "net/http"
 )
 
 func (c *Client) AppList() ([]string, error) <span class="cov0" title="0">{
-        if !c.loggedIn() </span><span class="cov0" title="0">{
-                return nil, unauthorized
-        }</span>
-        <span class="cov0" title="0">u := c.baseURL.ResolveReference(routes.apps)
-        res, err := c.session.Get(u.String(), nil)
+        res, err := c.baseRequest(routes.apps, "", "", nil, http.MethodGet)
         if err != nil </span><span class="cov0" title="0">{
                 return nil, err
         }</span>
         <span class="cov0" title="0">var r types.AppListResponse
         res.JSON(&amp;r)
-        return r.Ocs.Data.Apps, nil
-        return nil, nil</span>
+        return r.Ocs.Data.Apps, nil</span>
 }
 
-func (c *Client) appsBaseRequest(name string, route string, ro *req.RequestOptions, method string) error <span class="cov0" title="0">{
-        res, err := c.baseRequest(routes.apps, name, route, ro, method)
+func (c *Client) AppListEnabled() ([]string, error) <span class="cov0" title="0">{
+        ro := &amp;req.RequestOptions{
+                Params: map[string]string{"filter": "enabled"},
+        }
+        res, err := c.baseRequest(routes.apps, "", "", ro, http.MethodGet)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">var r types.AppListResponse
+        res.JSON(&amp;r)
+        return r.Ocs.Data.Apps, nil</span>
+}
+
+func (c *Client) AppListDisabled() ([]string, error) <span class="cov0" title="0">{
+        ro := &amp;req.RequestOptions{
+                Params: map[string]string{"filter": "disabled"},
+        }
+        res, err := c.baseRequest(routes.apps, "", "", ro, http.MethodGet)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">var r types.AppListResponse
+        res.JSON(&amp;r)
+        return r.Ocs.Data.Apps, nil</span>
+}
+
+func (c *Client) AppInfos(name string) (types.App, error) <span class="cov0" title="0">{
+        res, err := c.baseRequest(routes.apps, name, "", nil, http.MethodGet)
+        if err != nil </span><span class="cov0" title="0">{
+                return types.App{}, err
+        }</span>
+        <span class="cov0" title="0">var r types.AppResponse
+        res.JSON(&amp;r)
+        return r.Ocs.Data, nil</span>
+}
+
+func (c *Client) AppEnable(name string) error <span class="cov0" title="0">{
+        res, err := c.baseRequest(routes.apps, name, "", nil, http.MethodPut)
         if err != nil </span><span class="cov0" title="0">{
                 return err
         }</span>
-        <span class="cov0" title="0">var r types.UserResponse
+        <span class="cov0" title="0">var r types.BaseResponse
         res.JSON(&amp;r)
-        if r.Ocs.Meta.Statuscode != 100 </span><span class="cov0" title="0">{
-                e := types.ErrorFromMeta(r.Ocs.Meta)
-                return &amp;e
-        }</span>
-        <span class="cov0" title="0">return nil</span>
+        return nil</span>
 }
+
+func (c *Client) AppDisable(name string) error <span class="cov0" title="0">{
+        res, err := c.baseRequest(routes.apps, name, "", nil, http.MethodDelete)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">var r types.BaseResponse
+        res.JSON(&amp;r)
+        return nil</span>
+}
+
+func (c *Client) appsBaseRequest(name string, route string, ro *req.RequestOptions, method string) error <span class="cov0" title="0">{
+        _, err := c.baseRequest(routes.apps, name, route, ro, method)
+        return err
+}</span>
 </pre>
 		
 		<pre class="file" id="file1" style="display: none">package gonextcloud
@@ -168,12 +211,12 @@ func (c *Client) Logout() error <span class="cov1" title="1">{
         return nil
 }</span>
 
-func (c *Client) loggedIn() bool <span class="cov10" title="39">{
+func (c *Client) loggedIn() bool <span class="cov10" title="57">{
         // When authentication failed, capabilities doesn't contains core information
         if c.capabilities == nil </span><span class="cov1" title="1">{
                 return false
         }</span>
-        <span class="cov9" title="38">return c.capabilities.Core.WebdavRoot != ""</span>
+        <span class="cov9" title="56">return c.capabilities.Core.WebdavRoot != ""</span>
 }
 </pre>
 		
@@ -325,33 +368,28 @@ func (c *Client) GroupSubAdminList(name string) ([]string, error) <span class="c
 }
 
 func (c *Client) groupBaseRequest(name string, route string, ro *req.RequestOptions, method string) error <span class="cov10" title="2">{
-        res, err := c.baseRequest(routes.groups, name, route, ro, method)
-        if err != nil </span><span class="cov0" title="0">{
-                return err
-        }</span>
-        <span class="cov10" title="2">var r types.GroupListResponse
-        res.JSON(&amp;r)
-        return nil</span>
-}
+        _, err := c.baseRequest(routes.groups, name, route, ro, method)
+        return err
+}</span>
 </pre>
 		
 		<pre class="file" id="file4" style="display: none">package gonextcloud
 
 import (
         "encoding/json"
+        "github.com/fatih/structs"
         req "github.com/levigross/grequests"
         "github.com/partitio/gonextcloud/types"
         "net/http"
         "path"
         "strconv"
+        "strings"
+        "sync"
 )
 
 func (c *Client) UserList() ([]string, error) <span class="cov1" title="1">{
-        if !c.loggedIn() </span><span class="cov0" title="0">{
-                return nil, unauthorized
-        }</span>
-        <span class="cov1" title="1">u := c.baseURL.ResolveReference(routes.users)
-        res, err := c.session.Get(u.String(), nil)
+        res, err := c.baseRequest(routes.users, "", "", nil, http.MethodGet)
+        //res, err := c.session.Get(u.String(), nil)
         if err != nil </span><span class="cov0" title="0">{
                 return nil, err
         }</span>
@@ -360,65 +398,54 @@ func (c *Client) UserList() ([]string, error) <span class="cov1" title="1">{
         return r.Ocs.Data.Users, nil</span>
 }
 
-func (c *Client) User(name string) (*types.User, error) <span class="cov8" title="11">{
+func (c *Client) User(name string) (*types.User, error) <span class="cov5" title="13">{
         if name == "" </span><span class="cov1" title="1">{
                 return nil, &amp;types.APIError{Message: "name cannot be empty"}
         }</span>
-        <span class="cov8" title="10">if !c.loggedIn() </span><span class="cov0" title="0">{
-                return nil, unauthorized
-        }</span>
-        <span class="cov8" title="10">u := c.baseURL.ResolveReference(routes.users)
-        u.Path = path.Join(u.Path, name)
-        res, err := c.session.Get(u.String(), nil)
-        if err != nil </span><span class="cov0" title="0">{
+        <span class="cov5" title="12">res, err := c.baseRequest(routes.users, name, "", nil, http.MethodGet)
+        if err != nil </span><span class="cov1" title="1">{
                 return nil, err
         }</span>
-        <span class="cov8" title="10">var r types.UserResponse
+        <span class="cov5" title="11">var r types.UserResponse
         js := res.String()
         // Nextcloud does not encode JSON properly
         js = reformatJSON(js)
-        if err := json.Unmarshal([]byte(js), &amp;r); err != nil </span><span class="cov1" title="1">{
+        if err := json.Unmarshal([]byte(js), &amp;r); err != nil </span><span class="cov0" title="0">{
                 return nil, err
         }</span>
-        <span class="cov8" title="9">if r.Ocs.Meta.Statuscode != 100 </span><span class="cov0" title="0">{
-                e := types.ErrorFromMeta(r.Ocs.Meta)
-                return nil, &amp;e
-        }</span>
-        <span class="cov8" title="9">return &amp;r.Ocs.Data, nil</span>
+        <span class="cov5" title="11">return &amp;r.Ocs.Data, nil</span>
 }
 
 func (c *Client) UserSearch(search string) ([]string, error) <span class="cov1" title="1">{
-        if !c.loggedIn() </span><span class="cov0" title="0">{
-                return nil, unauthorized
-        }</span>
-        <span class="cov1" title="1">u := c.baseURL.ResolveReference(routes.users)
         ro := &amp;req.RequestOptions{
                 Params: map[string]string{"search": search},
         }
-        res, err := c.session.Get(u.String(), ro)
+        res, err := c.baseRequest(routes.users, "", "", ro, http.MethodGet)
         if err != nil </span><span class="cov0" title="0">{
                 return nil, err
         }</span>
         <span class="cov1" title="1">var r types.UserListResponse
         res.JSON(&amp;r)
-        if r.Ocs.Meta.Statuscode != 100 </span><span class="cov0" title="0">{
-                e := types.ErrorFromMeta(r.Ocs.Meta)
-                return nil, &amp;e
-        }</span>
-        <span class="cov1" title="1">return r.Ocs.Data.Users, nil</span>
+        return r.Ocs.Data.Users, nil</span>
 }
 
-func (c *Client) UserCreate(username string, password string) error <span class="cov3" title="2">{
+func (c *Client) UserCreate(username string, password string, user *types.User) error <span class="cov3" title="4">{
         ro := &amp;req.RequestOptions{
                 Data: map[string]string{
                         "userid":   username,
                         "password": password,
                 },
         }
-        return c.userBaseRequest("", "", ro, http.MethodPost)
-}</span>
+        if err := c.userBaseRequest("", "", ro, http.MethodPost); err != nil </span><span class="cov1" title="1">{
+                return err
+        }</span>
+        <span class="cov2" title="3">if user == nil </span><span class="cov2" title="2">{
+                return nil
+        }</span>
+        <span class="cov1" title="1">return c.UserUpdate(user)</span>
+}
 
-func (c *Client) UserDelete(name string) error <span class="cov1" title="1">{
+func (c *Client) UserDelete(name string) error <span class="cov2" title="3">{
         return c.userBaseRequest(name, "", nil, http.MethodDelete)
 }</span>
 
@@ -439,6 +466,31 @@ func (c *Client) UserDisable(name string) error <span class="cov1" title="1">{
 func (c *Client) UserSendWelcomeEmail(name string) error <span class="cov0" title="0">{
         return c.userBaseRequest(name, "welcome", nil, http.MethodPost)
 }</span>
+
+func (c *Client) UserUpdate(user *types.User) error <span class="cov2" title="2">{
+        m := structs.Map(user)
+        errs := make(chan types.UpdateError)
+        var wg sync.WaitGroup
+        for k := range m </span><span class="cov6" title="22">{
+                if !ignoredUserField(k) &amp;&amp; m[k].(string) != "" </span><span class="cov5" title="12">{
+                        wg.Add(1)
+                        go func(key string, value string) </span><span class="cov5" title="12">{
+                                defer wg.Done()
+                                if err := c.userUpdateAttribute(user.ID, strings.ToLower(key), value); err != nil </span><span class="cov0" title="0">{
+                                        errs &lt;- types.UpdateError{
+                                                Field: key,
+                                                Error: err,
+                                        }
+                                }</span>
+                        }(k, m[k].(string))
+                }
+        }
+        <span class="cov2" title="2">go func() </span><span class="cov2" title="2">{
+                wg.Wait()
+                close(errs)
+        }</span>()
+        <span class="cov2" title="2">return types.NewUpdateError(errs)</span>
+}
 
 func (c *Client) UserUpdateEmail(name string, email string) error <span class="cov1" title="1">{
         return c.userUpdateAttribute(name, "email", email)
@@ -473,22 +525,13 @@ func (c *Client) UserUpdateQuota(name string, quota int) error <span class="cov1
 }</span>
 
 func (c *Client) UserGroupList(name string) ([]string, error) <span class="cov1" title="1">{
-        if !c.loggedIn() </span><span class="cov0" title="0">{
-                return nil, unauthorized
-        }</span>
-        <span class="cov1" title="1">u := c.baseURL.ResolveReference(routes.users)
-        u.Path = path.Join(u.Path, name, "groups")
-        res, err := c.session.Get(u.String(), nil)
+        res, err := c.baseRequest(routes.users, name, "groups", nil, http.MethodGet)
         if err != nil </span><span class="cov0" title="0">{
                 return nil, err
         }</span>
         <span class="cov1" title="1">var r types.GroupListResponse
         res.JSON(&amp;r)
-        if r.Ocs.Meta.Statuscode != 100 </span><span class="cov0" title="0">{
-                e := types.ErrorFromMeta(r.Ocs.Meta)
-                return nil, &amp;e
-        }</span>
-        <span class="cov1" title="1">return r.Ocs.Data.Groups, nil</span>
+        return r.Ocs.Data.Groups, nil</span>
 }
 
 func (c *Client) UserGroupAdd(name string, group string) error <span class="cov1" title="1">{
@@ -527,26 +570,22 @@ func (c *Client) UserGroupDemote(name string, group string) error <span class="c
         return c.userBaseRequest(name, "subadmins", ro, http.MethodDelete)
 }</span>
 
-func (c *Client) UserGroupSubAdminList(name string) ([]string, error) <span class="cov3" title="2">{
+func (c *Client) UserGroupSubAdminList(name string) ([]string, error) <span class="cov2" title="2">{
         if !c.loggedIn() </span><span class="cov0" title="0">{
                 return nil, unauthorized
         }</span>
-        <span class="cov3" title="2">u := c.baseURL.ResolveReference(routes.users)
+        <span class="cov2" title="2">u := c.baseURL.ResolveReference(routes.users)
         u.Path = path.Join(u.Path, name, "subadmins")
         res, err := c.session.Get(u.String(), nil)
         if err != nil </span><span class="cov0" title="0">{
                 return nil, err
         }</span>
-        <span class="cov3" title="2">var r types.BaseResponse
+        <span class="cov2" title="2">var r types.BaseResponse
         res.JSON(&amp;r)
-        if r.Ocs.Meta.Statuscode != 100 </span><span class="cov1" title="1">{
-                e := types.ErrorFromMeta(r.Ocs.Meta)
-                return nil, &amp;e
-        }</span>
-        <span class="cov1" title="1">return r.Ocs.Data, nil</span>
+        return r.Ocs.Data, nil</span>
 }
 
-func (c *Client) userUpdateAttribute(name string, key string, value string) error <span class="cov7" title="8">{
+func (c *Client) userUpdateAttribute(name string, key string, value string) error <span class="cov6" title="20">{
         ro := &amp;req.RequestOptions{
                 Data: map[string]string{
                         "key":   key,
@@ -556,18 +595,19 @@ func (c *Client) userUpdateAttribute(name string, key string, value string) erro
         return c.userBaseRequest(name, "", ro, http.MethodPut)
 }</span>
 
-func (c *Client) userBaseRequest(name string, route string, ro *req.RequestOptions, method string) error <span class="cov10" title="16">{
-        res, err := c.baseRequest(routes.users, name, route, ro, method)
-        if err != nil </span><span class="cov1" title="1">{
-                return err
-        }</span>
-        <span class="cov9" title="15">var r types.UserResponse
-        res.JSON(&amp;r)
-        if r.Ocs.Meta.Statuscode != 100 </span><span class="cov0" title="0">{
-                e := types.ErrorFromMeta(r.Ocs.Meta)
-                return &amp;e
-        }</span>
-        <span class="cov9" title="15">return nil</span>
+func (c *Client) userBaseRequest(name string, route string, ro *req.RequestOptions, method string) error <span class="cov7" title="32">{
+        _, err := c.baseRequest(routes.users, name, route, ro, method)
+        return err
+}</span>
+
+func ignoredUserField(key string) bool <span class="cov7" title="44">{
+        keys := []string{"ID", "Quota", "Enabled", "Groups", "Language"}
+        for _, k := range keys </span><span class="cov10" title="180">{
+                if key == k </span><span class="cov6" title="20">{
+                        return true
+                }</span>
+        }
+        <span class="cov6" title="24">return false</span>
 }
 </pre>
 		
@@ -583,45 +623,45 @@ import (
         "strings"
 )
 
-func (c *Client) baseRequest(route *url.URL, name string, subroute string, ro *req.RequestOptions, method string) (*req.Response, error) <span class="cov10" title="21">{
+func (c *Client) baseRequest(route *url.URL, name string, subroute string, ro *req.RequestOptions, method string) (*req.Response, error) <span class="cov10" title="52">{
         if !c.loggedIn() </span><span class="cov1" title="1">{
                 return nil, unauthorized
         }</span>
-        <span class="cov9" title="20">u := c.baseURL.ResolveReference(route)
-        if name != "" </span><span class="cov9" title="16">{
+        <span class="cov9" title="51">u := c.baseURL.ResolveReference(route)
+        if name != "" </span><span class="cov9" title="42">{
                 u.Path = path.Join(u.Path, name)
         }</span>
-        <span class="cov9" title="20">if subroute != "" </span><span class="cov6" title="6">{
+        <span class="cov9" title="51">if subroute != "" </span><span class="cov5" title="7">{
                 u.Path = path.Join(u.Path, subroute)
         }</span>
-        <span class="cov9" title="20">var (
+        <span class="cov9" title="51">var (
                 res *req.Response
                 err error
         )
-        if method == http.MethodGet </span><span class="cov3" title="2">{
+        if method == http.MethodGet </span><span class="cov7" title="17">{
                 res, err = c.session.Get(u.String(), ro)
-        }</span> else<span class="cov9" title="18"> if method == http.MethodPost </span><span class="cov5" title="5">{
+        }</span> else<span class="cov9" title="34"> if method == http.MethodPost </span><span class="cov5" title="7">{
                 res, err = c.session.Post(u.String(), ro)
-        }</span> else<span class="cov8" title="13"> if method == http.MethodPut </span><span class="cov7" title="10">{
+        }</span> else<span class="cov8" title="27"> if method == http.MethodPut </span><span class="cov8" title="22">{
                 res, err = c.session.Put(u.String(), ro)
-        }</span> else<span class="cov4" title="3"> if method == http.MethodDelete </span><span class="cov4" title="3">{
+        }</span> else<span class="cov4" title="5"> if method == http.MethodDelete </span><span class="cov4" title="5">{
                 res, err = c.session.Delete(u.String(), ro)
         }</span>
-        <span class="cov9" title="20">if err != nil </span><span class="cov1" title="1">{
+        <span class="cov9" title="51">if err != nil </span><span class="cov1" title="1">{
                 return nil, err
         }</span>
         // As we cannot read the ReaderCloser twice, we use the string content
-        <span class="cov9" title="19">js := res.String()
+        <span class="cov9" title="50">js := res.String()
         var r types.BaseResponse
         json.Unmarshal([]byte(js), &amp;r)
-        if r.Ocs.Meta.Statuscode != 100 </span><span class="cov1" title="1">{
+        if r.Ocs.Meta.Statuscode != 100 </span><span class="cov2" title="2">{
                 err := types.ErrorFromMeta(r.Ocs.Meta)
-                return nil, &amp;err
+                return nil, err
         }</span>
-        <span class="cov9" title="18">return res, nil</span>
+        <span class="cov9" title="48">return res, nil</span>
 }
 
-func reformatJSON(json string) string <span class="cov7" title="10">{
+func reformatJSON(json string) string <span class="cov6" title="11">{
         // Nextcloud encode boolean as string
         json = strings.Replace(json, "\"true\"", "true", -1)
         json = strings.Replace(json, "\"false\"", "false", -1)
