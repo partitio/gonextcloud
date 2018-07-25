@@ -2,58 +2,28 @@
 
 A simple Client for Nextcloud's API in Go.
 
-## TODO
-- [Auth](#authentication)
-  - ~~login~~
-  - ~~logout~~
-- [Users](#users)
-  - ~~search~~
-  - ~~list~~
-  - ~~get infos~~
-  - ~~create~~
-  - ~~update~~
-  - ~~delete~~
-  - ~~enable~~
-  - ~~disable~~
-  - ~~get groups~~
-  - ~~add to group~~
-  - ~~remove from group~~
-  - ~~get subadmin group~~
-  - ~~promote subadmin~~
-  - ~~demote subadmin~~
-  - ~~send welcome mail~~ 
-- [Groups](#groups)
-  - ~~create~~
-  - ~~delete~~
-  - ~~get members~~
-  - ~~get subadmins~~
-- [Apps](#apps)
-  - list
-  - get infos
-  - enable
-  - disable
+# gonextcloud
 
-# client
---
 ```go
     import "github.com/partitio/gonextcloud/client"
 ```
 
 
 ## Usage
+
 ```go
 package main
 
 import (
 	"fmt"
-	"github.com/partitio/gonextcloud/client"
+	"github.com/partitio/gonextcloud"
 )
 
 func main() {
 	url := "https://www.mynextcloud.com"
 	username := "admin"
 	password := "password"
-	c, err := client.NewClient(url)
+	c, err := gonextcloud.NewClient(url)
 	if err != nil {
 		panic(err)
 	}
@@ -64,13 +34,92 @@ func main() {
 }
 ```
 
+#### type Client
+
+```go
+type Client struct {
+}
+```
+
+
 #### func  NewClient
 
 ```go
 func NewClient(hostname string) (*Client, error)
 ```
 
-## Authentication
+#### func (*Client) AppDisable
+
+```go
+func (c *Client) AppDisable(name string) error
+```
+
+#### func (*Client) AppEnable
+
+```go
+func (c *Client) AppEnable(name string) error
+```
+
+#### func (*Client) AppInfos
+
+```go
+func (c *Client) AppInfos(name string) (types.App, error)
+```
+
+#### func (*Client) AppList
+
+```go
+func (c *Client) AppList() ([]string, error)
+```
+
+#### func (*Client) AppListDisabled
+
+```go
+func (c *Client) AppListDisabled() ([]string, error)
+```
+
+#### func (*Client) AppListEnabled
+
+```go
+func (c *Client) AppListEnabled() ([]string, error)
+```
+
+#### func (*Client) GroupCreate
+
+```go
+func (c *Client) GroupCreate(name string) error
+```
+
+#### func (*Client) GroupDelete
+
+```go
+func (c *Client) GroupDelete(name string) error
+```
+
+#### func (*Client) GroupList
+
+```go
+func (c *Client) GroupList() ([]string, error)
+```
+
+#### func (*Client) GroupSearch
+
+```go
+func (c *Client) GroupSearch(search string) ([]string, error)
+```
+
+#### func (*Client) GroupSubAdminList
+
+```go
+func (c *Client) GroupSubAdminList(name string) ([]string, error)
+```
+
+#### func (*Client) GroupUsers
+
+```go
+func (c *Client) GroupUsers(name string) ([]string, error)
+```
+
 #### func (*Client) Login
 
 ```go
@@ -78,10 +127,11 @@ func (c *Client) Login(username string, password string) error
 ```
 
 #### func (*Client) Logout
+
 ```go
 func (c *Client) Logout() error
 ```
-## Users
+
 #### func (*Client) User
 
 ```go
@@ -91,7 +141,7 @@ func (c *Client) User(name string) (*types.User, error)
 #### func (*Client) UserCreate
 
 ```go
-func (c *Client) UserCreate(username string, password string) error
+func (c *Client) UserCreate(username string, password string, user *types.User) error
 ```
 
 #### func (*Client) UserDelete
@@ -166,6 +216,12 @@ func (c *Client) UserSearch(search string) ([]string, error)
 func (c *Client) UserSendWelcomeEmail(name string) error
 ```
 
+#### func (*Client) UserUpdate
+
+```go
+func (c *Client) UserUpdate(user *types.User) error
+```
+
 #### func (*Client) UserUpdateAddress
 
 ```go
@@ -199,7 +255,7 @@ func (c *Client) UserUpdatePhone(name string, phone string) error
 #### func (*Client) UserUpdateQuota
 
 ```go
-func (c *Client) UserUpdateQuota(name string, quota string) error
+func (c *Client) UserUpdateQuota(name string, quota int) error
 ```
 
 #### func (*Client) UserUpdateTwitter
@@ -210,43 +266,13 @@ func (c *Client) UserUpdateTwitter(name string, twitter string) error
 
 #### func (*Client) UserUpdateWebSite
 
-## Groups
-
 ```go
 func (c *Client) UserUpdateWebSite(name string, website string) error
 ```
-#### func (*Client) GroupCreate
+
+#### type Routes
 
 ```go
-func (c *Client) GroupCreate(name string) error
-```
-
-#### func (*Client) GroupDelete
-
-```go
-func (c *Client) GroupDelete(name string) error
-```
-
-#### func (*Client) GroupList
-
-```go
-func (c *Client) GroupList() ([]string, error)
-```
-
-#### func (*Client) GroupSearch
-
-```go
-func (c *Client) GroupSearch(search string) ([]string, error)
-```
-
-#### func (*Client) GroupSubAdminList
-
-```go
-func (c *Client) GroupSubAdminList(name string) ([]string, error)
-```
-
-#### func (*Client) GroupUsers
-
-```go
-func (c *Client) GroupUsers(name string) ([]string, error)
+type Routes struct {
+}
 ```

@@ -1,7 +1,9 @@
-# client
---
+![Nextcloud](https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Nextcloud_Logo.svg/2000px-Nextcloud_Logo.svg.png)
+
+# gonextcloud
+
 ```go
-    import "github.com/partitio/gonextcloud/client"
+import "github.com/partitio/gonextcloud/client"
 ```
 
 
@@ -12,14 +14,14 @@ package main
 
 import (
 	"fmt"
-	"github.com/partitio/gonextcloud/client"
+	"github.com/partitio/gonextcloud"
 )
 
 func main() {
 	url := "https://www.mynextcloud.com"
 	username := "admin"
 	password := "password"
-	c, err := client.NewClient(url)
+	c, err := gonextcloud.NewClient(url)
 	if err != nil {
 		panic(err)
 	}
@@ -29,6 +31,7 @@ func main() {
 	defer c.Logout()
 }
 ```
+
 
 #### type Client
 
@@ -42,6 +45,42 @@ type Client struct {
 
 ```go
 func NewClient(hostname string) (*Client, error)
+```
+
+#### func (*Client) AppDisable
+
+```go
+func (c *Client) AppDisable(name string) error
+```
+
+#### func (*Client) AppEnable
+
+```go
+func (c *Client) AppEnable(name string) error
+```
+
+#### func (*Client) AppInfos
+
+```go
+func (c *Client) AppInfos(name string) (types.App, error)
+```
+
+#### func (*Client) AppList
+
+```go
+func (c *Client) AppList() ([]string, error)
+```
+
+#### func (*Client) AppListDisabled
+
+```go
+func (c *Client) AppListDisabled() ([]string, error)
+```
+
+#### func (*Client) AppListEnabled
+
+```go
+func (c *Client) AppListEnabled() ([]string, error)
 ```
 
 #### func (*Client) GroupCreate
@@ -101,7 +140,7 @@ func (c *Client) User(name string) (*types.User, error)
 #### func (*Client) UserCreate
 
 ```go
-func (c *Client) UserCreate(username string, password string) error
+func (c *Client) UserCreate(username string, password string, user *types.User) error
 ```
 
 #### func (*Client) UserDelete
@@ -176,6 +215,12 @@ func (c *Client) UserSearch(search string) ([]string, error)
 func (c *Client) UserSendWelcomeEmail(name string) error
 ```
 
+#### func (*Client) UserUpdate
+
+```go
+func (c *Client) UserUpdate(user *types.User) error
+```
+
 #### func (*Client) UserUpdateAddress
 
 ```go
@@ -209,7 +254,7 @@ func (c *Client) UserUpdatePhone(name string, phone string) error
 #### func (*Client) UserUpdateQuota
 
 ```go
-func (c *Client) UserUpdateQuota(name string, quota string) error
+func (c *Client) UserUpdateQuota(name string, quota int) error
 ```
 
 #### func (*Client) UserUpdateTwitter
