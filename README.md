@@ -1,8 +1,9 @@
-# [WIP] Nextcloud Go API Client
+![Nextcloud](https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Nextcloud_Logo.svg/2000px-Nextcloud_Logo.svg.png)
 
-A simple Client for Nextcloud's API in Go.
+# GoNextcloud
 
-# gonextcloud
+A simple Client for Nextcloud's Provisioning API in Go.
+
 
 ```go
     import "github.com/partitio/gonextcloud/client"
