@@ -275,3 +275,379 @@ func (c *Client) UserUpdateWebSite(name string, website string) error
 type Routes struct {
 }
 ```
+# types
+
+```go
+import "github.com/partitio/gonextcloud/types"
+```
+
+#### type APIError
+
+```go
+type APIError struct {
+	Code    int
+	Message string
+}
+```
+
+
+#### func  ErrorFromMeta
+
+```go
+func ErrorFromMeta(meta Meta) *APIError
+```
+
+#### func (*APIError) Error
+
+```go
+func (e *APIError) Error() string
+```
+
+#### type App
+
+```go
+type App struct {
+	ID            string   `json:"id"`
+	Ocsid         string   `json:"ocsid"`
+	Name          string   `json:"name"`
+	Summary       string   `json:"summary"`
+	Description   string   `json:"description"`
+	Licence       string   `json:"licence"`
+	Author        string   `json:"author"`
+	Version       string   `json:"version"`
+	Namespace     string   `json:"namespace"`
+	Types         []string `json:"types"`
+	Documentation struct {
+		Admin     string `json:"admin"`
+		Developer string `json:"developer"`
+		User      string `json:"user"`
+	} `json:"documentation"`
+	Category   []string `json:"category"`
+	Website    string   `json:"website"`
+	Bugs       string   `json:"bugs"`
+	Repository struct {
+		Attributes struct {
+			Type string `json:"type"`
+		} `json:"@attributes"`
+		Value string `json:"@value"`
+	} `json:"repository"`
+	Screenshot   []interface{} `json:"screenshot"`
+	Dependencies struct {
+		Owncloud struct {
+			Attributes struct {
+				MinVersion string `json:"min-version"`
+				MaxVersion string `json:"max-version"`
+			} `json:"@attributes"`
+		} `json:"owncloud"`
+		Nextcloud struct {
+			Attributes struct {
+				MinVersion string `json:"min-version"`
+				MaxVersion string `json:"max-version"`
+			} `json:"@attributes"`
+		} `json:"nextcloud"`
+	} `json:"dependencies"`
+	Settings struct {
+		Admin           []string      `json:"admin"`
+		AdminSection    []string      `json:"admin-section"`
+		Personal        []interface{} `json:"personal"`
+		PersonalSection []interface{} `json:"personal-section"`
+	} `json:"settings"`
+	Info        []interface{} `json:"info"`
+	Remote      []interface{} `json:"remote"`
+	Public      []interface{} `json:"public"`
+	RepairSteps struct {
+		Install       []interface{} `json:"install"`
+		PreMigration  []interface{} `json:"pre-migration"`
+		PostMigration []interface{} `json:"post-migration"`
+		LiveMigration []interface{} `json:"live-migration"`
+		Uninstall     []interface{} `json:"uninstall"`
+	} `json:"repair-steps"`
+	BackgroundJobs     []interface{} `json:"background-jobs"`
+	TwoFactorProviders []interface{} `json:"two-factor-providers"`
+	Commands           []interface{} `json:"commands"`
+	Activity           struct {
+		Filters   []interface{} `json:"filters"`
+		Settings  []interface{} `json:"settings"`
+		Providers []interface{} `json:"providers"`
+	} `json:"activity"`
+}
+```
+
+
+#### type AppListResponse
+
+```go
+type AppListResponse struct {
+	Ocs struct {
+		Meta Meta `json:"meta"`
+		Data struct {
+			Apps []string `json:"apps"`
+		} `json:"data"`
+	} `json:"ocs"`
+}
+```
+
+
+#### type AppResponse
+
+```go
+type AppResponse struct {
+	Ocs struct {
+		Meta Meta `json:"meta"`
+		Data App  `json:"data"`
+	} `json:"ocs"`
+}
+```
+
+
+#### type BaseResponse
+
+```go
+type BaseResponse struct {
+	Ocs struct {
+		Meta Meta     `json:"meta"`
+		Data []string `json:"data"`
+	} `json:"ocs"`
+}
+```
+
+
+#### type Capabilities
+
+```go
+type Capabilities struct {
+	Core struct {
+		Pollinterval int    `json:"pollinterval"`
+		WebdavRoot   string `json:"webdav-root"`
+	} `json:"core"`
+	Bruteforce struct {
+		Delay int `json:"delay"`
+	} `json:"bruteforce"`
+	Activity struct {
+		Apiv2 []string `json:"apiv2"`
+	} `json:"activity"`
+	Dav struct {
+		Chunking string `json:"chunking"`
+	} `json:"dav"`
+	FilesSharing struct {
+		APIEnabled bool `json:"api_enabled"`
+		Public     struct {
+			Enabled  bool `json:"enabled"`
+			Password struct {
+				Enforced bool `json:"enforced"`
+			} `json:"password"`
+			ExpireDate struct {
+				Enabled bool `json:"enabled"`
+			} `json:"expire_date"`
+			SendMail        bool `json:"send_mail"`
+			Upload          bool `json:"upload"`
+			UploadFilesDrop bool `json:"upload_files_drop"`
+		} `json:"public"`
+		Resharing bool `json:"resharing"`
+		User      struct {
+			SendMail   bool `json:"send_mail"`
+			ExpireDate struct {
+				Enabled bool `json:"enabled"`
+			} `json:"expire_date"`
+		} `json:"user"`
+		GroupSharing bool `json:"group_sharing"`
+		Group        struct {
+			Enabled    bool `json:"enabled"`
+			ExpireDate struct {
+				Enabled bool `json:"enabled"`
+			} `json:"expire_date"`
+		} `json:"group"`
+		Federation struct {
+			Outgoing   bool `json:"outgoing"`
+			Incoming   bool `json:"incoming"`
+			ExpireDate struct {
+				Enabled bool `json:"enabled"`
+			} `json:"expire_date"`
+		} `json:"federation"`
+		Sharebymail struct {
+			Enabled         bool `json:"enabled"`
+			UploadFilesDrop struct {
+				Enabled bool `json:"enabled"`
+			} `json:"upload_files_drop"`
+			Password struct {
+				Enabled bool `json:"enabled"`
+			} `json:"password"`
+			ExpireDate struct {
+				Enabled bool `json:"enabled"`
+			} `json:"expire_date"`
+		} `json:"sharebymail"`
+	} `json:"files_sharing"`
+	Notifications struct {
+		OcsEndpoints []string `json:"ocs-endpoints"`
+		Push         []string `json:"push"`
+	} `json:"notifications"`
+	PasswordPolicy struct {
+		MinLength                int  `json:"minLength"`
+		EnforceNonCommonPassword bool `json:"enforceNonCommonPassword"`
+		EnforceNumericCharacters bool `json:"enforceNumericCharacters"`
+		EnforceSpecialCharacters bool `json:"enforceSpecialCharacters"`
+		EnforceUpperLowerCase    bool `json:"enforceUpperLowerCase"`
+	} `json:"password_policy"`
+	Theming struct {
+		Name              string `json:"name"`
+		URL               string `json:"url"`
+		Slogan            string `json:"slogan"`
+		Color             string `json:"color"`
+		ColorText         string `json:"color-text"`
+		ColorElement      string `json:"color-element"`
+		Logo              string `json:"logo"`
+		Background        string `json:"background"`
+		BackgroundPlain   bool   `json:"background-plain"`
+		BackgroundDefault bool   `json:"background-default"`
+	} `json:"theming"`
+	Files struct {
+		Bigfilechunking  bool     `json:"bigfilechunking"`
+		BlacklistedFiles []string `json:"blacklisted_files"`
+		Undelete         bool     `json:"undelete"`
+		Versioning       bool     `json:"versioning"`
+	} `json:"files"`
+}
+```
+
+
+#### type CapabilitiesResponse
+
+```go
+type CapabilitiesResponse struct {
+	Ocs struct {
+		Meta Meta `json:"meta"`
+		Data struct {
+			Version struct {
+				Major   int    `json:"major"`
+				Minor   int    `json:"minor"`
+				Micro   int    `json:"micro"`
+				String  string `json:"string"`
+				Edition string `json:"edition"`
+			} `json:"version"`
+			Capabilities Capabilities `json:"capabilities"`
+		} `json:"data"`
+	} `json:"ocs"`
+}
+```
+
+
+#### type ErrorResponse
+
+```go
+type ErrorResponse struct {
+	Ocs struct {
+		Meta Meta          `json:"meta"`
+		Data []interface{} `json:"data"`
+	} `json:"ocs"`
+}
+```
+
+
+#### type GroupListResponse
+
+```go
+type GroupListResponse struct {
+	Ocs struct {
+		Meta Meta `json:"meta"`
+		Data struct {
+			Groups []string `json:"groups"`
+		} `json:"data"`
+	} `json:"ocs"`
+}
+```
+
+
+#### type Meta
+
+```go
+type Meta struct {
+	Status       string `json:"status"`
+	Statuscode   int    `json:"statuscode"`
+	Message      string `json:"message"`
+	Totalitems   string `json:"totalitems"`
+	Itemsperpage string `json:"itemsperpage"`
+}
+```
+
+
+#### type UpdateError
+
+```go
+type UpdateError struct {
+	Field string
+	Error error
+}
+```
+
+
+#### type User
+
+```go
+type User struct {
+	Enabled bool   `json:"enabled"`
+	ID      string `json:"id"`
+	Quota   struct {
+		Free     int64   `json:"free"`
+		Used     int     `json:"used"`
+		Total    int64   `json:"total"`
+		Relative float64 `json:"relative"`
+		Quota    int     `json:"quota"`
+	} `json:"quota"`
+	Email       string   `json:"email"`
+	Displayname string   `json:"displayname"`
+	Phone       string   `json:"phone"`
+	Address     string   `json:"address"`
+	Website     string   `json:"website"`
+	Twitter     string   `json:"twitter"`
+	Groups      []string `json:"groups"`
+	Language    string   `json:"language"`
+}
+```
+
+
+#### type UserListResponse
+
+```go
+type UserListResponse struct {
+	Ocs struct {
+		Meta Meta `json:"meta"`
+		Data struct {
+			Users []string `json:"users"`
+		} `json:"data"`
+	} `json:"ocs"`
+}
+```
+
+
+#### type UserResponse
+
+```go
+type UserResponse struct {
+	Ocs struct {
+		Meta Meta `json:"meta"`
+		Data User `json:"data"`
+	} `json:"ocs"`
+}
+```
+
+
+#### type UserUpdateError
+
+```go
+type UserUpdateError struct {
+	Errors map[string]error
+}
+```
+
+
+#### func  NewUpdateError
+
+```go
+func NewUpdateError(errors chan UpdateError) *UserUpdateError
+```
+
+#### func (*UserUpdateError) Error
+
+```go
+func (e *UserUpdateError) Error() string
+```
