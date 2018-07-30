@@ -49,18 +49,12 @@ func (c *Client) GroupCreate(name string) error {
 			"groupid": name,
 		},
 	}
-	if err := c.groupBaseRequest("", "", ro, http.MethodPost); err != nil {
-		return err
-	}
-	return nil
+	return c.groupBaseRequest("", "", ro, http.MethodPost)
 }
 
 //GroupDelete deletes the group
 func (c *Client) GroupDelete(name string) error {
-	if err := c.groupBaseRequest(name, "", nil, http.MethodDelete); err != nil {
-		return err
-	}
-	return nil
+	return c.groupBaseRequest(name, "", nil, http.MethodDelete)
 }
 
 //GroupSubAdminList lists the group's subadmins

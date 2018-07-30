@@ -1,5 +1,6 @@
 package types
 
+//Capabilities
 type Capabilities struct {
 	Core struct {
 		Pollinterval int    `json:"pollinterval"`

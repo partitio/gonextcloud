@@ -1,5 +1,6 @@
 package types
 
+//App
 type App struct {
 	ID            string   `json:"id"`
 	Ocsid         string   `json:"ocsid"`

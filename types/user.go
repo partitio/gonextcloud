@@ -1,5 +1,6 @@
 package types
 
+//User
 type User struct {
 	Enabled bool   `json:"enabled"`
 	ID      string `json:"id"`

@@ -1,5 +1,6 @@
 package types
 
+//Meta
 type Meta struct {
 	Status       string `json:"status"`
 	Statuscode   int    `json:"statuscode"`
@@ -8,6 +9,7 @@ type Meta struct {
 	Itemsperpage string `json:"itemsperpage"`
 }
 
+//ErrorResponse
 type ErrorResponse struct {
 	Ocs struct {
 		Meta Meta          `json:"meta"`
@@ -15,6 +17,7 @@ type ErrorResponse struct {
 	} `json:"ocs"`
 }
 
+//UserListResponse
 type UserListResponse struct {
 	Ocs struct {
 		Meta Meta `json:"meta"`
@@ -24,6 +27,7 @@ type UserListResponse struct {
 	} `json:"ocs"`
 }
 
+//UserResponse
 type UserResponse struct {
 	Ocs struct {
 		Meta Meta `json:"meta"`
@@ -31,6 +35,7 @@ type UserResponse struct {
 	} `json:"ocs"`
 }
 
+//BaseResponse
 type BaseResponse struct {
 	Ocs struct {
 		Meta Meta     `json:"meta"`
@@ -38,6 +43,7 @@ type BaseResponse struct {
 	} `json:"ocs"`
 }
 
+//GroupListResponse
 type GroupListResponse struct {
 	Ocs struct {
 		Meta Meta `json:"meta"`
@@ -47,6 +53,7 @@ type GroupListResponse struct {
 	} `json:"ocs"`
 }
 
+//AppListResponse
 type AppListResponse struct {
 	Ocs struct {
 		Meta Meta `json:"meta"`
@@ -56,6 +63,7 @@ type AppListResponse struct {
 	} `json:"ocs"`
 }
 
+//AppResponse
 type AppResponse struct {
 	Ocs struct {
 		Meta Meta `json:"meta"`
@@ -63,6 +71,7 @@ type AppResponse struct {
 	} `json:"ocs"`
 }
 
+//CapabilitiesResponse
 type CapabilitiesResponse struct {
 	Ocs struct {
 		Meta Meta `json:"meta"`
