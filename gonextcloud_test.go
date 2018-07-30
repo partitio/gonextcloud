@@ -29,6 +29,7 @@ type Config struct {
 	NotExistingGroup string   `yaml:"not-existing-group"`
 }
 
+// LoadConfig loads the test configuration
 func LoadConfig() error {
 	f, err := os.Open("./config.yml")
 	if err != nil {
@@ -38,10 +39,7 @@ func LoadConfig() error {
 	if err != nil {
 		return err
 	}
-	if err := yaml.Unmarshal(b, &config); err != nil {
-		return err
-	}
-	return nil
+	return yaml.Unmarshal(b, &config)
 }
 
 func TestLoadConfig(t *testing.T) {

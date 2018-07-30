@@ -46,6 +46,7 @@ import (
 	"net/url"
 )
 
+// Client is the API client that performs all operations against a Nextcloud server.
 type Client struct {
 	baseURL      *url.URL
 	username     string
@@ -55,6 +56,7 @@ type Client struct {
 	capabilities *types.Capabilities
 }
 
+// NewClient create a new Client from the Nextcloud Instance URL
 func NewClient(hostname string) (*Client, error) {
 	baseURL, err := url.ParseRequestURI(hostname)
 	if err != nil {

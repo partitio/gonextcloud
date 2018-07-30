@@ -6,6 +6,7 @@ import (
 	"net/http"
 )
 
+//AppList return the list of the Nextcloud Apps
 func (c *Client) AppList() ([]string, error) {
 	res, err := c.baseRequest(routes.apps, "", "", nil, http.MethodGet)
 	if err != nil {
@@ -16,6 +17,7 @@ func (c *Client) AppList() ([]string, error) {
 	return r.Ocs.Data.Apps, nil
 }
 
+//AppListEnabled lists the enabled apps
 func (c *Client) AppListEnabled() ([]string, error) {
 	ro := &req.RequestOptions{
 		Params: map[string]string{"filter": "enabled"},
@@ -29,6 +31,7 @@ func (c *Client) AppListEnabled() ([]string, error) {
 	return r.Ocs.Data.Apps, nil
 }
 
+//AppListDisabled lists the disabled apps
 func (c *Client) AppListDisabled() ([]string, error) {
 	ro := &req.RequestOptions{
 		Params: map[string]string{"filter": "disabled"},
@@ -42,6 +45,7 @@ func (c *Client) AppListDisabled() ([]string, error) {
 	return r.Ocs.Data.Apps, nil
 }
 
+//AppInfos return the app's details
 func (c *Client) AppInfos(name string) (types.App, error) {
 	res, err := c.baseRequest(routes.apps, name, "", nil, http.MethodGet)
 	if err != nil {
@@ -52,24 +56,16 @@ func (c *Client) AppInfos(name string) (types.App, error) {
 	return r.Ocs.Data, nil
 }
 
+//AppEnable enables an app
 func (c *Client) AppEnable(name string) error {
-	res, err := c.baseRequest(routes.apps, name, "", nil, http.MethodPut)
-	if err != nil {
-		return err
-	}
-	var r types.BaseResponse
-	res.JSON(&r)
-	return nil
+	_, err := c.baseRequest(routes.apps, name, "", nil, http.MethodPut)
+	return err
 }
 
+//AppDisable disables an app
 func (c *Client) AppDisable(name string) error {
-	res, err := c.baseRequest(routes.apps, name, "", nil, http.MethodDelete)
-	if err != nil {
-		return err
-	}
-	var r types.BaseResponse
-	res.JSON(&r)
-	return nil
+	_, err := c.baseRequest(routes.apps, name, "", nil, http.MethodDelete)
+	return err
 }
 
 func (c *Client) appsBaseRequest(name string, route string, ro *req.RequestOptions, method string) error {

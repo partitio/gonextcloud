@@ -2,6 +2,7 @@ package gonextcloud
 
 import "net/url"
 
+// Route references the available routes
 type Routes struct {
 	capabilities *url.URL
 	users        *url.URL

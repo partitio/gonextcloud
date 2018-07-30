@@ -6,6 +6,7 @@ import (
 	"net/http"
 )
 
+//GroupList lists the Nextcloud groups
 func (c *Client) GroupList() ([]string, error) {
 	res, err := c.baseRequest(routes.groups, "", "", nil, http.MethodGet)
 	if err != nil {
@@ -16,6 +17,7 @@ func (c *Client) GroupList() ([]string, error) {
 	return r.Ocs.Data.Groups, nil
 }
 
+//GroupUsers list the group's users
 func (c *Client) GroupUsers(name string) ([]string, error) {
 	res, err := c.baseRequest(routes.groups, name, "", nil, http.MethodGet)
 	if err != nil {
@@ -26,6 +28,7 @@ func (c *Client) GroupUsers(name string) ([]string, error) {
 	return r.Ocs.Data.Users, nil
 }
 
+//GroupSearch return the list of groups matching the search string
 func (c *Client) GroupSearch(search string) ([]string, error) {
 	ro := &req.RequestOptions{
 		Params: map[string]string{"search": search},
@@ -39,6 +42,7 @@ func (c *Client) GroupSearch(search string) ([]string, error) {
 	return r.Ocs.Data.Groups, nil
 }
 
+//GroupCreate creates a group
 func (c *Client) GroupCreate(name string) error {
 	ro := &req.RequestOptions{
 		Data: map[string]string{
@@ -51,6 +55,7 @@ func (c *Client) GroupCreate(name string) error {
 	return nil
 }
 
+//GroupDelete deletes the group
 func (c *Client) GroupDelete(name string) error {
 	if err := c.groupBaseRequest(name, "", nil, http.MethodDelete); err != nil {
 		return err
@@ -58,6 +63,7 @@ func (c *Client) GroupDelete(name string) error {
 	return nil
 }
 
+//GroupSubAdminList lists the group's subadmins
 func (c *Client) GroupSubAdminList(name string) ([]string, error) {
 	res, err := c.baseRequest(routes.groups, name, "subadmins", nil, http.MethodGet)
 	if err != nil {

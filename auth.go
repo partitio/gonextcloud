@@ -8,6 +8,7 @@ import (
 
 var unauthorized = fmt.Errorf("login first")
 
+// Login perform login and create a session with the Nextcloud API.
 func (c *Client) Login(username string, password string) error {
 	c.username = username
 	c.password = password
@@ -34,6 +35,7 @@ func (c *Client) Login(username string, password string) error {
 	return nil
 }
 
+// Logout logs out from the Nextcloud API, close the session and delete session's cookie
 func (c *Client) Logout() error {
 	c.session.CloseIdleConnections()
 	c.session.HTTPClient.Jar = nil
