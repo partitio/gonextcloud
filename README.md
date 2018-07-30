@@ -1,5 +1,5 @@
 ![Nextcloud](https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Nextcloud_Logo.svg/640px-Nextcloud_Logo.svg.png)
-
+[![Go Report Card](https://goreportcard.com/badge/github.com/partitio/gonextcloud)](https://goreportcard.com/report/github.com/partitio/gonextcloud)
 # GoNextcloud
 
 A simple Client for Nextcloud's Provisioning API in Go.
@@ -34,7 +34,15 @@ func main() {
 	defer c.Logout()
 }
 ```
+## Run tests
+Configure the tests for your instance by editing [example.config.yml](example.config.yml) and renaming it config.yml
 
+then run the tests :
+```bash
+$ go test -v .
+```
+
+## Docs
 #### type Client
 
 ```go
