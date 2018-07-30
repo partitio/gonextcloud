@@ -12,7 +12,7 @@ import (
 
 func (c *Client) baseRequest(route *url.URL, name string, subroute string, ro *req.RequestOptions, method string) (*req.Response, error) {
 	if !c.loggedIn() {
-		return nil, unauthorized
+		return nil, errUnauthorized
 	}
 	u := c.baseURL.ResolveReference(route)
 	if name != "" {

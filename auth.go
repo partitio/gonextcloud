@@ -6,7 +6,7 @@ import (
 	"github.com/partitio/gonextcloud/types"
 )
 
-var unauthorized = fmt.Errorf("login first")
+var errUnauthorized = fmt.Errorf("login first")
 
 // Login perform login and create a session with the Nextcloud API.
 func (c *Client) Login(username string, password string) error {

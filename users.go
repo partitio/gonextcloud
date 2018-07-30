@@ -220,7 +220,7 @@ func (c *Client) UserGroupDemote(name string, group string) error {
 //UserGroupSubAdminList lists the groups where he is subadmin
 func (c *Client) UserGroupSubAdminList(name string) ([]string, error) {
 	if !c.loggedIn() {
-		return nil, unauthorized
+		return nil, errUnauthorized
 	}
 	u := c.baseURL.ResolveReference(routes.users)
 	u.Path = path.Join(u.Path, name, "subadmins")
