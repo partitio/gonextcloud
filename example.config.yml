@@ -1,0 +1,10 @@
+url: https://my.nextcloud.com
+login: admin
+password: mypassword
+app-name: testapp
+groups-to-create:
+  - grp1
+  - grp2
+  - grp3
+not-existing-user: this-user-should-not-exist
+not-existing-group: this-group-should-not-exist

@@ -1,5 +1,7 @@
 ![Nextcloud](https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Nextcloud_Logo.svg/2000px-Nextcloud_Logo.svg.png)
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/partitio/gonextcloud)](https://goreportcard.com/report/github.com/partitio/gonextcloud)
+
 # gonextcloud
 
 ```go
