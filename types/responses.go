@@ -87,3 +87,14 @@ type CapabilitiesResponse struct {
 		} `json:"data"`
 	} `json:"ocs"`
 }
+
+type MonitoringResponse struct {
+	Ocs struct {
+		Meta struct {
+			Status     string `json:"status"`
+			Statuscode int    `json:"statuscode"`
+			Message    string `json:"message"`
+		} `json:"meta"`
+		Data Monitoring `json:"data"`
+	} `json:"ocs"`
+}
