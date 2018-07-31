@@ -27,13 +27,6 @@ race_detector:
   script:
   - make race
 
-memory_sanitizer:
-  stage: test
-  tags:
-  - docker
-  script:
-  - make msan
-
 code_coverage:
   stage: test
   tags:
