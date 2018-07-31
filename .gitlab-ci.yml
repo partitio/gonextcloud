@@ -1,10 +1,9 @@
-image: golang:alpine
+image: golang:1.9
 
 stages:
 - test
 
 before_script:
-- apk add --update git make
 - go get -u github.com/kardianos/govendor
 - mkdir -p /go/src/github.com/partitio
 - cp -r $CI_PROJECT_DIR /go/src/github.com/partitio/gonextcloud
