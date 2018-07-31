@@ -5,6 +5,7 @@ import (
 	"net/http"
 )
 
+//Monitoring return nextcloud monitoring statistics
 func (c *Client) Monitoring() (*types.Monitoring, error) {
 	res, err := c.baseRequest(routes.monitor, "", "", nil, http.MethodGet)
 	if err != nil {

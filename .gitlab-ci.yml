@@ -4,6 +4,7 @@ stages:
 - test
 
 before_script:
+- go get -u golang.org/x/lint/golint
 - go get -u github.com/kardianos/govendor
 - mkdir -p /go/src/github.com/partitio
 - cp -r $CI_PROJECT_DIR /go/src/github.com/partitio/gonextcloud
