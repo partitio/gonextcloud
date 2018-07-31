@@ -1,0 +1,58 @@
+image: golang:alpine
+
+stages:
+- test
+
+before_script:
+- apk add --update git make
+- go get -u github.com/kardianos/govendor
+- mkdir -p /go/src/github.com/partitio
+- cp -r $CI_PROJECT_DIR /go/src/github.com/partitio/gonextcloud
+- cd /go/src/github.com/partitio/gonextcloud
+- sed -i -e 's/$NEXTCLOUD_URL/'${NEXTCLOUD_URL//\//\\/}'/g' config.yml
+- sed -i -e 's/$NEXTCLOUD_PASSWORD/'${NEXTCLOUD_PASSWORD}'/g' config.yml
+- make dep
+
+unit_tests:
+  stage: test
+  tags:
+  - docker
+  script:
+  - make test
+
+race_detector:
+  stage: test
+  tags:
+  - docker
+  script:
+  - make race
+
+memory_sanitizer:
+  stage: test
+  tags:
+  - docker
+  script:
+  - make msan
+
+code_coverage:
+  stage: test
+  tags:
+  - docker
+  script:
+  - make coverage
+
+code_coverage_report:
+  stage: test
+  tags:
+  - docker
+  script:
+  - make coverhtml
+  only:
+  - master
+
+lint_code:
+  stage: test
+  tags:
+  - docker
+  script:
+  - make lint
