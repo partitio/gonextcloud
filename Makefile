@@ -17,13 +17,11 @@ race: dep ## Run data race detector
 	@go test -race ${PKG_LIST}
 
 msan: dep ## Run memory sanitizer
-	@go test -msan ${PKG_LIST}
+	@go test -msan -short ${PKG_LIST}
 
 coverage: ## Generate global code coverage report
-	./tools/coverage.sh;
-
-coverhtml: ## Generate global code coverage report in HTML
-	./tools/coverage.sh html;
+	mkdir -p cover
+	go tool cover -html=cover/gonextcloud.cov -o coverage.html
 
 dep: ## Get the dependencies
 	mkdir -p vendor

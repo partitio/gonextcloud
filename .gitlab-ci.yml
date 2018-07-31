@@ -40,15 +40,6 @@ code_coverage:
   script:
   - make coverage
 
-code_coverage_report:
-  stage: test
-  tags:
-  - docker
-  script:
-  - make coverhtml
-  only:
-  - master
-
 lint_code:
   stage: test
   tags:
