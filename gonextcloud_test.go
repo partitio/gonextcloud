@@ -20,13 +20,13 @@ var c *Client
 const password = "somecomplicatedpassword"
 
 type Config struct {
-	URL              string   `yaml:"url"`
-	Login            string   `yaml:"login"`
-	Password         string   `yaml:"password"`
-	AppName          string   `yaml:"app-name"`
-	GroupsToCreate   []string `yaml:"groups-to-create"`
-	NotExistingUser  string   `yaml:"not-existing-user"`
-	NotExistingGroup string   `yaml:"not-existing-group"`
+	URL              string `yaml:"url"`
+	Login            string `yaml:"login"`
+	Password         string `yaml:"password"`
+	AppName          string `yaml:"app-name"`
+	ShareFolder      string `yaml:"share-folder"`
+	NotExistingUser  string `yaml:"not-existing-user"`
+	NotExistingGroup string `yaml:"not-existing-group"`
 }
 
 // LoadConfig loads the test configuration
@@ -307,7 +307,17 @@ func TestUserDelete(t *testing.T) {
 func TestInvalidBaseRequest(t *testing.T) {
 	c.baseURL = &url.URL{}
 	_, err := c.baseRequest(routes.capabilities, "admin", "invalid", nil, http.MethodGet)
+	c = nil
 	assert.Error(t, err)
+}
+
+func TestShareList(t *testing.T) {
+	if err := initClient(); err != nil {
+		return
+	}
+	s, err := c.SharesList()
+	assert.Nil(t, err)
+	assert.NotNil(t, s)
 }
 
 func TestLogout(t *testing.T) {

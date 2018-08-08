@@ -41,7 +41,7 @@ func (c *Client) baseRequest(route *url.URL, name string, subroute string, ro *r
 	js := res.String()
 	var r types.BaseResponse
 	json.Unmarshal([]byte(js), &r)
-	if r.Ocs.Meta.Statuscode != 100 {
+	if r.Ocs.Meta.Statuscode != 200 {
 		err := types.ErrorFromMeta(r.Ocs.Meta)
 		return nil, err
 	}

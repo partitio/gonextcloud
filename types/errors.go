@@ -38,7 +38,7 @@ type UserUpdateError struct {
 func (e *UserUpdateError) Error() string {
 	var errors []string
 	for k, e := range e.Errors {
-		errors = append(errors, fmt.Sprintf("%s: %s", k, e.Error()))
+		errors = append(errors, fmt.Sprintf("%s: %v", k, e))
 	}
 	return strings.Join(errors, ",")
 }

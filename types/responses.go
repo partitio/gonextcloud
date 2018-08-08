@@ -90,11 +90,21 @@ type CapabilitiesResponse struct {
 
 type MonitoringResponse struct {
 	Ocs struct {
-		Meta struct {
-			Status     string `json:"status"`
-			Statuscode int    `json:"statuscode"`
-			Message    string `json:"message"`
-		} `json:"meta"`
+		Meta Meta       `json:"meta"`
 		Data Monitoring `json:"data"`
+	} `json:"ocs"`
+}
+
+type SharesListResponse struct {
+	Ocs struct {
+		Meta Meta    `json:"meta"`
+		Data []Share `json:"data"`
+	} `json:"ocs"`
+}
+
+type SharesResponse struct {
+	Ocs struct {
+		Meta Meta  `json:"meta"`
+		Data Share `json:"data"`
 	} `json:"ocs"`
 }
