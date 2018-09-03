@@ -108,3 +108,24 @@ type SharesResponse struct {
 		Data Share `json:"data"`
 	} `json:"ocs"`
 }
+
+type GroupFoldersListResponse struct {
+	Ocs struct {
+		Meta Meta                                       `json:"meta"`
+		Data map[string]GroupFolderBadFormatIDAndGroups `json:"data"`
+	} `json:"ocs"`
+}
+
+type GroupFoldersCreateResponse struct {
+	Ocs struct {
+		Meta Meta                            `json:"meta"`
+		Data GroupFolderBadFormatIDAndGroups `json:"data"`
+	} `json:"ocs"`
+}
+
+type GroupFoldersResponse struct {
+	Ocs struct {
+		Meta Meta                       `json:"meta"`
+		Data GroupFolderBadFormatGroups `json:"data"`
+	} `json:"ocs"`
+}

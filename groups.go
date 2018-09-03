@@ -8,7 +8,7 @@ import (
 
 //GroupList lists the Nextcloud groups
 func (c *Client) GroupList() ([]string, error) {
-	res, err := c.baseRequest(routes.groups, "", "", nil, http.MethodGet)
+	res, err := c.baseRequest(http.MethodGet, routes.groups, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -19,7 +19,7 @@ func (c *Client) GroupList() ([]string, error) {
 
 //GroupUsers list the group's users
 func (c *Client) GroupUsers(name string) ([]string, error) {
-	res, err := c.baseRequest(routes.groups, name, "", nil, http.MethodGet)
+	res, err := c.baseRequest(http.MethodGet, routes.groups, nil, name)
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +33,7 @@ func (c *Client) GroupSearch(search string) ([]string, error) {
 	ro := &req.RequestOptions{
 		Params: map[string]string{"search": search},
 	}
-	res, err := c.baseRequest(routes.groups, "", "", ro, http.MethodGet)
+	res, err := c.baseRequest(http.MethodGet, routes.groups, ro)
 	if err != nil {
 		return nil, err
 	}
@@ -49,17 +49,17 @@ func (c *Client) GroupCreate(name string) error {
 			"groupid": name,
 		},
 	}
-	return c.groupBaseRequest("", "", ro, http.MethodPost)
+	return c.groupBaseRequest(http.MethodPost, ro)
 }
 
 //GroupDelete deletes the group
 func (c *Client) GroupDelete(name string) error {
-	return c.groupBaseRequest(name, "", nil, http.MethodDelete)
+	return c.groupBaseRequest(http.MethodDelete, nil, name)
 }
 
 //GroupSubAdminList lists the group's subadmins
 func (c *Client) GroupSubAdminList(name string) ([]string, error) {
-	res, err := c.baseRequest(routes.groups, name, "subadmins", nil, http.MethodGet)
+	res, err := c.baseRequest(http.MethodGet, routes.groups, nil, name, "subadmins")
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func (c *Client) GroupSubAdminList(name string) ([]string, error) {
 	return r.Ocs.Data.Users, nil
 }
 
-func (c *Client) groupBaseRequest(name string, route string, ro *req.RequestOptions, method string) error {
-	_, err := c.baseRequest(routes.groups, name, route, ro, method)
+func (c *Client) groupBaseRequest(method string, ro *req.RequestOptions, subRoute ...string) error {
+	_, err := c.baseRequest(method, routes.groups, ro, subRoute...)
 	return err
 }

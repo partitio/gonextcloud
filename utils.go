@@ -10,28 +10,29 @@ import (
 	"strings"
 )
 
-func (c *Client) baseRequest(route *url.URL, name string, subroute string, ro *req.RequestOptions, method string) (*req.Response, error) {
+func (c *Client) baseRequest(method string, route *url.URL, ro *req.RequestOptions, subRoutes ...string) (*req.Response, error) {
 	if !c.loggedIn() {
 		return nil, errUnauthorized
 	}
 	u := c.baseURL.ResolveReference(route)
-	if name != "" {
-		u.Path = path.Join(u.Path, name)
-	}
-	if subroute != "" {
-		u.Path = path.Join(u.Path, subroute)
+
+	for _, sr := range subRoutes {
+		if sr != "" {
+			u.Path = path.Join(u.Path, sr)
+		}
 	}
 	var (
 		res *req.Response
 		err error
 	)
-	if method == http.MethodGet {
+	switch method {
+	case http.MethodGet:
 		res, err = c.session.Get(u.String(), ro)
-	} else if method == http.MethodPost {
+	case http.MethodPost:
 		res, err = c.session.Post(u.String(), ro)
-	} else if method == http.MethodPut {
+	case http.MethodPut:
 		res, err = c.session.Put(u.String(), ro)
-	} else if method == http.MethodDelete {
+	case http.MethodDelete:
 		res, err = c.session.Delete(u.String(), ro)
 	}
 	if err != nil {
@@ -41,11 +42,11 @@ func (c *Client) baseRequest(route *url.URL, name string, subroute string, ro *r
 	js := res.String()
 	var r types.BaseResponse
 	json.Unmarshal([]byte(js), &r)
-	if r.Ocs.Meta.Statuscode != 200 {
-		err := types.ErrorFromMeta(r.Ocs.Meta)
-		return nil, err
+	if r.Ocs.Meta.Statuscode == 200 || r.Ocs.Meta.Statuscode == 100 {
+		return res, nil
 	}
-	return res, nil
+	err = types.ErrorFromMeta(r.Ocs.Meta)
+	return nil, err
 }
 
 func reformatJSON(json string) string {

@@ -37,7 +37,6 @@ For example, to list all the Nextcloud's instance users:
 		fmt.Println("Users :", users)
 	}
 */
-
 package gonextcloud
 
 import (

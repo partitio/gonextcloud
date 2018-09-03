@@ -10,7 +10,7 @@ import (
 )
 
 func (c *Client) SharesList() ([]types.Share, error) {
-	res, err := c.baseRequest(routes.shares, "", "", nil, http.MethodGet)
+	res, err := c.baseRequest(http.MethodGet, routes.shares, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -27,7 +27,7 @@ func (c *Client) Shares(path string, reshares bool, subfiles bool) ([]types.Shar
 			"subfiles": strconv.FormatBool(subfiles),
 		},
 	}
-	res, err := c.baseRequest(routes.shares, "", "", ro, http.MethodGet)
+	res, err := c.baseRequest(http.MethodGet, routes.shares, ro)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +37,7 @@ func (c *Client) Shares(path string, reshares bool, subfiles bool) ([]types.Shar
 }
 
 func (c *Client) Share(shareID string) (types.Share, error) {
-	res, err := c.baseRequest(routes.shares, shareID, "", nil, http.MethodGet)
+	res, err := c.baseRequest(http.MethodGet, routes.shares, nil, shareID)
 	if err != nil {
 		return types.Share{}, err
 	}
@@ -68,7 +68,7 @@ func (c *Client) ShareCreate(
 			"permissions":  strconv.Itoa(int(permission)),
 		},
 	}
-	res, err := c.baseRequest(routes.shares, "", "", ro, http.MethodPost)
+	res, err := c.baseRequest(http.MethodPost, routes.shares, ro)
 	if err != nil {
 		return types.Share{}, err
 	}
@@ -78,7 +78,7 @@ func (c *Client) ShareCreate(
 }
 
 func (c *Client) ShareDelete(shareID int) error {
-	_, err := c.baseRequest(routes.shares, strconv.Itoa(shareID), "", nil, http.MethodDelete)
+	_, err := c.baseRequest(http.MethodDelete, routes.shares, nil, strconv.Itoa(shareID))
 	return err
 }
 
@@ -151,6 +151,6 @@ func (c *Client) baseShareUpdate(shareID string, key string, value string) error
 	ro := &req.RequestOptions{
 		Data: map[string]string{key: value},
 	}
-	_, err := c.baseRequest(routes.shares, shareID, "", ro, http.MethodPut)
+	_, err := c.baseRequest(http.MethodPut, routes.shares, ro, shareID)
 	return err
 }

@@ -10,6 +10,7 @@ type Routes struct {
 	apps         *url.URL
 	monitor      *url.URL
 	shares       *url.URL
+	groupfolders *url.URL
 }
 
 const badRequest = 998
@@ -23,5 +24,6 @@ var (
 		apps:         &url.URL{Path: apiPath.Path + "/cloud/apps"},
 		monitor:      &url.URL{Path: apiPath.Path + "/apps/serverinfo/api/v1/info"},
 		shares:       &url.URL{Path: apiPath.Path + "/apps/files_sharing/api/v1/shares"},
+		groupfolders: &url.URL{Path: "apps/groupfolders/folders"},
 	}
 )
