@@ -14,7 +14,7 @@ import (
 
 // UserList return the Nextcloud'user list
 func (c *Client) UserList() ([]string, error) {
-	res, err := c.baseRequest(routes.users, "", "", nil, http.MethodGet)
+	res, err := c.baseRequest(http.MethodGet, routes.users, nil)
 	//res, err := c.session.Get(u.String(), nil)
 	if err != nil {
 		return nil, err
@@ -29,7 +29,7 @@ func (c *Client) User(name string) (*types.User, error) {
 	if name == "" {
 		return nil, &types.APIError{Message: "name cannot be empty"}
 	}
-	res, err := c.baseRequest(routes.users, name, "", nil, http.MethodGet)
+	res, err := c.baseRequest(http.MethodGet, routes.users, nil, name)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func (c *Client) UserSearch(search string) ([]string, error) {
 	ro := &req.RequestOptions{
 		Params: map[string]string{"search": search},
 	}
-	res, err := c.baseRequest(routes.users, "", "", ro, http.MethodGet)
+	res, err := c.baseRequest(http.MethodGet, routes.users, ro)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +65,7 @@ func (c *Client) UserCreate(username string, password string, user *types.User) 
 			"password": password,
 		},
 	}
-	if err := c.userBaseRequest("", "", ro, http.MethodPost); err != nil {
+	if err := c.userBaseRequest(http.MethodPost, ro); err != nil {
 		return err
 	}
 	if user == nil {
@@ -76,7 +76,7 @@ func (c *Client) UserCreate(username string, password string, user *types.User) 
 
 //UserDelete delete the user
 func (c *Client) UserDelete(name string) error {
-	return c.userBaseRequest(name, "", nil, http.MethodDelete)
+	return c.userBaseRequest(http.MethodDelete, nil, name)
 }
 
 //UserEnable enables the user
@@ -84,7 +84,7 @@ func (c *Client) UserEnable(name string) error {
 	ro := &req.RequestOptions{
 		Data: map[string]string{},
 	}
-	return c.userBaseRequest(name, "enable", ro, http.MethodPut)
+	return c.userBaseRequest(http.MethodPut, ro, name, "enable")
 }
 
 //UserDisable disables the user
@@ -92,12 +92,12 @@ func (c *Client) UserDisable(name string) error {
 	ro := &req.RequestOptions{
 		Data: map[string]string{},
 	}
-	return c.userBaseRequest(name, "disable", ro, http.MethodPut)
+	return c.userBaseRequest(http.MethodPut, ro, name, "disable")
 }
 
 //UserSendWelcomeEmail (re)send the welcome mail to the user (return an error if the user has not configured his email)
 func (c *Client) UserSendWelcomeEmail(name string) error {
-	return c.userBaseRequest(name, "welcome", nil, http.MethodPost)
+	return c.userBaseRequest(http.MethodPost, nil, name, "welcome")
 }
 
 //UserUpdate takes a *types.User struct to update the user's information
@@ -168,7 +168,7 @@ func (c *Client) UserUpdateQuota(name string, quota int) error {
 
 //UserGroupList lists the user's groups
 func (c *Client) UserGroupList(name string) ([]string, error) {
-	res, err := c.baseRequest(routes.users, name, "groups", nil, http.MethodGet)
+	res, err := c.baseRequest(http.MethodGet, routes.users, nil, name, "groups")
 	if err != nil {
 		return nil, err
 	}
@@ -184,7 +184,7 @@ func (c *Client) UserGroupAdd(name string, group string) error {
 			"groupid": group,
 		},
 	}
-	return c.userBaseRequest(name, "groups", ro, http.MethodPost)
+	return c.userBaseRequest(http.MethodPost, ro, name, "groups")
 }
 
 //UserGroupRemove removes the user from the group
@@ -194,7 +194,7 @@ func (c *Client) UserGroupRemove(name string, group string) error {
 			"groupid": group,
 		},
 	}
-	return c.userBaseRequest(name, "groups", ro, http.MethodDelete)
+	return c.userBaseRequest(http.MethodDelete, ro, name, "groups")
 }
 
 //UserGroupPromote promotes the user as group admin
@@ -204,7 +204,7 @@ func (c *Client) UserGroupPromote(name string, group string) error {
 			"groupid": group,
 		},
 	}
-	return c.userBaseRequest(name, "subadmins", ro, http.MethodPost)
+	return c.userBaseRequest(http.MethodPost, ro, name, "subadmins")
 }
 
 //UserGroupDemote demotes the user
@@ -214,7 +214,7 @@ func (c *Client) UserGroupDemote(name string, group string) error {
 			"groupid": group,
 		},
 	}
-	return c.userBaseRequest(name, "subadmins", ro, http.MethodDelete)
+	return c.userBaseRequest(http.MethodDelete, ro, name, "subadmins")
 }
 
 //UserGroupSubAdminList lists the groups where he is subadmin
@@ -240,11 +240,11 @@ func (c *Client) userUpdateAttribute(name string, key string, value string) erro
 			"value": value,
 		},
 	}
-	return c.userBaseRequest(name, "", ro, http.MethodPut)
+	return c.userBaseRequest(http.MethodPut, ro, name)
 }
 
-func (c *Client) userBaseRequest(name string, route string, ro *req.RequestOptions, method string) error {
-	_, err := c.baseRequest(routes.users, name, route, ro, method)
+func (c *Client) userBaseRequest(method string, ro *req.RequestOptions, subRoutes ...string) error {
+	_, err := c.baseRequest(method, routes.users, ro, subRoutes...)
 	return err
 }
 
