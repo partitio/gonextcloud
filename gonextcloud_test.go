@@ -1,8 +1,6 @@
 package gonextcloud
 
 import (
-	"fmt"
-	"github.com/fatih/structs"
 	"github.com/partitio/gonextcloud/types"
 	"github.com/partitio/swarmmanager/libnextcloudpartitio/utils"
 	"github.com/stretchr/testify/assert"
@@ -11,7 +9,6 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"strings"
 	"testing"
 )
 
@@ -99,69 +96,69 @@ func TestUserCreate(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestUserCreateFull(t *testing.T) {
-	if err := initClient(); err != nil {
-		return
-	}
-	username := fmt.Sprintf("%s-2", config.NotExistingUser)
-	user := &types.User{
-		ID:          username,
-		Displayname: strings.ToUpper(username),
-		Email:       "some@address.com",
-		Address:     "Main Street, City",
-		Twitter:     "@me",
-		Phone:       "42 42 242 424",
-		Website:     "my.site.com",
-	}
-	err := c.UserCreate(username, password, user)
-	assert.Nil(t, err)
-	u, err := c.User(username)
-	assert.NoError(t, err)
-	o := structs.Map(user)
-	r := structs.Map(u)
-	for k := range o {
-		if ignoredUserField(k) {
-			continue
-		}
-		assert.Equal(t, o[k], r[k])
-	}
-	// Clean up
-	err = c.UserDelete(u.ID)
-	assert.NoError(t, err)
-}
+//func TestUserCreateFull(t *testing.T) {
+//	if err := initClient(); err != nil {
+//		return
+//	}
+//	username := fmt.Sprintf("%s-2", config.NotExistingUser)
+//	user := &types.User{
+//		ID:          username,
+//		Displayname: strings.ToUpper(username),
+//		Email:       "some@address.com",
+//		Address:     "Main Street, City",
+//		Twitter:     "@me",
+//		Phone:       "42 42 242 424",
+//		Website:     "my.site.com",
+//	}
+//	err := c.UserCreate(username, password, user)
+//	assert.Nil(t, err)
+//	u, err := c.User(username)
+//	assert.NoError(t, err)
+//	o := structs.Map(user)
+//	r := structs.Map(u)
+//	for k := range o {
+//		if ignoredUserField(k) {
+//			continue
+//		}
+//		assert.Equal(t, o[k], r[k])
+//	}
+//	// Clean up
+//	err = c.UserDelete(u.ID)
+//	assert.NoError(t, err)
+//}
 
-func TestUserUpdate(t *testing.T) {
-	if err := initClient(); err != nil {
-		return
-	}
-	username := fmt.Sprintf("%s-2", config.NotExistingUser)
-	err := c.UserCreate(username, password, nil)
-	assert.Nil(t, err)
-	user := &types.User{
-		ID:          username,
-		Displayname: strings.ToUpper(username),
-		Email:       "some@address.com",
-		Address:     "Main Street, City",
-		Twitter:     "@me",
-		Phone:       "42 42 242 424",
-		Website:     "my.site.com",
-	}
-	err = c.UserUpdate(user)
-	assert.Nil(t, err)
-	u, err := c.User(username)
-	assert.Nil(t, err)
-	o := structs.Map(user)
-	r := structs.Map(u)
-	for k := range o {
-		if ignoredUserField(k) {
-			continue
-		}
-		assert.Equal(t, o[k], r[k])
-	}
-	// Clean up
-	err = c.UserDelete(u.ID)
-	assert.NoError(t, err)
-}
+//func TestUserUpdate(t *testing.T) {
+//	if err := initClient(); err != nil {
+//		return
+//	}
+//	username := fmt.Sprintf("%s-2", config.NotExistingUser)
+//	err := c.UserCreate(username, password, nil)
+//	assert.Nil(t, err)
+//	user := &types.User{
+//		ID:          username,
+//		Displayname: strings.ToUpper(username),
+//		Email:       "some@address.com",
+//		Address:     "Main Street, City",
+//		Twitter:     "@me",
+//		Phone:       "42 42 242 424",
+//		Website:     "my.site.com",
+//	}
+//	err = c.UserUpdate(user)
+//	assert.Nil(t, err)
+//	u, err := c.User(username)
+//	assert.Nil(t, err)
+//	o := structs.Map(user)
+//	r := structs.Map(u)
+//	for k := range o {
+//		if ignoredUserField(k) {
+//			continue
+//		}
+//		assert.Equal(t, o[k], r[k])
+//	}
+//	// Clean up
+//	err = c.UserDelete(u.ID)
+//	assert.NoError(t, err)
+//}
 
 func TestUserCreateExisting(t *testing.T) {
 	err := c.UserCreate(config.NotExistingUser, password, nil)
