@@ -1,5 +1,5 @@
 PROJECT_NAME := "gonextcloud"
-PKG := "github.com/partitio/$(PROJECT_NAME)"
+PKG := "gitlab.adphi.fr/partitio/Nextcloud-Partitio/$(PROJECT_NAME)"
 PKG_LIST := $(shell go list ${PKG})
 GO_FILES := $(shell find . -name '*.go' | grep -v _test.go)
 
@@ -20,11 +20,11 @@ msan: dep ## Run memory sanitizer
 	@go test -msan -short ${PKG_LIST}
 
 coverage: ## Generate global code coverage report
-	mkdir -p cover
+	@mkdir -p cover
 	go tool cover -html=cover/gonextcloud.cov -o coverage.html
 
 dep: ## Get the dependencies
-	mkdir -p vendor
+	@mkdir -p vendor
 	@govendor add +external
 
 help: ## Display this help screen

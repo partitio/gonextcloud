@@ -1,7 +1,7 @@
 package gonextcloud
 
 import (
-	"github.com/partitio/gonextcloud/types"
+	"gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud/types"
 	"net/http"
 )
 

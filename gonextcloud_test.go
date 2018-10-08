@@ -1,7 +1,7 @@
 package gonextcloud
 
 import (
-	"github.com/partitio/gonextcloud/types"
+	"gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud/types"
 	"github.com/partitio/swarmmanager/libnextcloudpartitio/utils"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v2"

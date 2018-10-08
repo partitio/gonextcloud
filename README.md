@@ -1,13 +1,13 @@
 ![Nextcloud](https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Nextcloud_Logo.svg/640px-Nextcloud_Logo.svg.png)
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/partitio/gonextcloud)](https://goreportcard.com/report/github.com/partitio/gonextcloud)
+[![Go Report Card](https://goreportcard.com/badge/gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud)](https://goreportcard.com/report/gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud)
 # GoNextcloud
 
 A simple Client for Nextcloud's Provisioning API in Go.
 
 
 ```go
-    import "github.com/partitio/gonextcloud"
+    import "gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud"
 ```
 
 
@@ -18,7 +18,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/partitio/gonextcloud"
+	"gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud"
 )
 
 func main() {
@@ -290,7 +290,7 @@ type Routes struct {
 # types
 
 ```go
-import "github.com/partitio/gonextcloud/types"
+import "gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud/types"
 ```
 
 

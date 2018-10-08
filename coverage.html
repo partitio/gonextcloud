@@ -54,17 +54,17 @@
 			<div id="nav">
 				<select id="files">
 				
-				<option value="file0">github.com/partitio/gonextcloud/apps.go (0.0%)</option>
+				<option value="file0">gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud/apps.go (0.0%)</option>
 				
-				<option value="file1">github.com/partitio/gonextcloud/auth.go (100.0%)</option>
+				<option value="file1">gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud/auth.go (100.0%)</option>
 				
-				<option value="file2">github.com/partitio/gonextcloud/client.go (85.7%)</option>
+				<option value="file2">gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud/client.go (85.7%)</option>
 				
-				<option value="file3">github.com/partitio/gonextcloud/groups.go (35.3%)</option>
+				<option value="file3">gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud/groups.go (35.3%)</option>
 				
-				<option value="file4">github.com/partitio/gonextcloud/users.go (89.0%)</option>
+				<option value="file4">gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud/users.go (89.0%)</option>
 				
-				<option value="file5">github.com/partitio/gonextcloud/utils.go (100.0%)</option>
+				<option value="file5">gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud/utils.go (100.0%)</option>
 				
 				</select>
 			</div>
@@ -91,7 +91,7 @@
 
 import (
         req "github.com/levigross/grequests"
-        "github.com/partitio/gonextcloud/types"
+        "gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud/types"
         "net/http"
 )
 
@@ -172,7 +172,7 @@ func (c *Client) appsBaseRequest(name string, route string, ro *req.RequestOptio
 import (
         "fmt"
         req "github.com/levigross/grequests"
-        "github.com/partitio/gonextcloud/types"
+        "gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud/types"
 )
 
 var unauthorized = fmt.Errorf("login first")
@@ -236,7 +236,7 @@ For example, to list all the Nextcloud's instance users:
 
         import (
                 "fmt"
-                "github.com/partitio/gonextcloud/client"
+                "gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud/client"
         )
 
         func main() {
@@ -264,7 +264,7 @@ package gonextcloud
 
 import (
         req "github.com/levigross/grequests"
-        "github.com/partitio/gonextcloud/types"
+        "gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud/types"
         "net/url"
 )
 
@@ -301,7 +301,7 @@ func NewClient(hostname string) (*Client, error) <span class="cov10" title="3">{
 
 import (
         req "github.com/levigross/grequests"
-        "github.com/partitio/gonextcloud/types"
+        "gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud/types"
         "net/http"
 )
 
@@ -379,7 +379,7 @@ import (
         "encoding/json"
         "github.com/fatih/structs"
         req "github.com/levigross/grequests"
-        "github.com/partitio/gonextcloud/types"
+        "gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud/types"
         "net/http"
         "path"
         "strconv"
@@ -616,7 +616,7 @@ func ignoredUserField(key string) bool <span class="cov7" title="44">{
 import (
         "encoding/json"
         req "github.com/levigross/grequests"
-        "github.com/partitio/gonextcloud/types"
+        "gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud/types"
         "net/http"
         "net/url"
         "path"

@@ -14,7 +14,7 @@ For example, to list all the Nextcloud's instance users:
 
 	import (
 		"fmt"
-		"github.com/partitio/gonextcloud/client"
+		"gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud/client"
 	)
 
 	func main() {
@@ -41,7 +41,7 @@ package gonextcloud
 
 import (
 	req "github.com/levigross/grequests"
-	"github.com/partitio/gonextcloud/types"
+	"gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud/types"
 	"net/url"
 )
 

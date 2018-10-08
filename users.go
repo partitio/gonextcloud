@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"github.com/fatih/structs"
 	req "github.com/levigross/grequests"
-	"github.com/partitio/gonextcloud/types"
+	"gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud/types"
 	"net/http"
 	"path"
 	"strconv"
