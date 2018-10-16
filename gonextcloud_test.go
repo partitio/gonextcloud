@@ -76,7 +76,6 @@ var (
 			func(t *testing.T) {
 				us, err := c.UserList()
 				assert.NoError(t, err)
-
 				assert.Contains(t, us, config.Login)
 			},
 		},
@@ -195,7 +194,7 @@ var (
 		{
 			"TestUserCreateExisting",
 			func(t *testing.T) {
-				err := c.UserCreate(config.NotExistingUser, password, nil)
+				err := c.UserCreate(config.Login, password, nil)
 				assert.Error(t, err)
 			},
 		},
@@ -480,11 +479,9 @@ func TestUserCreateWithoutPassword(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Nextcloud does not seems to like recreating a deleted user
-	rand.Seed(time.Now().Unix())
-	n := fmt.Sprintf("%s-%s", config.NotExistingUser, strconv.Itoa(rand.Int()))
-	err := c.UserCreateWithoutPassword(n, config.Email, strings.Title(config.NotExistingUser))
+	err := c.UserCreateWithoutPassword(config.NotExistingUser, config.Email, strings.Title(config.NotExistingUser))
 	assert.NoError(t, err)
-	err = c.UserDelete(n)
+	err = c.UserDelete(config.NotExistingUser)
 	assert.NoError(t, err)
 }
 
@@ -534,11 +531,13 @@ func LoadConfig() error {
 	if e != "" {
 		config.Email = e
 	}
+	config.NotExistingUser = fmt.Sprintf("%s-%s", config.NotExistingUser, strconv.Itoa(rand.Int()))
 	return nil
 }
 
 func initClient() error {
 	if c == nil {
+		rand.Seed(time.Now().Unix())
 		if err := LoadConfig(); err != nil {
 			return err
 		}

@@ -8,6 +8,7 @@ import (
 	"strconv"
 )
 
+//GroupFoldersList returns the groups folders
 func (c *Client) GroupFoldersList() (map[int]types.GroupFolder, error) {
 	res, err := c.baseRequest(http.MethodGet, routes.groupfolders, nil)
 	if err != nil {
@@ -19,6 +20,7 @@ func (c *Client) GroupFoldersList() (map[int]types.GroupFolder, error) {
 	return gfs, nil
 }
 
+//GroupFolders returns the group folder details
 func (c *Client) GroupFolders(id int) (types.GroupFolder, error) {
 	res, err := c.baseRequest(http.MethodGet, routes.groupfolders, nil, strconv.Itoa(id))
 	if err != nil {
@@ -32,6 +34,7 @@ func (c *Client) GroupFolders(id int) (types.GroupFolder, error) {
 	return r.Ocs.Data.FormatGroupFolder(), nil
 }
 
+//GroupFoldersCreate creates a group folder
 func (c *Client) GroupFoldersCreate(name string) (id int, err error) {
 	// TODO: Validate Folder name
 	ro := &req.RequestOptions{
@@ -49,6 +52,7 @@ func (c *Client) GroupFoldersCreate(name string) (id int, err error) {
 	return id, nil
 }
 
+//GroupFoldersRename renames the group folder
 func (c *Client) GroupFoldersRename(groupID int, name string) error {
 	ro := &req.RequestOptions{
 		Data: map[string]string{
@@ -64,10 +68,8 @@ func (c *Client) GroupFoldersRename(groupID int, name string) error {
 }
 
 //TODO func (c *Client) GroupFoldersDelete(id int) error {
-//	// GroupFolders's response does not give any clues about success or failure
-//	return nil
-//}
 
+//GroupFoldersAddGroup adds group to folder
 func (c *Client) GroupFoldersAddGroup(folderID int, groupName string) error {
 	ro := &req.RequestOptions{
 		Data: map[string]string{
@@ -82,6 +84,7 @@ func (c *Client) GroupFoldersAddGroup(folderID int, groupName string) error {
 	return nil
 }
 
+//GroupFoldersRemoveGroup remove a group from the group folder
 func (c *Client) GroupFoldersRemoveGroup(folderID int, groupName string) error {
 	// GroupFolders's response does not give any clues about success or failure
 	_, err := c.baseRequest(http.MethodDelete, routes.groupfolders, nil, strconv.Itoa(folderID), "groups", groupName)
@@ -91,6 +94,7 @@ func (c *Client) GroupFoldersRemoveGroup(folderID int, groupName string) error {
 	return nil
 }
 
+//GroupFoldersSetGroupPermissions set groups permissions
 func (c *Client) GroupFoldersSetGroupPermissions(folderID int, groupName string, permission types.SharePermission) error {
 	ro := &req.RequestOptions{
 		Data: map[string]string{

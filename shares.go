@@ -9,6 +9,7 @@ import (
 	"sync"
 )
 
+//SharesList list all shares of the logged in user
 func (c *Client) SharesList() ([]types.Share, error) {
 	res, err := c.baseRequest(http.MethodGet, routes.shares, nil)
 	if err != nil {
@@ -19,6 +20,7 @@ func (c *Client) SharesList() ([]types.Share, error) {
 	return r.Ocs.Data, nil
 }
 
+//Shares return shares from a specific file or folder
 func (c *Client) Shares(path string, reshares bool, subfiles bool) ([]types.Share, error) {
 	ro := &req.RequestOptions{
 		Params: map[string]string{
@@ -36,6 +38,7 @@ func (c *Client) Shares(path string, reshares bool, subfiles bool) ([]types.Shar
 	return r.Ocs.Data, nil
 }
 
+//Share Get information about a known Share
 func (c *Client) Share(shareID string) (types.Share, error) {
 	res, err := c.baseRequest(http.MethodGet, routes.shares, nil, shareID)
 	if err != nil {
@@ -46,6 +49,7 @@ func (c *Client) Share(shareID string) (types.Share, error) {
 	return r.Ocs.Data[0], nil
 }
 
+//ShareCreate create a share
 func (c *Client) ShareCreate(
 	path string,
 	shareType types.ShareType,
@@ -77,11 +81,13 @@ func (c *Client) ShareCreate(
 	return r.Ocs.Data, nil
 }
 
+//ShareDelete Remove the given share.
 func (c *Client) ShareDelete(shareID int) error {
 	_, err := c.baseRequest(http.MethodDelete, routes.shares, nil, strconv.Itoa(shareID))
 	return err
 }
 
+// ShareUpdate update share details
 // expireDate expireDate expects a well formatted date string, e.g. ‘YYYY-MM-DD’
 func (c *Client) ShareUpdate(shareUpdate types.ShareUpdate) error {
 	errs := make(chan types.UpdateError)
@@ -130,19 +136,23 @@ func (c *Client) ShareUpdate(shareUpdate types.ShareUpdate) error {
 	return types.NewUpdateError(errs)
 }
 
+// ShareUpdateExpireDate updates the share's expire date
 // expireDate expects a well formatted date string, e.g. ‘YYYY-MM-DD’
 func (c *Client) ShareUpdateExpireDate(shareID int, expireDate string) error {
 	return c.baseShareUpdate(strconv.Itoa(shareID), "expireDate", expireDate)
 }
 
+//ShareUpdatePublicUpload enable or disable public upload
 func (c *Client) ShareUpdatePublicUpload(shareID int, public bool) error {
 	return c.baseShareUpdate(strconv.Itoa(shareID), "publicUpload", strconv.FormatBool(public))
 }
 
+//ShareUpdatePassword updates share password
 func (c *Client) ShareUpdatePassword(shareID int, password string) error {
 	return c.baseShareUpdate(strconv.Itoa(shareID), "password", password)
 }
 
+//ShareUpdatePermissions update permissions
 func (c *Client) ShareUpdatePermissions(shareID int, permissions types.SharePermission) error {
 	return c.baseShareUpdate(strconv.Itoa(shareID), "permissions", strconv.Itoa(int(permissions)))
 }
