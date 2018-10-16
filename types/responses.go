@@ -90,6 +90,24 @@ type AppResponse struct {
 	} `json:"ocs"`
 }
 
+type AppConfigResponse struct {
+	Ocs struct {
+		Meta Meta `json:"meta"`
+		Data struct {
+			Data []string `json:"data"`
+		} `json:"data"`
+	} `json:"ocs"`
+}
+
+type AppcConfigValueResponse struct {
+	Ocs struct {
+		Meta Meta `json:"meta"`
+		Data struct {
+			Data string `json:"data"`
+		} `json:"data"`
+	} `json:"ocs"`
+}
+
 //CapabilitiesResponse
 type CapabilitiesResponse struct {
 	Ocs struct {
