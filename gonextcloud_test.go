@@ -1,15 +1,19 @@
 package gonextcloud
 
 import (
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud/types"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
+	"math/rand"
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
 	"testing"
+	"time"
 )
 
 type Config struct {
@@ -551,9 +555,12 @@ func TestUserCreateWithoutPassword(t *testing.T) {
 	if err := initClient(); err != nil {
 		t.Fatal(err)
 	}
-	err := c.UserCreateWithoutPassword(config.NotExistingUser, config.Email, strings.Title(config.NotExistingUser))
+	// Nextcloud does not seems to like recreating a deleted user
+	rand.Seed(time.Now().Unix())
+	n := fmt.Sprintf("%s-%s", config.NotExistingUser, strconv.Itoa(rand.Int()))
+	err := c.UserCreateWithoutPassword(n, config.Email, strings.Title(config.NotExistingUser))
 	assert.NoError(t, err)
-	err = c.UserDelete(config.NotExistingUser)
+	err = c.UserDelete(n)
 	assert.NoError(t, err)
 }
 
