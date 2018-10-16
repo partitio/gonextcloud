@@ -587,7 +587,23 @@ func LoadConfig() error {
 	if err != nil {
 		return err
 	}
-	return yaml.Unmarshal(b, &config)
+	if err := yaml.Unmarshal(b, &config); err != nil {
+		return err
+	}
+	// Override with env variables
+	u := os.Getenv("NEXTCLOUD_URL")
+	if u != "" {
+		config.URL = u
+	}
+	p := os.Getenv("NEXTCLOUD_PASSWORD")
+	if p != "" {
+		config.Password = p
+	}
+	e := os.Getenv("NEXTCLOUD_EMAIL")
+	if e != "" {
+		config.Email = e
+	}
+	return nil
 }
 
 func initClient() error {
