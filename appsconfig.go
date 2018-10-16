@@ -59,8 +59,8 @@ func (c *Client) AppsConfigDeleteValue(id, key, value string) error {
 
 //AppsConfig returns all apps AppConfigDetails
 func (c *Client) AppsConfig() (map[string]map[string]string, error) {
-	config := make(map[string]map[string]string)
-	var err error
+	config := map[string]map[string]string{}
+	m := sync.Mutex{}
 	appsIDs, err := c.AppsConfigList()
 	if err != nil {
 		return nil, err
@@ -72,7 +72,9 @@ func (c *Client) AppsConfig() (map[string]map[string]string, error) {
 			defer wg.Done()
 			d, err := c.AppsConfigDetails(id)
 			if err == nil {
+				m.Lock()
 				config[id] = d
+				m.Unlock()
 			}
 		}(appsIDs[i])
 	}
@@ -82,7 +84,8 @@ func (c *Client) AppsConfig() (map[string]map[string]string, error) {
 
 //AppsConfigDetails returns all the config's key, values pair of the app
 func (c *Client) AppsConfigDetails(appID string) (map[string]string, error) {
-	config := make(map[string]string)
+	config := map[string]string{}
+	m := sync.Mutex{}
 	var err error
 	var ks []string
 	ks, err = c.AppsConfigKeys(appID)
@@ -94,10 +97,11 @@ func (c *Client) AppsConfigDetails(appID string) (map[string]string, error) {
 	for i := range ks {
 		go func(key string) {
 			defer wg.Done()
-			var v string
-			v, err = c.AppsConfigValue(appID, key)
+			v, err := c.AppsConfigValue(appID, key)
 			if err == nil {
+				m.Lock()
 				config[key] = v
+				m.Unlock()
 			}
 		}(ks[i])
 	}
