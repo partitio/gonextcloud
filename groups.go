@@ -17,6 +17,17 @@ func (c *Client) GroupList() ([]string, error) {
 	return r.Ocs.Data.Groups, nil
 }
 
+//GroupListDetails lists the Nextcloud groups
+func (c *Client) GroupListDetails() ([]types.Group, error) {
+	res, err := c.baseRequest(http.MethodGet, routes.groups, nil, "details")
+	if err != nil {
+		return nil, err
+	}
+	var r types.GroupListDetailsResponse
+	res.JSON(&r)
+	return r.Ocs.Data.Groups, nil
+}
+
 //GroupUsers list the group's users
 func (c *Client) GroupUsers(name string) ([]string, error) {
 	res, err := c.baseRequest(http.MethodGet, routes.groups, nil, name)

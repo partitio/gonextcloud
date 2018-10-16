@@ -18,5 +18,11 @@ type User struct {
 	Website     string   `json:"website"`
 	Twitter     string   `json:"twitter"`
 	Groups      []string `json:"groups"`
-	Language    string   `json:"language"`
+	Language    string   `json:"language,omitempty"`
+
+	StorageLocation string        `json:"storageLocation,omitempty"`
+	LastLogin       int64         `json:"lastLogin,omitempty"`
+	Backend         string        `json:"backend,omitempty"`
+	Subadmin        []interface{} `json:"subadmin,omitempty"`
+	Locale          string        `json:"locale,omitempty"`
 }

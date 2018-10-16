@@ -27,6 +27,7 @@ func (c *Client) Login(username string, password string) error {
 	res.JSON(&r)
 	// No need to check for Ocs.Meta.StatusCode as capabilities are always returned
 	c.capabilities = &r.Ocs.Data.Capabilities
+	c.version = &r.Ocs.Data.Version
 	// Check if authentication failed
 	if !c.loggedIn() {
 		e := types.APIError{Message: "authentication failed"}

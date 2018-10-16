@@ -27,6 +27,15 @@ type UserListResponse struct {
 	} `json:"ocs"`
 }
 
+type UserListDetailsResponse struct {
+	Ocs struct {
+		Meta Meta `json:"meta"`
+		Data struct {
+			Users map[string]User `json:"users"`
+		} `json:"data"`
+	} `json:"ocs"`
+}
+
 //UserResponse
 type UserResponse struct {
 	Ocs struct {
@@ -49,6 +58,16 @@ type GroupListResponse struct {
 		Meta Meta `json:"meta"`
 		Data struct {
 			Groups []string `json:"groups"`
+		} `json:"data"`
+	} `json:"ocs"`
+}
+
+//GroupListDetailsResponse
+type GroupListDetailsResponse struct {
+	Ocs struct {
+		Meta Meta `json:"meta"`
+		Data struct {
+			Groups []Group `json:"groups"`
 		} `json:"data"`
 	} `json:"ocs"`
 }
@@ -76,16 +95,18 @@ type CapabilitiesResponse struct {
 	Ocs struct {
 		Meta Meta `json:"meta"`
 		Data struct {
-			Version struct {
-				Major   int    `json:"major"`
-				Minor   int    `json:"minor"`
-				Micro   int    `json:"micro"`
-				String  string `json:"string"`
-				Edition string `json:"edition"`
-			} `json:"version"`
+			Version      Version      `json:"version"`
 			Capabilities Capabilities `json:"capabilities"`
 		} `json:"data"`
 	} `json:"ocs"`
+}
+
+type Version struct {
+	Major   int    `json:"major"`
+	Minor   int    `json:"minor"`
+	Micro   int    `json:"micro"`
+	String  string `json:"string"`
+	Edition string `json:"edition"`
 }
 
 type MonitoringResponse struct {

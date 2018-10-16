@@ -14,6 +14,7 @@ type Client struct {
 	session      *req.Session
 	headers      map[string]string
 	capabilities *types.Capabilities
+	version      *types.Version
 }
 
 // NewClient create a new Client from the Nextcloud Instance URL

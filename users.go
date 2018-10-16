@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/fatih/structs"
 	req "github.com/levigross/grequests"
+	"github.com/pkg/errors"
 	"gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud/types"
 	"net/http"
 	"path"
@@ -20,6 +21,18 @@ func (c *Client) UserList() ([]string, error) {
 		return nil, err
 	}
 	var r types.UserListResponse
+	res.JSON(&r)
+	return r.Ocs.Data.Users, nil
+}
+
+//UserListDetails return a map of user with details
+func (c *Client) UserListDetails() (map[string]types.User, error) {
+	res, err := c.baseRequest(http.MethodGet, routes.users, nil, "details")
+	//res, err := c.session.Get(u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	var r types.UserListDetailsResponse
 	res.JSON(&r)
 	return r.Ocs.Data.Users, nil
 }
@@ -75,6 +88,29 @@ func (c *Client) UserCreate(username string, password string, user *types.User) 
 	}
 	// Add user details information
 	return c.UserUpdate(user)
+}
+
+// UserCreateWithoutPassword create a user without provisioning a password, the email address must be provided to send
+// an init password email
+func (c *Client) UserCreateWithoutPassword(username, email, displayName string) error {
+	if c.version.Major < 14 {
+		return errors.New("unsupported method: requires Nextcloud 14+")
+	}
+	if username == "" || email == "" {
+		return errors.New("username and email cannot be empty")
+	}
+	ro := &req.RequestOptions{
+		Data: map[string]string{
+			"userid":      username,
+			"email":       email,
+			"displayName": displayName,
+		},
+	}
+
+	if err := c.userBaseRequest(http.MethodPost, ro); err != nil {
+		return err
+	}
+	return nil
 }
 
 //UserDelete delete the user

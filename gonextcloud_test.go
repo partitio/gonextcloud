@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -19,6 +20,7 @@ type Config struct {
 	ShareFolder      string `yaml:"share-folder"`
 	NotExistingUser  string `yaml:"not-existing-user"`
 	NotExistingGroup string `yaml:"not-existing-group"`
+	Email            string `yaml:"email"`
 }
 
 const password = "somecomplicatedpassword"
@@ -542,6 +544,37 @@ func TestGroupFolders(t *testing.T) {
 	for _, tt := range groupFoldersTests {
 		t.Run(tt.string, tt.test)
 	}
+}
+
+func TestUserCreateWithoutPassword(t *testing.T) {
+	c = nil
+	if err := initClient(); err != nil {
+		t.Fatal(err)
+	}
+	err := c.UserCreateWithoutPassword(config.NotExistingUser, config.Email, strings.Title(config.NotExistingUser))
+	assert.NoError(t, err)
+	err = c.UserDelete(config.NotExistingUser)
+	assert.NoError(t, err)
+}
+
+func TestUserListDetails(t *testing.T) {
+	c = nil
+	if err := initClient(); err != nil {
+		t.Fatal(err)
+	}
+	us, err := c.UserListDetails()
+	assert.NoError(t, err)
+	assert.Contains(t, us, config.Login)
+}
+
+func TestGroupListDetails(t *testing.T) {
+	c = nil
+	if err := initClient(); err != nil {
+		t.Fatal(err)
+	}
+	gs, err := c.GroupListDetails()
+	assert.NoError(t, err)
+	assert.NotEmpty(t, gs)
 }
 
 // LoadConfig loads the test configuration
