@@ -59,6 +59,7 @@ func (c *Client) UserSearch(search string) ([]string, error) {
 
 // UserCreate create a new user
 func (c *Client) UserCreate(username string, password string, user *types.User) error {
+	// Create base User
 	ro := &req.RequestOptions{
 		Data: map[string]string{
 			"userid":   username,
@@ -68,9 +69,11 @@ func (c *Client) UserCreate(username string, password string, user *types.User) 
 	if err := c.userBaseRequest(http.MethodPost, ro); err != nil {
 		return err
 	}
+	// Check if we need to add user details information
 	if user == nil {
 		return nil
 	}
+	// Add user details information
 	return c.UserUpdate(user)
 }
 
