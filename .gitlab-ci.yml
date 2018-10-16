@@ -21,12 +21,12 @@ unit_tests:
   script:
   - make test
 
-race_detector:
-  stage: test
-  tags:
-  - docker
-  script:
-  - make race
+#race_detector:
+#  stage: test
+#  tags:
+#  - docker
+#  script:
+#  - make race
 
 code_coverage:
   stage: test
