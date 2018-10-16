@@ -1,5 +1,7 @@
 ![Nextcloud](https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Nextcloud_Logo.svg/640px-Nextcloud_Logo.svg.png)
 
+[![pipeline status](http://gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud/badges/master/pipeline.svg)](http://gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud/commits/master)
+[![coverage report](http://gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud/badges/master/coverage.svg)](http://gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud/commits/master)
 [![Go Report Card](https://goreportcard.com/badge/gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud)](https://goreportcard.com/report/gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud)
 # GoNextcloud
 
