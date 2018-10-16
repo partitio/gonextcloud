@@ -1,0 +1,8 @@
+url: $NEXTCLOUD_URL
+login: admin
+password: $NEXTCLOUD_PASSWORD
+app-name: testapp
+share-folder: /Documents
+not-existing-user: this-user-should-not-exist
+not-existing-group: this-group-should-not-exist
+email: $NEXTCLOUD_EMAIL
