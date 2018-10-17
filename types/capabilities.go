@@ -12,6 +12,17 @@ type Capabilities struct {
 	Activity struct {
 		Apiv2 []string `json:"apiv2"`
 	} `json:"activity"`
+	Ocm struct {
+		Enabled    bool   `json:"enabled"`
+		APIVersion string `json:"apiVersion"`
+		EndPoint   string `json:"endPoint"`
+		ShareTypes []struct {
+			Name      string `json:"name"`
+			Protocols struct {
+				Webdav string `json:"webdav"`
+			} `json:"protocols"`
+		} `json:"shareTypes"`
+	} `json:"ocm"`
 	Dav struct {
 		Chunking string `json:"chunking"`
 	} `json:"dav"`
@@ -43,7 +54,8 @@ type Capabilities struct {
 				Enabled bool `json:"enabled"`
 			} `json:"expire_date"`
 		} `json:"group"`
-		Federation struct {
+		DefaultPermissions int `json:"default_permissions"`
+		Federation         struct {
 			Outgoing   bool `json:"outgoing"`
 			Incoming   bool `json:"incoming"`
 			ExpireDate struct {
@@ -64,8 +76,9 @@ type Capabilities struct {
 		} `json:"sharebymail"`
 	} `json:"files_sharing"`
 	Notifications struct {
-		OcsEndpoints []string `json:"ocs-endpoints"`
-		Push         []string `json:"push"`
+		OcsEndpoints       []string `json:"ocs-endpoints"`
+		Push               []string `json:"push"`
+		AdminNotifications []string `json:"admin-notifications"`
 	} `json:"notifications"`
 	PasswordPolicy struct {
 		MinLength                int  `json:"minLength"`
@@ -92,4 +105,9 @@ type Capabilities struct {
 		Undelete         bool     `json:"undelete"`
 		Versioning       bool     `json:"versioning"`
 	} `json:"files"`
+	Registration struct {
+		Enabled  bool   `json:"enabled"`
+		APIRoot  string `json:"apiRoot"`
+		APILevel string `json:"apiLevel"`
+	} `json:"registration"`
 }

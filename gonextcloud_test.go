@@ -478,6 +478,9 @@ func TestUserCreateWithoutPassword(t *testing.T) {
 	if err := initClient(); err != nil {
 		t.Fatal(err)
 	}
+	if c.version.Major < 14 {
+		t.SkipNow()
+	}
 	// Nextcloud does not seems to like recreating a deleted user
 	err := c.UserCreateWithoutPassword(config.NotExistingUser, config.Email, strings.Title(config.NotExistingUser))
 	assert.NoError(t, err)

@@ -168,3 +168,17 @@ type GroupFoldersResponse struct {
 		Data GroupFolderBadFormatGroups `json:"data"`
 	} `json:"ocs"`
 }
+
+type NotificationsListResponse struct {
+	Ocs struct {
+		Meta Meta           `json:"meta"`
+		Data []Notification `json:"data"`
+	} `json:"ocs"`
+}
+
+type NotificationResponse struct {
+	Ocs struct {
+		Meta Meta         `json:"meta"`
+		Data Notification `json:"data"`
+	} `json:"ocs"`
+}
