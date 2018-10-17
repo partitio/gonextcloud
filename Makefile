@@ -21,7 +21,8 @@ msan: dep ## Run memory sanitizer
 
 coverage: ## Generate global code coverage report
 	@mkdir -p cover
-	go tool cover -html=cover/gonextcloud.cov -o coverage.html
+	@touch cover/${PROJECT_NAME}cov
+	go tool cover -html=cover/${PROJECT_NAME}cov -o coverage.html
 
 dep: ## Get the dependencies
 	@mkdir -p vendor
