@@ -58,7 +58,7 @@ func (c *Client) AppInfos(name string) (types.App, error) {
 
 //AppEnable enables an app
 func (c *Client) AppEnable(name string) error {
-	_, err := c.baseRequest(http.MethodPut, routes.apps, nil, name)
+	_, err := c.baseRequest(http.MethodPost, routes.apps, nil, name)
 	return err
 }
 
