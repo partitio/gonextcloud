@@ -6,9 +6,25 @@ import (
 	"net/http"
 )
 
-//GroupList lists the Nextcloud groups
-func (c *Client) GroupList() ([]string, error) {
-	res, err := c.baseRequest(http.MethodGet, routes.groups, nil)
+//GroupsI available methods
+type GroupsI interface {
+	List() ([]string, error)
+	ListDetails() ([]types.Group, error)
+	Users(name string) ([]string, error)
+	Search(search string) ([]string, error)
+	Create(name string) error
+	Delete(name string) error
+	SubAdminList(name string) ([]string, error)
+}
+
+//Groups contains all Groups available actions
+type Groups struct {
+	c *Client
+}
+
+//List lists the Nextcloud groups
+func (g *Groups) List() ([]string, error) {
+	res, err := g.c.baseRequest(http.MethodGet, routes.groups, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -17,9 +33,9 @@ func (c *Client) GroupList() ([]string, error) {
 	return r.Ocs.Data.Groups, nil
 }
 
-//GroupListDetails lists the Nextcloud groups
-func (c *Client) GroupListDetails() ([]types.Group, error) {
-	res, err := c.baseRequest(http.MethodGet, routes.groups, nil, "details")
+//ListDetails lists the Nextcloud groups
+func (g *Groups) ListDetails() ([]types.Group, error) {
+	res, err := g.c.baseRequest(http.MethodGet, routes.groups, nil, "details")
 	if err != nil {
 		return nil, err
 	}
@@ -28,9 +44,9 @@ func (c *Client) GroupListDetails() ([]types.Group, error) {
 	return r.Ocs.Data.Groups, nil
 }
 
-//GroupUsers list the group's users
-func (c *Client) GroupUsers(name string) ([]string, error) {
-	res, err := c.baseRequest(http.MethodGet, routes.groups, nil, name)
+//Users list the group's users
+func (g *Groups) Users(name string) ([]string, error) {
+	res, err := g.c.baseRequest(http.MethodGet, routes.groups, nil, name)
 	if err != nil {
 		return nil, err
 	}
@@ -39,12 +55,12 @@ func (c *Client) GroupUsers(name string) ([]string, error) {
 	return r.Ocs.Data.Users, nil
 }
 
-//GroupSearch return the list of groups matching the search string
-func (c *Client) GroupSearch(search string) ([]string, error) {
+//Search return the list of groups matching the search string
+func (g *Groups) Search(search string) ([]string, error) {
 	ro := &req.RequestOptions{
 		Params: map[string]string{"search": search},
 	}
-	res, err := c.baseRequest(http.MethodGet, routes.groups, ro)
+	res, err := g.c.baseRequest(http.MethodGet, routes.groups, ro)
 	if err != nil {
 		return nil, err
 	}
@@ -53,24 +69,24 @@ func (c *Client) GroupSearch(search string) ([]string, error) {
 	return r.Ocs.Data.Groups, nil
 }
 
-//GroupCreate creates a group
-func (c *Client) GroupCreate(name string) error {
+//Create creates a group
+func (g *Groups) Create(name string) error {
 	ro := &req.RequestOptions{
 		Data: map[string]string{
 			"groupid": name,
 		},
 	}
-	return c.groupBaseRequest(http.MethodPost, ro)
+	return g.baseRequest(http.MethodPost, ro)
 }
 
-//GroupDelete deletes the group
-func (c *Client) GroupDelete(name string) error {
-	return c.groupBaseRequest(http.MethodDelete, nil, name)
+//Delete deletes the group
+func (g *Groups) Delete(name string) error {
+	return g.baseRequest(http.MethodDelete, nil, name)
 }
 
-//GroupSubAdminList lists the group's subadmins
-func (c *Client) GroupSubAdminList(name string) ([]string, error) {
-	res, err := c.baseRequest(http.MethodGet, routes.groups, nil, name, "subadmins")
+//SubAdminList lists the group's subadmins
+func (g *Groups) SubAdminList(name string) ([]string, error) {
+	res, err := g.c.baseRequest(http.MethodGet, routes.groups, nil, name, "subadmins")
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +95,7 @@ func (c *Client) GroupSubAdminList(name string) ([]string, error) {
 	return r.Ocs.Data.Users, nil
 }
 
-func (c *Client) groupBaseRequest(method string, ro *req.RequestOptions, subRoute ...string) error {
-	_, err := c.baseRequest(method, routes.groups, ro, subRoute...)
+func (g *Groups) baseRequest(method string, ro *req.RequestOptions, subRoute ...string) error {
+	_, err := g.c.baseRequest(method, routes.groups, ro, subRoute...)
 	return err
 }

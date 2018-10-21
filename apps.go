@@ -6,9 +6,24 @@ import (
 	"net/http"
 )
 
-//AppList return the list of the Nextcloud Apps
-func (c *Client) AppList() ([]string, error) {
-	res, err := c.baseRequest(http.MethodGet, routes.apps, nil)
+//AppsI available methods
+type AppsI interface {
+	List() ([]string, error)
+	ListEnabled() ([]string, error)
+	ListDisabled() ([]string, error)
+	Infos(name string) (types.App, error)
+	Enable(name string) error
+	Disable(name string) error
+}
+
+//Apps contains all Apps available actions
+type Apps struct {
+	c *Client
+}
+
+//List return the list of the Nextcloud Apps
+func (a *Apps) List() ([]string, error) {
+	res, err := a.c.baseRequest(http.MethodGet, routes.apps, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -17,12 +32,12 @@ func (c *Client) AppList() ([]string, error) {
 	return r.Ocs.Data.Apps, nil
 }
 
-//AppListEnabled lists the enabled apps
-func (c *Client) AppListEnabled() ([]string, error) {
+//ListEnabled lists the enabled apps
+func (a *Apps) ListEnabled() ([]string, error) {
 	ro := &req.RequestOptions{
 		Params: map[string]string{"filter": "enabled"},
 	}
-	res, err := c.baseRequest(http.MethodGet, routes.apps, ro)
+	res, err := a.c.baseRequest(http.MethodGet, routes.apps, ro)
 	if err != nil {
 		return nil, err
 	}
@@ -31,12 +46,12 @@ func (c *Client) AppListEnabled() ([]string, error) {
 	return r.Ocs.Data.Apps, nil
 }
 
-//AppListDisabled lists the disabled apps
-func (c *Client) AppListDisabled() ([]string, error) {
+//ListDisabled lists the disabled apps
+func (a *Apps) ListDisabled() ([]string, error) {
 	ro := &req.RequestOptions{
 		Params: map[string]string{"filter": "disabled"},
 	}
-	res, err := c.baseRequest(http.MethodGet, routes.apps, ro)
+	res, err := a.c.baseRequest(http.MethodGet, routes.apps, ro)
 	if err != nil {
 		return nil, err
 	}
@@ -45,9 +60,9 @@ func (c *Client) AppListDisabled() ([]string, error) {
 	return r.Ocs.Data.Apps, nil
 }
 
-//AppInfos return the app's details
-func (c *Client) AppInfos(name string) (types.App, error) {
-	res, err := c.baseRequest(http.MethodGet, routes.apps, nil, name)
+//Infos return the app's details
+func (a *Apps) Infos(name string) (types.App, error) {
+	res, err := a.c.baseRequest(http.MethodGet, routes.apps, nil, name)
 	if err != nil {
 		return types.App{}, err
 	}
@@ -56,14 +71,14 @@ func (c *Client) AppInfos(name string) (types.App, error) {
 	return r.Ocs.Data, nil
 }
 
-//AppEnable enables an app
-func (c *Client) AppEnable(name string) error {
-	_, err := c.baseRequest(http.MethodPost, routes.apps, nil, name)
+//Enable enables an app
+func (a *Apps) Enable(name string) error {
+	_, err := a.c.baseRequest(http.MethodPost, routes.apps, nil, name)
 	return err
 }
 
-//AppDisable disables an app
-func (c *Client) AppDisable(name string) error {
-	_, err := c.baseRequest(http.MethodDelete, routes.apps, nil, name)
+//Disable disables an app
+func (a *Apps) Disable(name string) error {
+	_, err := a.c.baseRequest(http.MethodDelete, routes.apps, nil, name)
 	return err
 }

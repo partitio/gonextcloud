@@ -74,7 +74,7 @@ var (
 		{
 			"user list",
 			func(t *testing.T) {
-				us, err := c.UserList()
+				us, err := c.Users.List()
 				assert.NoError(t, err)
 				assert.Contains(t, us, config.Login)
 			},
@@ -83,7 +83,7 @@ var (
 		{
 			"existing user",
 			func(t *testing.T) {
-				u, err := c.User(config.Login)
+				u, err := c.Users.Get(config.Login)
 				assert.NoError(t, err)
 				assert.NotNil(t, u)
 			},
@@ -92,7 +92,7 @@ var (
 		{
 			"empty user",
 			func(t *testing.T) {
-				u, err := c.User("")
+				u, err := c.Users.Get("")
 				assert.Error(t, err)
 				assert.Empty(t, u)
 			},
@@ -101,7 +101,7 @@ var (
 		{
 			"TestNonExistingUser",
 			func(t *testing.T) {
-				_, err := c.User(config.NotExistingUser)
+				_, err := c.Users.Get(config.NotExistingUser)
 				assert.Error(t, err)
 			},
 		},
@@ -109,7 +109,7 @@ var (
 		{
 			"TestUserSearch",
 			func(t *testing.T) {
-				us, err := c.UserSearch(config.Login)
+				us, err := c.Users.Search(config.Login)
 				assert.NoError(t, err)
 				assert.Contains(t, us, config.Login)
 			},
@@ -118,7 +118,7 @@ var (
 		{
 			"TestUserCreate",
 			func(t *testing.T) {
-				err := c.UserCreate(config.NotExistingUser, password, nil)
+				err := c.Users.Create(config.NotExistingUser, password, nil)
 				assert.NoError(t, err)
 			},
 		},
@@ -129,7 +129,7 @@ var (
 		//			return
 		//		}
 		//		username := fmt.Sprintf("%s-2", config.NotExistingUser)
-		//		user := &types.User{
+		//		user := &types.Users{
 		//			ID:          username,
 		//			Displayname: strings.ToUpper(username),
 		//			Email:       "some@address.com",
@@ -138,9 +138,9 @@ var (
 		//			Phone:       "42 42 242 424",
 		//			Website:     "my.site.com",
 		//		}
-		//		err := c.UserCreate(username, password, user)
+		//		err := c.Users.Create(username, password, user)
 		//		assert.NoError(t, err)
-		//		u, err := c.User(username)
+		//		u, err := c.Users.Get(username)
 		//		assert.NoError(t, err)
 		//		o := structs.Map(user)
 		//		r := structs.Map(u)
@@ -151,7 +151,7 @@ var (
 		//			assert.Equal(t, o[k], r[k])
 		//		}
 		//		// Clean up
-		//		err = c.UserDelete(u.ID)
+		//		err = c.Users.Delete(u.ID)
 		//		assert.NoError(t, err)
 		//	},
 		//},
@@ -163,9 +163,9 @@ var (
 		//			return
 		//		}
 		//		username := fmt.Sprintf("%s-2", config.NotExistingUser)
-		//		err := c.UserCreate(username, password, nil)
+		//		err := c.Users.Create(username, password, nil)
 		//		assert.NoError(t, err)
-		//		user := &types.User{
+		//		user := &types.Users{
 		//			ID:          username,
 		//			Displayname: strings.ToUpper(username),
 		//			Email:       "some@address.com",
@@ -174,9 +174,9 @@ var (
 		//			Phone:       "42 42 242 424",
 		//			Website:     "my.site.com",
 		//		}
-		//		err = c.UserUpdate(user)
+		//		err = c.Users.Update(user)
 		//		assert.NoError(t, err)
-		//		u, err := c.User(username)
+		//		u, err := c.Users.Get(username)
 		//		assert.NoError(t, err)
 		//		o := structs.Map(user)
 		//		r := structs.Map(u)
@@ -187,14 +187,14 @@ var (
 		//			assert.Equal(t, o[k], r[k])
 		//		}
 		//		// Clean up
-		//		err = c.UserDelete(u.ID)
+		//		err = c.Users.Delete(u.ID)
 		//		assert.NoError(t, err)
 		//	},
 		//},
 		{
 			"TestUserCreateExisting",
 			func(t *testing.T) {
-				err := c.UserCreate(config.Login, password, nil)
+				err := c.Users.Create(config.Login, password, nil)
 				assert.Error(t, err)
 			},
 		},
@@ -202,7 +202,7 @@ var (
 		{
 			"TestGroupList",
 			func(t *testing.T) {
-				gs, err := c.GroupList()
+				gs, err := c.Groups.List()
 				assert.NoError(t, err)
 				assert.Contains(t, gs, "admin")
 			},
@@ -211,7 +211,7 @@ var (
 		{
 			"TestGroupCreate",
 			func(t *testing.T) {
-				err := c.GroupCreate(config.NotExistingGroup)
+				err := c.Groups.Create(config.NotExistingGroup)
 				assert.NoError(t, err)
 			},
 		},
@@ -220,9 +220,9 @@ var (
 			"TestUserUpdateEmail",
 			func(t *testing.T) {
 				email := "my@mail.com"
-				err := c.UserUpdateEmail(config.NotExistingUser, email)
+				err := c.Users.UpdateEmail(config.NotExistingUser, email)
 				assert.NoError(t, err)
-				u, err := c.User(config.NotExistingUser)
+				u, err := c.Users.Get(config.NotExistingUser)
 				assert.NoError(t, err)
 				if err != nil {
 					t.Fail()
@@ -236,9 +236,9 @@ var (
 			"TestUserUpdateDisplayName",
 			func(t *testing.T) {
 				displayName := "Display Name"
-				err := c.UserUpdateDisplayName(config.NotExistingUser, displayName)
+				err := c.Users.UpdateDisplayName(config.NotExistingUser, displayName)
 				assert.NoError(t, err)
-				u, err := c.User(config.NotExistingUser)
+				u, err := c.Users.Get(config.NotExistingUser)
 				assert.NoError(t, err)
 				if err != nil {
 					t.Fail()
@@ -252,9 +252,9 @@ var (
 			"TestUserUpdatePhone",
 			func(t *testing.T) {
 				phone := "+33 42 42 42 42"
-				err := c.UserUpdatePhone(config.NotExistingUser, phone)
+				err := c.Users.UpdatePhone(config.NotExistingUser, phone)
 				assert.NoError(t, err)
-				u, err := c.User(config.NotExistingUser)
+				u, err := c.Users.Get(config.NotExistingUser)
 				assert.NoError(t, err)
 				if err != nil {
 					t.Fail()
@@ -268,9 +268,9 @@ var (
 			"TestUserUpdateAddress",
 			func(t *testing.T) {
 				address := "Main Street, Galifrey"
-				err := c.UserUpdateAddress(config.NotExistingUser, address)
+				err := c.Users.UpdateAddress(config.NotExistingUser, address)
 				assert.NoError(t, err)
-				u, err := c.User(config.NotExistingUser)
+				u, err := c.Users.Get(config.NotExistingUser)
 				assert.NoError(t, err)
 				if err != nil {
 					t.Fail()
@@ -284,9 +284,9 @@ var (
 			"TestUserUpdateWebSite",
 			func(t *testing.T) {
 				website := "www.doctor.who"
-				err := c.UserUpdateWebSite(config.NotExistingUser, website)
+				err := c.Users.UpdateWebSite(config.NotExistingUser, website)
 				assert.NoError(t, err)
-				u, err := c.User(config.NotExistingUser)
+				u, err := c.Users.Get(config.NotExistingUser)
 				assert.NoError(t, err)
 				if err != nil {
 					t.Fail()
@@ -299,9 +299,9 @@ var (
 			"TestUserUpdateTwitter",
 			func(t *testing.T) {
 				twitter := "@doctorwho"
-				err := c.UserUpdateTwitter(config.NotExistingUser, twitter)
+				err := c.Users.UpdateTwitter(config.NotExistingUser, twitter)
 				assert.NoError(t, err)
-				u, err := c.User(config.NotExistingUser)
+				u, err := c.Users.Get(config.NotExistingUser)
 				assert.NoError(t, err)
 				if err != nil {
 					t.Fail()
@@ -314,10 +314,10 @@ var (
 			"TestUserUpdateQuota",
 			func(t *testing.T) {
 				quota := 1024 * 1024 * 1024
-				err := c.UserUpdateQuota(config.NotExistingUser, quota)
+				err := c.Users.UpdateQuota(config.NotExistingUser, quota)
 				assert.NoError(t, err)
-				// TODO : Find better verification : A never connected User does not have quota available
-				//u, err := c.User(config.NotExistingUser)
+				// TODO : Find better verification : A never connected Users does not have quota available
+				//u, err := c.Users(config.NotExistingUser)
 				//assert.NoError(t, err)
 				//assert.Equal(t, quota, u.Quota.Quota)
 			},
@@ -326,15 +326,15 @@ var (
 			"TestUserUpdatePassword",
 			func(t *testing.T) {
 				password := "newcomplexpassword"
-				err := c.UserUpdatePassword(config.NotExistingUser, password)
+				err := c.Users.UpdatePassword(config.NotExistingUser, password)
 				assert.NoError(t, err)
 			}},
 		{
 			"TestUserGroupAdd",
 			func(t *testing.T) {
-				err := c.UserGroupAdd(config.NotExistingUser, config.NotExistingGroup)
+				err := c.Users.GroupAdd(config.NotExistingUser, config.NotExistingGroup)
 				assert.NoError(t, err)
-				gs, err := c.UserGroupList(config.NotExistingUser)
+				gs, err := c.Users.GroupList(config.NotExistingUser)
 				assert.NoError(t, err)
 				assert.Contains(t, gs, config.NotExistingGroup)
 			},
@@ -342,7 +342,7 @@ var (
 		{
 			"TestUserGroupSubAdminList",
 			func(t *testing.T) {
-				gs, err := c.UserGroupSubAdminList(config.NotExistingUser)
+				gs, err := c.Users.GroupSubAdminList(config.NotExistingUser)
 				assert.NoError(t, err)
 				assert.Empty(t, gs)
 			},
@@ -350,9 +350,9 @@ var (
 		{
 			"TestUserGroupPromote",
 			func(t *testing.T) {
-				err := c.UserGroupPromote(config.NotExistingUser, config.NotExistingGroup)
+				err := c.Users.GroupPromote(config.NotExistingUser, config.NotExistingGroup)
 				assert.NoError(t, err)
-				gs, err := c.UserGroupSubAdminList(config.NotExistingUser)
+				gs, err := c.Users.GroupSubAdminList(config.NotExistingUser)
 				assert.NoError(t, err)
 				assert.Contains(t, gs, config.NotExistingGroup)
 			},
@@ -360,7 +360,7 @@ var (
 		{
 			"TestUserGroupDemote",
 			func(t *testing.T) {
-				err := c.UserGroupDemote(config.NotExistingUser, config.NotExistingGroup)
+				err := c.Users.GroupDemote(config.NotExistingUser, config.NotExistingGroup)
 				assert.NoError(t, err)
 				//gs, err := c.UserGroupSubAdminList(config.NotExistingUser)
 				//assert.NoError(t, err)
@@ -370,9 +370,9 @@ var (
 		{
 			"TestUserDisable",
 			func(t *testing.T) {
-				err := c.UserDisable(config.NotExistingUser)
+				err := c.Users.Disable(config.NotExistingUser)
 				assert.NoError(t, err)
-				u, err := c.User(config.NotExistingUser)
+				u, err := c.Users.Get(config.NotExistingUser)
 				assert.NoError(t, err)
 				if err != nil {
 					t.Fail()
@@ -384,9 +384,9 @@ var (
 		{
 			"TestUserEnable",
 			func(t *testing.T) {
-				err := c.UserEnable(config.NotExistingUser)
+				err := c.Users.Enable(config.NotExistingUser)
 				assert.NoError(t, err)
-				u, err := c.User(config.NotExistingUser)
+				u, err := c.Users.Get(config.NotExistingUser)
 				assert.NoError(t, err)
 				if err != nil {
 					t.Fail()
@@ -398,14 +398,14 @@ var (
 		{
 			"TestGroupDelete",
 			func(t *testing.T) {
-				err := c.GroupDelete(config.NotExistingGroup)
+				err := c.Groups.Delete(config.NotExistingGroup)
 				assert.NoError(t, err)
 			},
 		},
 		{
 			"TestUserDelete",
 			func(t *testing.T) {
-				err := c.UserDelete(config.NotExistingUser)
+				err := c.Users.Delete(config.NotExistingUser)
 				assert.NoError(t, err)
 			},
 		},
@@ -424,7 +424,7 @@ var (
 				if err := initClient(); err != nil {
 					return
 				}
-				s, err := c.SharesList()
+				s, err := c.Shares.List()
 				assert.NoError(t, err)
 				assert.NotNil(t, s)
 			},
@@ -482,9 +482,9 @@ func TestUserCreateWithoutPassword(t *testing.T) {
 		t.SkipNow()
 	}
 	// Nextcloud does not seems to like recreating a deleted user
-	err := c.UserCreateWithoutPassword(config.NotExistingUser, config.Email, strings.Title(config.NotExistingUser))
+	err := c.Users.CreateWithoutPassword(config.NotExistingUser, config.Email, strings.Title(config.NotExistingUser))
 	assert.NoError(t, err)
-	err = c.UserDelete(config.NotExistingUser)
+	err = c.Users.Delete(config.NotExistingUser)
 	assert.NoError(t, err)
 }
 
@@ -493,7 +493,7 @@ func TestUserListDetails(t *testing.T) {
 	if err := initClient(); err != nil {
 		t.Fatal(err)
 	}
-	us, err := c.UserListDetails()
+	us, err := c.Users.ListDetails()
 	assert.NoError(t, err)
 	assert.Contains(t, us, config.Login)
 }
@@ -503,7 +503,7 @@ func TestGroupListDetails(t *testing.T) {
 	if err := initClient(); err != nil {
 		t.Fatal(err)
 	}
-	gs, err := c.GroupListDetails()
+	gs, err := c.Groups.ListDetails()
 	assert.NoError(t, err)
 	assert.NotEmpty(t, gs)
 }

@@ -13,9 +13,43 @@ import (
 	"sync"
 )
 
-// UserList return the Nextcloud'user list
-func (c *Client) UserList() ([]string, error) {
-	res, err := c.baseRequest(http.MethodGet, routes.users, nil)
+//UsersI available methods
+type UsersI interface {
+	List() ([]string, error)
+	ListDetails() (map[string]types.User, error)
+	Get(name string) (*types.User, error)
+	Search(search string) ([]string, error)
+	Create(username string, password string, user *types.User) error
+	CreateWithoutPassword(username, email, displayName string) error
+	Delete(name string) error
+	Enable(name string) error
+	Disable(name string) error
+	SendWelcomeEmail(name string) error
+	Update(user *types.User) error
+	UpdateEmail(name string, email string) error
+	UpdateDisplayName(name string, displayName string) error
+	UpdatePhone(name string, phone string) error
+	UpdateAddress(name string, address string) error
+	UpdateWebSite(name string, website string) error
+	UpdateTwitter(name string, twitter string) error
+	UpdatePassword(name string, password string) error
+	UpdateQuota(name string, quota int) error
+	GroupList(name string) ([]string, error)
+	GroupAdd(name string, group string) error
+	GroupRemove(name string, group string) error
+	GroupPromote(name string, group string) error
+	GroupDemote(name string, group string) error
+	GroupSubAdminList(name string) ([]string, error)
+}
+
+//Users contains all Users available actions
+type Users struct {
+	c *Client
+}
+
+// List return the Nextcloud'user list
+func (u *Users) List() ([]string, error) {
+	res, err := u.c.baseRequest(http.MethodGet, routes.users, nil)
 	//res, err := c.session.Get(u.String(), nil)
 	if err != nil {
 		return nil, err
@@ -25,9 +59,9 @@ func (c *Client) UserList() ([]string, error) {
 	return r.Ocs.Data.Users, nil
 }
 
-//UserListDetails return a map of user with details
-func (c *Client) UserListDetails() (map[string]types.User, error) {
-	res, err := c.baseRequest(http.MethodGet, routes.users, nil, "details")
+//ListDetails return a map of user with details
+func (u *Users) ListDetails() (map[string]types.User, error) {
+	res, err := u.c.baseRequest(http.MethodGet, routes.users, nil, "details")
 	//res, err := c.session.Get(u.String(), nil)
 	if err != nil {
 		return nil, err
@@ -37,12 +71,12 @@ func (c *Client) UserListDetails() (map[string]types.User, error) {
 	return r.Ocs.Data.Users, nil
 }
 
-// User return the details about the specified user
-func (c *Client) User(name string) (*types.User, error) {
+// Get return the details about the specified user
+func (u *Users) Get(name string) (*types.User, error) {
 	if name == "" {
 		return nil, &types.APIError{Message: "name cannot be empty"}
 	}
-	res, err := c.baseRequest(http.MethodGet, routes.users, nil, name)
+	res, err := u.c.baseRequest(http.MethodGet, routes.users, nil, name)
 	if err != nil {
 		return nil, err
 	}
@@ -56,12 +90,12 @@ func (c *Client) User(name string) (*types.User, error) {
 	return &r.Ocs.Data, nil
 }
 
-// UserSearch returns the users whose name match the search string
-func (c *Client) UserSearch(search string) ([]string, error) {
+// Search returns the users whose name match the search string
+func (u *Users) Search(search string) ([]string, error) {
 	ro := &req.RequestOptions{
 		Params: map[string]string{"search": search},
 	}
-	res, err := c.baseRequest(http.MethodGet, routes.users, ro)
+	res, err := u.c.baseRequest(http.MethodGet, routes.users, ro)
 	if err != nil {
 		return nil, err
 	}
@@ -70,16 +104,16 @@ func (c *Client) UserSearch(search string) ([]string, error) {
 	return r.Ocs.Data.Users, nil
 }
 
-// UserCreate create a new user
-func (c *Client) UserCreate(username string, password string, user *types.User) error {
-	// Create base User
+// Create create a new user
+func (u *Users) Create(username string, password string, user *types.User) error {
+	// Create base Users
 	ro := &req.RequestOptions{
 		Data: map[string]string{
 			"userid":   username,
 			"password": password,
 		},
 	}
-	if err := c.userBaseRequest(http.MethodPost, ro); err != nil {
+	if err := u.baseRequest(http.MethodPost, ro); err != nil {
 		return err
 	}
 	// Check if we need to add user details information
@@ -87,13 +121,13 @@ func (c *Client) UserCreate(username string, password string, user *types.User) 
 		return nil
 	}
 	// Add user details information
-	return c.UserUpdate(user)
+	return u.Update(user)
 }
 
-// UserCreateWithoutPassword create a user without provisioning a password, the email address must be provided to send
+// CreateWithoutPassword create a user without provisioning a password, the email address must be provided to send
 // an init password email
-func (c *Client) UserCreateWithoutPassword(username, email, displayName string) error {
-	if c.version.Major < 14 {
+func (u *Users) CreateWithoutPassword(username, email, displayName string) error {
+	if u.c.version.Major < 14 {
 		return errors.New("unsupported method: requires Nextcloud 14+")
 	}
 	if username == "" || email == "" {
@@ -107,40 +141,40 @@ func (c *Client) UserCreateWithoutPassword(username, email, displayName string) 
 		},
 	}
 
-	if err := c.userBaseRequest(http.MethodPost, ro); err != nil {
+	if err := u.baseRequest(http.MethodPost, ro); err != nil {
 		return err
 	}
 	return nil
 }
 
-//UserDelete delete the user
-func (c *Client) UserDelete(name string) error {
-	return c.userBaseRequest(http.MethodDelete, nil, name)
+//Delete delete the user
+func (u *Users) Delete(name string) error {
+	return u.baseRequest(http.MethodDelete, nil, name)
 }
 
-//UserEnable enables the user
-func (c *Client) UserEnable(name string) error {
+//Enable enables the user
+func (u *Users) Enable(name string) error {
 	ro := &req.RequestOptions{
 		Data: map[string]string{},
 	}
-	return c.userBaseRequest(http.MethodPut, ro, name, "enable")
+	return u.baseRequest(http.MethodPut, ro, name, "enable")
 }
 
-//UserDisable disables the user
-func (c *Client) UserDisable(name string) error {
+//Disable disables the user
+func (u *Users) Disable(name string) error {
 	ro := &req.RequestOptions{
 		Data: map[string]string{},
 	}
-	return c.userBaseRequest(http.MethodPut, ro, name, "disable")
+	return u.baseRequest(http.MethodPut, ro, name, "disable")
 }
 
-//UserSendWelcomeEmail (re)send the welcome mail to the user (return an error if the user has not configured his email)
-func (c *Client) UserSendWelcomeEmail(name string) error {
-	return c.userBaseRequest(http.MethodPost, nil, name, "welcome")
+//SendWelcomeEmail (re)send the welcome mail to the user (return an error if the user has not configured his email)
+func (u *Users) SendWelcomeEmail(name string) error {
+	return u.baseRequest(http.MethodPost, nil, name, "welcome")
 }
 
-//UserUpdate takes a *types.User struct to update the user's information
-func (c *Client) UserUpdate(user *types.User) error {
+//Update takes a *types.Users struct to update the user's information
+func (u *Users) Update(user *types.User) error {
 	m := structs.Map(user)
 	errs := make(chan types.UpdateError)
 	var wg sync.WaitGroup
@@ -149,7 +183,7 @@ func (c *Client) UserUpdate(user *types.User) error {
 			wg.Add(1)
 			go func(key string, value string) {
 				defer wg.Done()
-				if err := c.userUpdateAttribute(user.ID, strings.ToLower(key), value); err != nil {
+				if err := u.updateAttribute(user.ID, strings.ToLower(key), value); err != nil {
 					errs <- types.UpdateError{
 						Field: key,
 						Error: err,
@@ -165,49 +199,49 @@ func (c *Client) UserUpdate(user *types.User) error {
 	return types.NewUpdateError(errs)
 }
 
-//UserUpdateEmail update the user's email
-func (c *Client) UserUpdateEmail(name string, email string) error {
-	return c.userUpdateAttribute(name, "email", email)
+//UpdateEmail update the user's email
+func (u *Users) UpdateEmail(name string, email string) error {
+	return u.updateAttribute(name, "email", email)
 }
 
-//UserUpdateDisplayName update the user's display name
-func (c *Client) UserUpdateDisplayName(name string, displayName string) error {
-	return c.userUpdateAttribute(name, "displayname", displayName)
+//UpdateDisplayName update the user's display name
+func (u *Users) UpdateDisplayName(name string, displayName string) error {
+	return u.updateAttribute(name, "displayname", displayName)
 }
 
-//UserUpdatePhone update the user's phone
-func (c *Client) UserUpdatePhone(name string, phone string) error {
-	return c.userUpdateAttribute(name, "phone", phone)
+//UpdatePhone update the user's phone
+func (u *Users) UpdatePhone(name string, phone string) error {
+	return u.updateAttribute(name, "phone", phone)
 }
 
-//UserUpdateAddress update the user's address
-func (c *Client) UserUpdateAddress(name string, address string) error {
-	return c.userUpdateAttribute(name, "address", address)
+//UpdateAddress update the user's address
+func (u *Users) UpdateAddress(name string, address string) error {
+	return u.updateAttribute(name, "address", address)
 }
 
-//UserUpdateWebSite update the user's website
-func (c *Client) UserUpdateWebSite(name string, website string) error {
-	return c.userUpdateAttribute(name, "website", website)
+//UpdateWebSite update the user's website
+func (u *Users) UpdateWebSite(name string, website string) error {
+	return u.updateAttribute(name, "website", website)
 }
 
-//UserUpdateTwitter update the user's twitter
-func (c *Client) UserUpdateTwitter(name string, twitter string) error {
-	return c.userUpdateAttribute(name, "twitter", twitter)
+//UpdateTwitter update the user's twitter
+func (u *Users) UpdateTwitter(name string, twitter string) error {
+	return u.updateAttribute(name, "twitter", twitter)
 }
 
-//UserUpdatePassword update the user's password
-func (c *Client) UserUpdatePassword(name string, password string) error {
-	return c.userUpdateAttribute(name, "password", password)
+//UpdatePassword update the user's password
+func (u *Users) UpdatePassword(name string, password string) error {
+	return u.updateAttribute(name, "password", password)
 }
 
-//UserUpdateQuota update the user's quota (bytes)
-func (c *Client) UserUpdateQuota(name string, quota int) error {
-	return c.userUpdateAttribute(name, "quota", strconv.Itoa(quota))
+//UpdateQuota update the user's quota (bytes)
+func (u *Users) UpdateQuota(name string, quota int) error {
+	return u.updateAttribute(name, "quota", strconv.Itoa(quota))
 }
 
-//UserGroupList lists the user's groups
-func (c *Client) UserGroupList(name string) ([]string, error) {
-	res, err := c.baseRequest(http.MethodGet, routes.users, nil, name, "groups")
+//GroupList lists the user's groups
+func (u *Users) GroupList(name string) ([]string, error) {
+	res, err := u.c.baseRequest(http.MethodGet, routes.users, nil, name, "groups")
 	if err != nil {
 		return nil, err
 	}
@@ -216,54 +250,54 @@ func (c *Client) UserGroupList(name string) ([]string, error) {
 	return r.Ocs.Data.Groups, nil
 }
 
-//UserGroupAdd adds a the user to the group
-func (c *Client) UserGroupAdd(name string, group string) error {
+//GroupAdd adds a the user to the group
+func (u *Users) GroupAdd(name string, group string) error {
 	ro := &req.RequestOptions{
 		Data: map[string]string{
 			"groupid": group,
 		},
 	}
-	return c.userBaseRequest(http.MethodPost, ro, name, "groups")
+	return u.baseRequest(http.MethodPost, ro, name, "groups")
 }
 
-//UserGroupRemove removes the user from the group
-func (c *Client) UserGroupRemove(name string, group string) error {
+//GroupRemove removes the user from the group
+func (u *Users) GroupRemove(name string, group string) error {
 	ro := &req.RequestOptions{
 		Data: map[string]string{
 			"groupid": group,
 		},
 	}
-	return c.userBaseRequest(http.MethodDelete, ro, name, "groups")
+	return u.baseRequest(http.MethodDelete, ro, name, "groups")
 }
 
-//UserGroupPromote promotes the user as group admin
-func (c *Client) UserGroupPromote(name string, group string) error {
+//GroupPromote promotes the user as group admin
+func (u *Users) GroupPromote(name string, group string) error {
 	ro := &req.RequestOptions{
 		Data: map[string]string{
 			"groupid": group,
 		},
 	}
-	return c.userBaseRequest(http.MethodPost, ro, name, "subadmins")
+	return u.baseRequest(http.MethodPost, ro, name, "subadmins")
 }
 
-//UserGroupDemote demotes the user
-func (c *Client) UserGroupDemote(name string, group string) error {
+//GroupDemote demotes the user
+func (u *Users) GroupDemote(name string, group string) error {
 	ro := &req.RequestOptions{
 		Data: map[string]string{
 			"groupid": group,
 		},
 	}
-	return c.userBaseRequest(http.MethodDelete, ro, name, "subadmins")
+	return u.baseRequest(http.MethodDelete, ro, name, "subadmins")
 }
 
-//UserGroupSubAdminList lists the groups where he is subadmin
-func (c *Client) UserGroupSubAdminList(name string) ([]string, error) {
-	if !c.loggedIn() {
+//GroupSubAdminList lists the groups where he is subadmin
+func (u *Users) GroupSubAdminList(name string) ([]string, error) {
+	if !u.c.loggedIn() {
 		return nil, errUnauthorized
 	}
-	u := c.baseURL.ResolveReference(routes.users)
-	u.Path = path.Join(u.Path, name, "subadmins")
-	res, err := c.session.Get(u.String(), nil)
+	ur := u.c.baseURL.ResolveReference(routes.users)
+	ur.Path = path.Join(ur.Path, name, "subadmins")
+	res, err := u.c.session.Get(ur.String(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -272,18 +306,18 @@ func (c *Client) UserGroupSubAdminList(name string) ([]string, error) {
 	return r.Ocs.Data, nil
 }
 
-func (c *Client) userUpdateAttribute(name string, key string, value string) error {
+func (u *Users) updateAttribute(name string, key string, value string) error {
 	ro := &req.RequestOptions{
 		Data: map[string]string{
 			"key":   key,
 			"value": value,
 		},
 	}
-	return c.userBaseRequest(http.MethodPut, ro, name)
+	return u.baseRequest(http.MethodPut, ro, name)
 }
 
-func (c *Client) userBaseRequest(method string, ro *req.RequestOptions, subRoutes ...string) error {
-	_, err := c.baseRequest(method, routes.users, ro, subRoutes...)
+func (u *Users) baseRequest(method string, ro *req.RequestOptions, subRoutes ...string) error {
+	_, err := u.c.baseRequest(method, routes.users, ro, subRoutes...)
 	return err
 }
 

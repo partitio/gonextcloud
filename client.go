@@ -15,6 +15,14 @@ type Client struct {
 	headers      map[string]string
 	capabilities *types.Capabilities
 	version      *types.Version
+
+	Apps          *Apps
+	AppsConfig    *AppsConfig
+	GroupFolders  *GroupFolders
+	Notifications *Notifications
+	Shares        *Shares
+	Users         *Users
+	Groups        *Groups
 }
 
 // NewClient create a new Client from the Nextcloud Instance URL
@@ -27,12 +35,19 @@ func NewClient(hostname string) (*Client, error) {
 		}
 	}
 
-	c := Client{
+	c := &Client{
 		baseURL: baseURL,
 		headers: map[string]string{
 			"OCS-APIREQUEST": "true",
 			"Accept":         "application/json",
 		},
 	}
-	return &c, nil
+	c.Apps = &Apps{c}
+	c.AppsConfig = &AppsConfig{c}
+	c.GroupFolders = &GroupFolders{c}
+	c.Notifications = &Notifications{c}
+	c.Shares = &Shares{c}
+	c.Users = &Users{c}
+	c.Groups = &Groups{c}
+	return c, nil
 }

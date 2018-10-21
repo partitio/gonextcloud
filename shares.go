@@ -9,9 +9,35 @@ import (
 	"sync"
 )
 
-//SharesList list all shares of the logged in user
-func (c *Client) SharesList() ([]types.Share, error) {
-	res, err := c.baseRequest(http.MethodGet, routes.shares, nil)
+//SharesI available methods
+type SharesI interface {
+	List() ([]types.Share, error)
+	GetFromPath(path string, reshares bool, subfiles bool) ([]types.Share, error)
+	Get(shareID string) (types.Share, error)
+	Create(
+		path string,
+		shareType types.ShareType,
+		permission types.SharePermission,
+		shareWith string,
+		publicUpload bool,
+		password string,
+	) (types.Share, error)
+	Delete(shareID int) error
+	Update(shareUpdate types.ShareUpdate) error
+	UpdateExpireDate(shareID int, expireDate string) error
+	UpdatePublicUpload(shareID int, public bool) error
+	UpdatePassword(shareID int, password string) error
+	UpdatePermissions(shareID int, permissions types.SharePermission) error
+}
+
+//Shares contains all Shares available actions
+type Shares struct {
+	c *Client
+}
+
+//List list all shares of the logged in user
+func (s *Shares) List() ([]types.Share, error) {
+	res, err := s.c.baseRequest(http.MethodGet, routes.shares, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -20,8 +46,8 @@ func (c *Client) SharesList() ([]types.Share, error) {
 	return r.Ocs.Data, nil
 }
 
-//Shares return shares from a specific file or folder
-func (c *Client) Shares(path string, reshares bool, subfiles bool) ([]types.Share, error) {
+//GetFromPath return shares from a specific file or folder
+func (s *Shares) GetFromPath(path string, reshares bool, subfiles bool) ([]types.Share, error) {
 	ro := &req.RequestOptions{
 		Params: map[string]string{
 			"path":     path,
@@ -29,7 +55,7 @@ func (c *Client) Shares(path string, reshares bool, subfiles bool) ([]types.Shar
 			"subfiles": strconv.FormatBool(subfiles),
 		},
 	}
-	res, err := c.baseRequest(http.MethodGet, routes.shares, ro)
+	res, err := s.c.baseRequest(http.MethodGet, routes.shares, ro)
 	if err != nil {
 		return nil, err
 	}
@@ -38,9 +64,9 @@ func (c *Client) Shares(path string, reshares bool, subfiles bool) ([]types.Shar
 	return r.Ocs.Data, nil
 }
 
-//Share Get information about a known Share
-func (c *Client) Share(shareID string) (types.Share, error) {
-	res, err := c.baseRequest(http.MethodGet, routes.shares, nil, shareID)
+//Get information about a known Share
+func (s *Shares) Get(shareID string) (types.Share, error) {
+	res, err := s.c.baseRequest(http.MethodGet, routes.shares, nil, shareID)
 	if err != nil {
 		return types.Share{}, err
 	}
@@ -49,8 +75,8 @@ func (c *Client) Share(shareID string) (types.Share, error) {
 	return r.Ocs.Data[0], nil
 }
 
-//ShareCreate create a share
-func (c *Client) ShareCreate(
+//Create create a share
+func (s *Shares) Create(
 	path string,
 	shareType types.ShareType,
 	permission types.SharePermission,
@@ -72,7 +98,7 @@ func (c *Client) ShareCreate(
 			"permissions":  strconv.Itoa(int(permission)),
 		},
 	}
-	res, err := c.baseRequest(http.MethodPost, routes.shares, ro)
+	res, err := s.c.baseRequest(http.MethodPost, routes.shares, ro)
 	if err != nil {
 		return types.Share{}, err
 	}
@@ -81,21 +107,21 @@ func (c *Client) ShareCreate(
 	return r.Ocs.Data, nil
 }
 
-//ShareDelete Remove the given share.
-func (c *Client) ShareDelete(shareID int) error {
-	_, err := c.baseRequest(http.MethodDelete, routes.shares, nil, strconv.Itoa(shareID))
+//Delete Remove the given share.
+func (s *Shares) Delete(shareID int) error {
+	_, err := s.c.baseRequest(http.MethodDelete, routes.shares, nil, strconv.Itoa(shareID))
 	return err
 }
 
-// ShareUpdate update share details
+// Update update share details
 // expireDate expireDate expects a well formatted date string, e.g. ‘YYYY-MM-DD’
-func (c *Client) ShareUpdate(shareUpdate types.ShareUpdate) error {
+func (s *Shares) Update(shareUpdate types.ShareUpdate) error {
 	errs := make(chan types.UpdateError)
 	var wg sync.WaitGroup
 	wg.Add(4)
 	go func() {
 		defer wg.Done()
-		if err := c.ShareUpdatePassword(shareUpdate.ShareID, shareUpdate.Password); err != nil {
+		if err := s.UpdatePassword(shareUpdate.ShareID, shareUpdate.Password); err != nil {
 			errs <- types.UpdateError{
 				Field: "password",
 				Error: err,
@@ -104,7 +130,7 @@ func (c *Client) ShareUpdate(shareUpdate types.ShareUpdate) error {
 	}()
 	go func() {
 		defer wg.Done()
-		if err := c.ShareUpdateExpireDate(shareUpdate.ShareID, shareUpdate.ExpireDate); err != nil {
+		if err := s.UpdateExpireDate(shareUpdate.ShareID, shareUpdate.ExpireDate); err != nil {
 			errs <- types.UpdateError{
 				Field: "expireDate",
 				Error: err,
@@ -113,7 +139,7 @@ func (c *Client) ShareUpdate(shareUpdate types.ShareUpdate) error {
 	}()
 	go func() {
 		defer wg.Done()
-		if err := c.ShareUpdatePermissions(shareUpdate.ShareID, shareUpdate.Permissions); err != nil {
+		if err := s.UpdatePermissions(shareUpdate.ShareID, shareUpdate.Permissions); err != nil {
 			errs <- types.UpdateError{
 				Field: "permissions",
 				Error: err,
@@ -122,7 +148,7 @@ func (c *Client) ShareUpdate(shareUpdate types.ShareUpdate) error {
 	}()
 	go func() {
 		defer wg.Done()
-		if err := c.ShareUpdatePublicUpload(shareUpdate.ShareID, shareUpdate.PublicUpload); err != nil {
+		if err := s.UpdatePublicUpload(shareUpdate.ShareID, shareUpdate.PublicUpload); err != nil {
 			errs <- types.UpdateError{
 				Field: "publicUpload",
 				Error: err,
@@ -136,31 +162,31 @@ func (c *Client) ShareUpdate(shareUpdate types.ShareUpdate) error {
 	return types.NewUpdateError(errs)
 }
 
-// ShareUpdateExpireDate updates the share's expire date
+//UpdateExpireDate updates the share's expire date
 // expireDate expects a well formatted date string, e.g. ‘YYYY-MM-DD’
-func (c *Client) ShareUpdateExpireDate(shareID int, expireDate string) error {
-	return c.baseShareUpdate(strconv.Itoa(shareID), "expireDate", expireDate)
+func (s *Shares) UpdateExpireDate(shareID int, expireDate string) error {
+	return s.baseShareUpdate(strconv.Itoa(shareID), "expireDate", expireDate)
 }
 
-//ShareUpdatePublicUpload enable or disable public upload
-func (c *Client) ShareUpdatePublicUpload(shareID int, public bool) error {
-	return c.baseShareUpdate(strconv.Itoa(shareID), "publicUpload", strconv.FormatBool(public))
+//UpdatePublicUpload enable or disable public upload
+func (s *Shares) UpdatePublicUpload(shareID int, public bool) error {
+	return s.baseShareUpdate(strconv.Itoa(shareID), "publicUpload", strconv.FormatBool(public))
 }
 
-//ShareUpdatePassword updates share password
-func (c *Client) ShareUpdatePassword(shareID int, password string) error {
-	return c.baseShareUpdate(strconv.Itoa(shareID), "password", password)
+//UpdatePassword updates share password
+func (s *Shares) UpdatePassword(shareID int, password string) error {
+	return s.baseShareUpdate(strconv.Itoa(shareID), "password", password)
 }
 
-//ShareUpdatePermissions update permissions
-func (c *Client) ShareUpdatePermissions(shareID int, permissions types.SharePermission) error {
-	return c.baseShareUpdate(strconv.Itoa(shareID), "permissions", strconv.Itoa(int(permissions)))
+//UpdatePermissions update permissions
+func (s *Shares) UpdatePermissions(shareID int, permissions types.SharePermission) error {
+	return s.baseShareUpdate(strconv.Itoa(shareID), "permissions", strconv.Itoa(int(permissions)))
 }
 
-func (c *Client) baseShareUpdate(shareID string, key string, value string) error {
+func (s *Shares) baseShareUpdate(shareID string, key string, value string) error {
 	ro := &req.RequestOptions{
 		Data: map[string]string{key: value},
 	}
-	_, err := c.baseRequest(http.MethodPut, routes.shares, ro, shareID)
+	_, err := s.c.baseRequest(http.MethodPut, routes.shares, ro, shareID)
 	return err
 }

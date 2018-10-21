@@ -7,9 +7,25 @@ import (
 	"sync"
 )
 
-//AppsConfigList lists all the available apps
-func (c *Client) AppsConfigList() (apps []string, err error) {
-	res, err := c.baseRequest(http.MethodGet, routes.appsConfig, nil)
+//AppsConfigI available methods
+type AppsConfigI interface {
+	List() (apps []string, err error)
+	Keys(id string) (keys []string, err error)
+	Value(id, key string) (string, error)
+	SetValue(id, key, value string) error
+	DeleteValue(id, key, value string) error
+	Get() (map[string]map[string]string, error)
+	Details(appID string) (map[string]string, error)
+}
+
+//AppsConfig contains all Apps Configuration available actions
+type AppsConfig struct {
+	c *Client
+}
+
+//List lists all the available apps
+func (a *AppsConfig) List() (apps []string, err error) {
+	res, err := a.c.baseRequest(http.MethodGet, routes.appsConfig, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -18,9 +34,9 @@ func (c *Client) AppsConfigList() (apps []string, err error) {
 	return r.Ocs.Data.Data, nil
 }
 
-//AppsConfigKeys returns the app's config keys
-func (c *Client) AppsConfigKeys(id string) (keys []string, err error) {
-	res, err := c.baseRequest(http.MethodGet, routes.appsConfig, nil, id)
+//Keys returns the app's config keys
+func (a *AppsConfig) Keys(id string) (keys []string, err error) {
+	res, err := a.c.baseRequest(http.MethodGet, routes.appsConfig, nil, id)
 	if err != nil {
 		return nil, err
 	}
@@ -29,9 +45,9 @@ func (c *Client) AppsConfigKeys(id string) (keys []string, err error) {
 	return r.Ocs.Data.Data, nil
 }
 
-//AppsConfigValue get the config value for the given app's key
-func (c *Client) AppsConfigValue(id, key string) (string, error) {
-	res, err := c.baseRequest(http.MethodGet, routes.appsConfig, nil, id, key)
+//Value get the config value for the given app's key
+func (a *AppsConfig) Value(id, key string) (string, error) {
+	res, err := a.c.baseRequest(http.MethodGet, routes.appsConfig, nil, id, key)
 	if err != nil {
 		return "", err
 	}
@@ -40,28 +56,28 @@ func (c *Client) AppsConfigValue(id, key string) (string, error) {
 	return r.Ocs.Data.Data, nil
 }
 
-//AppsConfigSetValue set the config value for the given app's key
-func (c *Client) AppsConfigSetValue(id, key, value string) error {
+//SetValue set the config value for the given app's key
+func (a *AppsConfig) SetValue(id, key, value string) error {
 	ro := &req.RequestOptions{
 		Data: map[string]string{
 			"value": value,
 		},
 	}
-	_, err := c.baseRequest(http.MethodPost, routes.appsConfig, ro, id, key)
+	_, err := a.c.baseRequest(http.MethodPost, routes.appsConfig, ro, id, key)
 	return err
 }
 
-//AppsConfigDeleteValue delete the config value and (!! be careful !!) the key
-func (c *Client) AppsConfigDeleteValue(id, key, value string) error {
-	_, err := c.baseRequest(http.MethodDelete, routes.appsConfig, nil, id, key)
+//DeleteValue delete the config value and (!! be careful !!) the key
+func (a *AppsConfig) DeleteValue(id, key, value string) error {
+	_, err := a.c.baseRequest(http.MethodDelete, routes.appsConfig, nil, id, key)
 	return err
 }
 
-//AppsConfig returns all apps AppConfigDetails
-func (c *Client) AppsConfig() (map[string]map[string]string, error) {
+//Get returns all apps AppConfigDetails
+func (a *AppsConfig) Get() (map[string]map[string]string, error) {
 	config := map[string]map[string]string{}
 	m := sync.Mutex{}
-	appsIDs, err := c.AppsConfigList()
+	appsIDs, err := a.List()
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +86,7 @@ func (c *Client) AppsConfig() (map[string]map[string]string, error) {
 	for i := range appsIDs {
 		go func(id string) {
 			defer wg.Done()
-			d, err := c.AppsConfigDetails(id)
+			d, err := a.Details(id)
 			if err == nil {
 				m.Lock()
 				config[id] = d
@@ -82,13 +98,13 @@ func (c *Client) AppsConfig() (map[string]map[string]string, error) {
 	return config, err
 }
 
-//AppsConfigDetails returns all the config's key, values pair of the app
-func (c *Client) AppsConfigDetails(appID string) (map[string]string, error) {
+//Details returns all the config's key, values pair of the app
+func (a *AppsConfig) Details(appID string) (map[string]string, error) {
 	config := map[string]string{}
 	m := sync.Mutex{}
 	var err error
 	var ks []string
-	ks, err = c.AppsConfigKeys(appID)
+	ks, err = a.Keys(appID)
 	if err != nil {
 		return config, err
 	}
@@ -97,7 +113,7 @@ func (c *Client) AppsConfigDetails(appID string) (map[string]string, error) {
 	for i := range ks {
 		go func(key string) {
 			defer wg.Done()
-			v, err := c.AppsConfigValue(appID, key)
+			v, err := a.Value(appID, key)
 			if err == nil {
 				m.Lock()
 				config[key] = v
