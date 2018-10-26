@@ -5,7 +5,7 @@ import (
 	"github.com/fatih/structs"
 	req "github.com/levigross/grequests"
 	"github.com/pkg/errors"
-	"gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud/types"
+	"gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud/types"
 	"net/http"
 	"path"
 	"strconv"

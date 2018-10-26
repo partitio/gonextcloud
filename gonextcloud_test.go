@@ -3,7 +3,7 @@ package gonextcloud
 import (
 	"fmt"
 	"github.com/stretchr/testify/assert"
-	"gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud/types"
+	"gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud/types"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"math/rand"

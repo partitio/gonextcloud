@@ -1,5 +1,5 @@
 PROJECT_NAME := "gonextcloud"
-PKG := "gitlab.adphi.fr/partitio/Nextcloud-Partitio/$(PROJECT_NAME)"
+PKG := "gitlab.bertha.cloud/partitio/Nextcloud-Partitio/$(PROJECT_NAME)"
 PKG_LIST := $(shell go list ${PKG})
 GO_FILES := $(shell find . -name '*.go' | grep -v _test.go)
 

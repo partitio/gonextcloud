@@ -6,9 +6,9 @@ stages:
 before_script:
 - go get -u golang.org/x/lint/golint
 - go get -u github.com/kardianos/govendor
-- mkdir -p /go/src/gitlab.adphi.fr/partitio/Nextcloud-Partitio
-- cp -r $CI_PROJECT_DIR /go/src/gitlab.adphi.fr/partitio/Nextcloud-Partitio
-- cd /go/src/gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud
+- mkdir -p /go/src/gitlab.bertha.cloud/partitio/Nextcloud-Partitio
+- cp -r $CI_PROJECT_DIR /go/src/gitlab.bertha.cloud/partitio/Nextcloud-Partitio
+- cd /go/src/gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud
 #- sed -i -e 's/$NEXTCLOUD_URL/'${NEXTCLOUD_URL//\//\\/}'/g' config.yml
 #- sed -i -e 's/$NEXTCLOUD_PASSWORD/'${NEXTCLOUD_PASSWORD}'/g' config.yml
 #- sed -i -e 's/$NEXTCLOUD_EMAIL/'${NEXTCLOUD_EMAIL}'/g' config.yml

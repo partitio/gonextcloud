@@ -14,7 +14,7 @@ For example, to list all the Nextcloud's instance users:
 
 	import (
 		"fmt"
-		"gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud/client"
+		"gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud/client"
 	)
 
 	func main() {

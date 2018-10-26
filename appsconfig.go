@@ -2,7 +2,7 @@ package gonextcloud
 
 import (
 	req "github.com/levigross/grequests"
-	"gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud/types"
+	"gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud/types"
 	"net/http"
 	"sync"
 )

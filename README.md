@@ -1,9 +1,9 @@
 ![Nextcloud](https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Nextcloud_Logo.svg/640px-Nextcloud_Logo.svg.png)
 
-[![pipeline status](http://gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud/badges/master/pipeline.svg)](http://gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud/commits/master)
-[![coverage report](http://gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud/badges/master/coverage.svg)](http://gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud/commits/master)
-[![Go Report Card](https://goreportcard.com/badge/gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud)](https://goreportcard.com/report/gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud)
-[![GoDoc](https://godoc.org/gitlab.com/gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud?status.svg)](https://godoc.org/gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud)
+[![pipeline status](http://gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud/badges/master/pipeline.svg)](http://gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud/commits/master)
+[![coverage report](http://gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud/badges/master/coverage.svg)](http://gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud/commits/master)
+[![Go Report Card](https://goreportcard.com/badge/gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud)](https://goreportcard.com/report/gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud)
+[![GoDoc](https://godoc.org/gitlab.com/gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud?status.svg)](https://godoc.org/gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud)
 # GoNextcloud
 
 A simple Client for Nextcloud's Provisioning API in Go.
@@ -14,7 +14,7 @@ https://docs.nextcloud.com/server/13/admin_manual/configuration_user/user_provis
 ## Usage
 
 ```go
-import "gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud"
+import "gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud"
 ```
 
 You use the library by creating a client object and calling methods on it.
@@ -25,7 +25,7 @@ package main
 
 import (
     "fmt"
-    "gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud/client"
+    "gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud/client"
 )
 
 func main() {

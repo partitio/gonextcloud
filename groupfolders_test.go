@@ -2,7 +2,7 @@ package gonextcloud
 
 import (
 	"github.com/stretchr/testify/assert"
-	"gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud/types"
+	"gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud/types"
 	"testing"
 )
 
