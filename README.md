@@ -21,32 +21,32 @@ You use the library by creating a client object and calling methods on it.
 
 For example, to list all the Nextcloud's instance users:
 ```go
-    package main
+package main
 
-    import (
-    	"fmt"
-    	"gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud/client"
-    )
+import (
+    "fmt"
+    "gitlab.adphi.fr/partitio/Nextcloud-Partitio/gonextcloud/client"
+)
 
-    func main() {
-    	url := "https://www.mynextcloud.com"
-    	username := "admin"
-    	password := "password"
-    	c, err := client.NewClient(url)
-    	if err != nil {
-    		panic(err)
-    	}
-    	if err := c.Login(username, password); err != nil {
-    		panic(err)
-    	}
-    	defer c.Logout()
-
-    	users, err := c.Users.List()
-    	if err != nil {
-    		panic(err)
-    	}
-    	fmt.Println("Users :", users)
+func main() {
+    url := "https://www.mynextcloud.com"
+    username := "admin"
+    password := "password"
+    c, err := client.NewClient(url)
+    if err != nil {
+        panic(err)
     }
+    if err := c.Login(username, password); err != nil {
+        panic(err)
+    }
+    defer c.Logout()
+
+    users, err := c.Users.List()
+    if err != nil {
+        panic(err)
+    }
+    fmt.Println("Users :", users)
+}
 ```
 
 ## Run tests
