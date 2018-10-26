@@ -14,14 +14,14 @@ For example, to list all the Nextcloud's instance users:
 
 	import (
 		"fmt"
-		"gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud/client"
+		"gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud"
 	)
 
 	func main() {
 		url := "https://www.mynextcloud.com"
 		username := "admin"
 		password := "password"
-		c, err := client.NewClient(url)
+		c, err := gonextcloud.NewClient(url)
 		if err != nil {
 			panic(err)
 		}
