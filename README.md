@@ -1,7 +1,7 @@
 ![Nextcloud](https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Nextcloud_Logo.svg/640px-Nextcloud_Logo.svg.png)
 
-[![pipeline status](http://gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud/badges/master/pipeline.svg)](http://gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud/commits/master)
-[![coverage report](http://gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud/badges/master/coverage.svg)](http://gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud/commits/master)
+[![pipeline status](https://gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud/badges/master/pipeline.svg)](https://gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud/commits/master)
+[![coverage report](https://gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud/badges/master/coverage.svg)](https://gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud/commits/master)
 [![Go Report Card](https://goreportcard.com/badge/gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud)](https://goreportcard.com/report/gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud)
 [![GoDoc](https://godoc.org/gitlab.com/gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud?status.svg)](https://godoc.org/gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud)
 # GoNextcloud
