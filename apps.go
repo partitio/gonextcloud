@@ -6,16 +6,6 @@ import (
 	"net/http"
 )
 
-//AppsI available methods
-type AppsI interface {
-	List() ([]string, error)
-	ListEnabled() ([]string, error)
-	ListDisabled() ([]string, error)
-	Infos(name string) (types.App, error)
-	Enable(name string) error
-	Disable(name string) error
-}
-
 //Apps contains all Apps available actions
 type Apps struct {
 	c *Client

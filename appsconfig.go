@@ -7,17 +7,6 @@ import (
 	"sync"
 )
 
-//AppsConfigI available methods
-type AppsConfigI interface {
-	List() (apps []string, err error)
-	Keys(id string) (keys []string, err error)
-	Value(id, key string) (string, error)
-	SetValue(id, key, value string) error
-	DeleteValue(id, key, value string) error
-	Get() (map[string]map[string]string, error)
-	Details(appID string) (map[string]string, error)
-}
-
 //AppsConfig contains all Apps Configuration available actions
 type AppsConfig struct {
 	c *Client

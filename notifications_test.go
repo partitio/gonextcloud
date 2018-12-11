@@ -17,14 +17,14 @@ var (
 		{
 			"notificationCreate",
 			func(t *testing.T) {
-				err := c.Notifications.Create(config.Login, title, message)
+				err := c.Notifications().Create(config.Login, title, message)
 				assert.NoError(t, err)
 			},
 		}, {
 			"notificationDelete",
 			func(t *testing.T) {
 				// Get created Notification ID
-				ns, err := c.Notifications.List()
+				ns, err := c.Notifications().List()
 				if err != nil {
 					t.SkipNow()
 				}
@@ -37,7 +37,7 @@ var (
 				if createdID == 0 {
 					t.SkipNow()
 				}
-				err = c.Notifications.Delete(createdID)
+				err = c.Notifications().Delete(createdID)
 				assert.NoError(t, err)
 			},
 		},
@@ -49,10 +49,10 @@ func TestNotificationsList(t *testing.T) {
 	if err := initClient(); err != nil {
 		t.Fatal(err)
 	}
-	if err := c.Notifications.Available(); err != nil {
+	if err := c.Notifications().Available(); err != nil {
 		t.SkipNow()
 	}
-	ns, err := c.Notifications.List()
+	ns, err := c.Notifications().List()
 	assert.NoError(t, err)
 	if len(ns) > 0 {
 		notificationID = ns[0].NotificationID
@@ -67,10 +67,10 @@ func TestNotifications(t *testing.T) {
 	if err := initClient(); err != nil {
 		t.Fatal(err)
 	}
-	if err := c.Notifications.Available(); err != nil {
+	if err := c.Notifications().Available(); err != nil {
 		t.SkipNow()
 	}
-	n, err := c.Notifications.Get(notificationID)
+	n, err := c.Notifications().Get(notificationID)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, n)
 }

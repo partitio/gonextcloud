@@ -16,13 +16,13 @@ type Client struct {
 	capabilities *types.Capabilities
 	version      *types.Version
 
-	Apps          *Apps
-	AppsConfig    *AppsConfig
-	GroupFolders  *GroupFolders
-	Notifications *Notifications
-	Shares        *Shares
-	Users         *Users
-	Groups        *Groups
+	apps          *Apps
+	appsConfig    *AppsConfig
+	groupFolders  *GroupFolders
+	notifications *Notifications
+	shares        *Shares
+	users         *Users
+	groups        *Groups
 }
 
 // NewClient create a new Client from the Nextcloud Instance URL
@@ -42,12 +42,40 @@ func NewClient(hostname string) (*Client, error) {
 			"Accept":         "application/json",
 		},
 	}
-	c.Apps = &Apps{c}
-	c.AppsConfig = &AppsConfig{c}
-	c.GroupFolders = &GroupFolders{c}
-	c.Notifications = &Notifications{c}
-	c.Shares = &Shares{c}
-	c.Users = &Users{c}
-	c.Groups = &Groups{c}
+	c.apps = &Apps{c}
+	c.appsConfig = &AppsConfig{c}
+	c.groupFolders = &GroupFolders{c}
+	c.notifications = &Notifications{c}
+	c.shares = &Shares{c}
+	c.users = &Users{c}
+	c.groups = &Groups{c}
 	return c, nil
+}
+
+func (c *Client) Apps() types.Apps {
+	return c.apps
+}
+
+func (c *Client) AppsConfig() types.AppsConfig {
+	return c.appsConfig
+}
+
+func (c *Client) GroupFolders() types.GroupFolders {
+	return c.groupFolders
+}
+
+func (c *Client) Notifications() types.Notifications {
+	return c.notifications
+}
+
+func (c *Client) Shares() types.Shares {
+	return c.shares
+}
+
+func (c *Client) Users() types.Users {
+	return c.users
+}
+
+func (c *Client) Groups() types.Groups {
+	return c.groups
 }

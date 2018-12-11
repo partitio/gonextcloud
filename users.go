@@ -7,40 +7,12 @@ import (
 	"github.com/pkg/errors"
 	"gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud/types"
 	"net/http"
+	"net/url"
 	"path"
 	"strconv"
 	"strings"
 	"sync"
 )
-
-//UsersI available methods
-type UsersI interface {
-	List() ([]string, error)
-	ListDetails() (map[string]types.User, error)
-	Get(name string) (*types.User, error)
-	Search(search string) ([]string, error)
-	Create(username string, password string, user *types.User) error
-	CreateWithoutPassword(username, email, displayName string) error
-	Delete(name string) error
-	Enable(name string) error
-	Disable(name string) error
-	SendWelcomeEmail(name string) error
-	Update(user *types.User) error
-	UpdateEmail(name string, email string) error
-	UpdateDisplayName(name string, displayName string) error
-	UpdatePhone(name string, phone string) error
-	UpdateAddress(name string, address string) error
-	UpdateWebSite(name string, website string) error
-	UpdateTwitter(name string, twitter string) error
-	UpdatePassword(name string, password string) error
-	UpdateQuota(name string, quota int) error
-	GroupList(name string) ([]string, error)
-	GroupAdd(name string, group string) error
-	GroupRemove(name string, group string) error
-	GroupPromote(name string, group string) error
-	GroupDemote(name string, group string) error
-	GroupSubAdminList(name string) ([]string, error)
-}
 
 //Users contains all Users available actions
 type Users struct {
@@ -126,21 +98,34 @@ func (u *Users) Create(username string, password string, user *types.User) error
 
 // CreateWithoutPassword create a user without provisioning a password, the email address must be provided to send
 // an init password email
-func (u *Users) CreateWithoutPassword(username, email, displayName string) error {
+func (u *Users) CreateWithoutPassword(username, email, displayName, quota, language string, groups ...string) error {
 	if u.c.version.Major < 14 {
 		return errors.New("unsupported method: requires Nextcloud 14+")
 	}
 	if username == "" || email == "" {
 		return errors.New("username and email cannot be empty")
 	}
-	ro := &req.RequestOptions{
-		Data: map[string]string{
-			"userid":      username,
-			"email":       email,
-			"displayName": displayName,
-		},
+
+	data := map[string]string{
+		"userid":      username,
+		"email":       email,
+		"displayName": displayName,
+		"quota":       quota,
+		"language":    language,
 	}
 
+	ro := &req.RequestOptions{}
+	f := url.Values{}
+	for k, v := range data {
+		if v != "" {
+			f.Add(k, v)
+		}
+	}
+	for _, g := range groups {
+		f.Add("groups[]", g)
+	}
+	ro.RequestBody = strings.NewReader(f.Encode())
+	ro.Headers = map[string]string{"Content-Type": "application/x-www-form-urlencoded"}
 	if err := u.baseRequest(http.MethodPost, ro); err != nil {
 		return err
 	}

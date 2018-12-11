@@ -8,18 +8,6 @@ import (
 	"strconv"
 )
 
-//GroupFoldersI available methods
-type GroupFoldersI interface {
-	List() (map[int]types.GroupFolder, error)
-	Get(id int) (types.GroupFolder, error)
-	Create(name string) (id int, err error)
-	Rename(groupID int, name string) error
-	AddGroup(folderID int, groupName string) error
-	RemoveGroup(folderID int, groupName string) error
-	SetGroupPermissions(folderID int, groupName string, permission types.SharePermission) error
-	SetQuota(folderID int, quota int) error
-}
-
 //GroupFolders contains all Groups Folders available actions
 type GroupFolders struct {
 	c *Client

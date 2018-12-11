@@ -6,17 +6,6 @@ import (
 	"net/http"
 )
 
-//GroupsI available methods
-type GroupsI interface {
-	List() ([]string, error)
-	ListDetails() ([]types.Group, error)
-	Users(name string) ([]string, error)
-	Search(search string) ([]string, error)
-	Create(name string) error
-	Delete(name string) error
-	SubAdminList(name string) ([]string, error)
-}
-
 //Groups contains all Groups available actions
 type Groups struct {
 	c *Client

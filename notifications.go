@@ -8,17 +8,6 @@ import (
 	"strconv"
 )
 
-//NotificationsI available methods
-type NotificationsI interface {
-	List() ([]types.Notification, error)
-	Get(id int) (types.Notification, error)
-	Delete(id int) error
-	DeleteAll() error
-	Create(userID, title, message string) error
-	AdminAvailable() error
-	Available() error
-}
-
 //Notifications contains all Notifications available actions
 type Notifications struct {
 	c *Client

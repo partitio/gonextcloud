@@ -9,27 +9,6 @@ import (
 	"sync"
 )
 
-//SharesI available methods
-type SharesI interface {
-	List() ([]types.Share, error)
-	GetFromPath(path string, reshares bool, subfiles bool) ([]types.Share, error)
-	Get(shareID string) (types.Share, error)
-	Create(
-		path string,
-		shareType types.ShareType,
-		permission types.SharePermission,
-		shareWith string,
-		publicUpload bool,
-		password string,
-	) (types.Share, error)
-	Delete(shareID int) error
-	Update(shareUpdate types.ShareUpdate) error
-	UpdateExpireDate(shareID int, expireDate string) error
-	UpdatePublicUpload(shareID int, public bool) error
-	UpdatePassword(shareID int, password string) error
-	UpdatePermissions(shareID int, permissions types.SharePermission) error
-}
-
 //Shares contains all Shares available actions
 type Shares struct {
 	c *Client
