@@ -1,16 +1,20 @@
 package types
 
-//Users
+//User encapsulate the data needed to create a new Nextcloud's User
 type User struct {
-	Enabled bool   `json:"enabled"`
-	ID      string `json:"id"`
-	Quota   struct {
-		Free     int64   `json:"free"`
-		Used     int     `json:"used"`
-		Total    int64   `json:"total"`
-		Relative float64 `json:"relative"`
-		Quota    int     `json:"quota"`
-	} `json:"quota"`
+	Username    string
+	Email       string
+	DisplayName string
+	Quota       string
+	Language    string
+	Groups      []string
+}
+
+//UserDetails is the raw Nextcloud User response
+type UserDetails struct {
+	Enabled     bool     `json:"enabled"`
+	ID          string   `json:"id"`
+	Quota       Quota    `json:"quota"`
 	Email       string   `json:"email"`
 	Displayname string   `json:"displayname"`
 	Phone       string   `json:"phone"`
@@ -25,4 +29,12 @@ type User struct {
 	Backend         string        `json:"backend,omitempty"`
 	Subadmin        []interface{} `json:"subadmin,omitempty"`
 	Locale          string        `json:"locale,omitempty"`
+}
+
+type Quota struct {
+	Free     int64   `json:"free"`
+	Used     int     `json:"used"`
+	Total    int64   `json:"total"`
+	Relative float64 `json:"relative"`
+	Quota    int     `json:"quota"`
 }

@@ -95,16 +95,17 @@ type Shares interface {
 //Users available methods
 type Users interface {
 	List() ([]string, error)
-	ListDetails() (map[string]User, error)
-	Get(name string) (*User, error)
+	ListDetails() (map[string]UserDetails, error)
+	Get(name string) (*UserDetails, error)
 	Search(search string) ([]string, error)
-	Create(username string, password string, user *User) error
+	Create(username string, password string, user *UserDetails) error
 	CreateWithoutPassword(username, email, displayName, quota, language string, groups ...string) error
+	CreateBatchWithoutPassword(users []User) error
 	Delete(name string) error
 	Enable(name string) error
 	Disable(name string) error
 	SendWelcomeEmail(name string) error
-	Update(user *User) error
+	Update(user *UserDetails) error
 	UpdateEmail(name string, email string) error
 	UpdateDisplayName(name string, displayName string) error
 	UpdatePhone(name string, phone string) error

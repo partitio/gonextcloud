@@ -5,6 +5,7 @@ import (
 	"github.com/fatih/structs"
 	req "github.com/levigross/grequests"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud/types"
 	"net/http"
 	"net/url"
@@ -32,7 +33,7 @@ func (u *Users) List() ([]string, error) {
 }
 
 //ListDetails return a map of user with details
-func (u *Users) ListDetails() (map[string]types.User, error) {
+func (u *Users) ListDetails() (map[string]types.UserDetails, error) {
 	res, err := u.c.baseRequest(http.MethodGet, routes.users, nil, "details")
 	//res, err := c.session.Get(u.String(), nil)
 	if err != nil {
@@ -44,7 +45,7 @@ func (u *Users) ListDetails() (map[string]types.User, error) {
 }
 
 // Get return the details about the specified user
-func (u *Users) Get(name string) (*types.User, error) {
+func (u *Users) Get(name string) (*types.UserDetails, error) {
 	if name == "" {
 		return nil, &types.APIError{Message: "name cannot be empty"}
 	}
@@ -77,7 +78,7 @@ func (u *Users) Search(search string) ([]string, error) {
 }
 
 // Create create a new user
-func (u *Users) Create(username string, password string, user *types.User) error {
+func (u *Users) Create(username string, password string, user *types.UserDetails) error {
 	// Create base Users
 	ro := &req.RequestOptions{
 		Data: map[string]string{
@@ -132,6 +133,36 @@ func (u *Users) CreateWithoutPassword(username, email, displayName, quota, langu
 	return nil
 }
 
+//CreateBatchWithoutPassword create multiple users and send them the init password email
+func (u *Users) CreateBatchWithoutPassword(users []types.User) error {
+	var wg sync.WaitGroup
+	errs := make(chan error)
+	for _, us := range users {
+		wg.Add(1)
+		go func(user types.User) {
+			logrus.Debugf("creating user %s", user.Username)
+			defer wg.Done()
+			if err := u.CreateWithoutPassword(
+				user.Username, user.Email, user.DisplayName, "", "", user.Groups...,
+			); err != nil {
+				errs <- err
+			}
+		}(us)
+	}
+	go func() {
+		wg.Wait()
+		close(errs)
+	}()
+	var es []error
+	for err := range errs {
+		es = append(es, err)
+	}
+	if len(es) > 0 {
+		return errors.Errorf("errors occurred while creating users: %v", es)
+	}
+	return nil
+}
+
 //Delete delete the user
 func (u *Users) Delete(name string) error {
 	return u.baseRequest(http.MethodDelete, nil, name)
@@ -159,7 +190,7 @@ func (u *Users) SendWelcomeEmail(name string) error {
 }
 
 //Update takes a *types.Users struct to update the user's information
-func (u *Users) Update(user *types.User) error {
+func (u *Users) Update(user *types.UserDetails) error {
 	m := structs.Map(user)
 	errs := make(chan types.UpdateError)
 	var wg sync.WaitGroup

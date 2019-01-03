@@ -45,16 +45,14 @@ func (e *UserUpdateError) Error() string {
 
 //NewUpdateError returns an UpdateError based on an UpdateError channel
 func NewUpdateError(errors chan UpdateError) *UserUpdateError {
-	empty := true
 	var ue UserUpdateError
 	for e := range errors {
 		if ue.Errors == nil {
-			empty = false
 			ue.Errors = map[string]error{e.Field: e.Error}
 		}
 		ue.Errors[e.Field] = e.Error
 	}
-	if !empty {
+	if len(ue.Errors) > 0 {
 		return &ue
 	}
 	return nil

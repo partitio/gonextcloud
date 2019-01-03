@@ -12,6 +12,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 )
@@ -486,6 +487,41 @@ func TestUserCreateWithoutPassword(t *testing.T) {
 	assert.NoError(t, err)
 	err = c.Users().Delete(config.NotExistingUser)
 	assert.NoError(t, err)
+}
+
+func TestUserCreateBatchWithoutPassword(t *testing.T) {
+	c = nil
+	if err := initClient(); err != nil {
+		t.Fatal(err)
+	}
+	if c.version.Major < 14 {
+		t.SkipNow()
+	}
+	var us []types.User
+	for i := 0; i < 5; i++ {
+		u := fmt.Sprintf(config.NotExistingUser+"_%d", i)
+		us = append(us, types.User{
+			Username:    u,
+			DisplayName: strings.Title(u),
+			Groups:      []string{"admin"},
+			Email:       config.Email,
+			Language:    "fr",
+			Quota:       "100024",
+		})
+	}
+	err := c.Users().CreateBatchWithoutPassword(us)
+	assert.NoError(t, err)
+
+	// Cleaning
+	var wg sync.WaitGroup
+	for _, u := range us {
+		wg.Add(1)
+		go func(n string) {
+			defer wg.Done()
+			c.Users().Delete(n)
+		}(u.Username)
+	}
+	wg.Wait()
 }
 
 func TestUserListDetails(t *testing.T) {

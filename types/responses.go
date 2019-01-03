@@ -31,7 +31,7 @@ type UserListDetailsResponse struct {
 	Ocs struct {
 		Meta Meta `json:"meta"`
 		Data struct {
-			Users map[string]User `json:"users"`
+			Users map[string]UserDetails `json:"users"`
 		} `json:"data"`
 	} `json:"ocs"`
 }
@@ -39,8 +39,8 @@ type UserListDetailsResponse struct {
 //UserResponse
 type UserResponse struct {
 	Ocs struct {
-		Meta Meta `json:"meta"`
-		Data User `json:"data"`
+		Meta Meta        `json:"meta"`
+		Data UserDetails `json:"data"`
 	} `json:"ocs"`
 }
 

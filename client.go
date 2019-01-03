@@ -52,30 +52,37 @@ func NewClient(hostname string) (*Client, error) {
 	return c, nil
 }
 
+//Apps return the Apps client Interface
 func (c *Client) Apps() types.Apps {
 	return c.apps
 }
 
+//AppsConfig return the AppsConfig client Interface
 func (c *Client) AppsConfig() types.AppsConfig {
 	return c.appsConfig
 }
 
+//GroupFolders return the GroupFolders client Interface
 func (c *Client) GroupFolders() types.GroupFolders {
 	return c.groupFolders
 }
 
+//Notifications return the Notifications client Interface
 func (c *Client) Notifications() types.Notifications {
 	return c.notifications
 }
 
+//Shares return the Shares client Interface
 func (c *Client) Shares() types.Shares {
 	return c.shares
 }
 
+//Users return the Users client Interface
 func (c *Client) Users() types.Users {
 	return c.users
 }
 
+//Groups return the Groups client Interface
 func (c *Client) Groups() types.Groups {
 	return c.groups
 }
