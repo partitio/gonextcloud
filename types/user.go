@@ -33,8 +33,8 @@ type UserDetails struct {
 
 type Quota struct {
 	Free     int64   `json:"free"`
-	Used     int     `json:"used"`
+	Used     int64   `json:"used"`
 	Total    int64   `json:"total"`
 	Relative float64 `json:"relative"`
-	Quota    int     `json:"quota"`
+	Quota    int64   `json:"quota"`
 }
