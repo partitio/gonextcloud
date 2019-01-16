@@ -113,7 +113,7 @@ type Users interface {
 	UpdateWebSite(name string, website string) error
 	UpdateTwitter(name string, twitter string) error
 	UpdatePassword(name string, password string) error
-	UpdateQuota(name string, quota int) error
+	UpdateQuota(name string, quota int64) error
 	GroupList(name string) ([]string, error)
 	GroupAdd(name string, group string) error
 	GroupRemove(name string, group string) error

@@ -394,11 +394,11 @@ func (_m *Users) UpdatePhone(name string, phone string) error {
 }
 
 // UpdateQuota provides a mock function with given fields: name, quota
-func (_m *Users) UpdateQuota(name string, quota int) error {
+func (_m *Users) UpdateQuota(name string, quota int64) error {
 	ret := _m.Called(name, quota)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(string, int) error); ok {
+	if rf, ok := ret.Get(0).(func(string, int64) error); ok {
 		r0 = rf(name, quota)
 	} else {
 		r0 = ret.Error(0)

@@ -55,5 +55,7 @@ func reformatJSON(json string) string {
 	json = strings.Replace(json, "\"false\"", "false", -1)
 	// Nextcloud encode quota as an empty array for never connected users
 	json = strings.Replace(json, "\"quota\":[],", "", -1)
+	// Nextcloud send admin unlimited quota as -3, others as "none" : replace with negative value
+	json = strings.Replace(json, "\"quota\":\"none\"", "\"quota\":-3", -1)
 	return json
 }

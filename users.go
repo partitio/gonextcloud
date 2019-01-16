@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"net/url"
 	"path"
-	"strconv"
 	"strings"
 	"sync"
 )
@@ -195,8 +194,21 @@ func (u *Users) Update(user *types.UserDetails) error {
 	errs := make(chan types.UpdateError)
 	var wg sync.WaitGroup
 	for k := range m {
-		if !ignoredUserField(k) && m[k].(string) != "" {
+		var value string
+		// Quota is a special case
+		if k == "Quota" {
+			// If empty
+			if user.Quota == (types.Quota{}) {
+				value = "default"
+			} else {
+				value = user.Quota.String()
+			}
+		} else {
+			value = m[k].(string)
+		}
+		if !ignoredUserField(k) && value != "" {
 			wg.Add(1)
+			// All other non ignored values are strings
 			go func(key string, value string) {
 				defer wg.Done()
 				if err := u.updateAttribute(user.ID, strings.ToLower(key), value); err != nil {
@@ -205,7 +217,7 @@ func (u *Users) Update(user *types.UserDetails) error {
 						Error: err,
 					}
 				}
-			}(k, m[k].(string))
+			}(k, value)
 		}
 	}
 	go func() {
@@ -250,9 +262,10 @@ func (u *Users) UpdatePassword(name string, password string) error {
 	return u.updateAttribute(name, "password", password)
 }
 
-//UpdateQuota update the user's quota (bytes)
-func (u *Users) UpdateQuota(name string, quota int) error {
-	return u.updateAttribute(name, "quota", strconv.Itoa(quota))
+//UpdateQuota update the user's quota (bytes). Set negative quota for unlimited
+func (u *Users) UpdateQuota(name string, quota int64) error {
+	q := types.Quota{Quota: quota}
+	return u.updateAttribute(name, "quota", q.String())
 }
 
 //GroupList lists the user's groups

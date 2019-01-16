@@ -1,5 +1,7 @@
 package types
 
+import "strconv"
+
 //User encapsulate the data needed to create a new Nextcloud's User
 type User struct {
 	Username    string
@@ -37,4 +39,11 @@ type Quota struct {
 	Total    int64   `json:"total"`
 	Relative float64 `json:"relative"`
 	Quota    int64   `json:"quota"`
+}
+
+func (q *Quota) String() string {
+	if q.Quota < 0 {
+		return "none"
+	}
+	return strconv.FormatInt(q.Quota, 10)
 }

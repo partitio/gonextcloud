@@ -166,7 +166,7 @@ var (
 		//		username := fmt.Sprintf("%s-2", config.NotExistingUser)
 		//		err := c.Users().Create(username, password, nil)
 		//		assert.NoError(t, err)
-		//		user := &types.Users{
+		//		user := &types.UserDetails{
 		//			ID:          username,
 		//			Displayname: strings.ToUpper(username),
 		//			Email:       "some@address.com",
@@ -174,6 +174,10 @@ var (
 		//			Twitter:     "@me",
 		//			Phone:       "42 42 242 424",
 		//			Website:     "my.site.com",
+		//			Quota: types.Quota{
+		//				// Unlimited
+		//				Quota: -3,
+		//			},
 		//		}
 		//		err = c.Users().Update(user)
 		//		assert.NoError(t, err)
@@ -314,7 +318,7 @@ var (
 		{
 			"TestUserUpdateQuota",
 			func(t *testing.T) {
-				quota := 1024 * 1024 * 1024
+				quota := int64(1024 * 1024 * 1024)
 				err := c.Users().UpdateQuota(config.NotExistingUser, quota)
 				assert.NoError(t, err)
 				// TODO : Find better verification : A never connected Users does not have quota available
