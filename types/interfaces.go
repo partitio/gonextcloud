@@ -9,6 +9,8 @@ type Client interface {
 	Shares() Shares
 	Users() Users
 	Groups() Groups
+	Login(username string, password string) error
+	Logout() error
 }
 
 type Auth interface {
