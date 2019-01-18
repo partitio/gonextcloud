@@ -194,6 +194,10 @@ func (u *Users) Update(user *types.UserDetails) error {
 	errs := make(chan types.UpdateError)
 	var wg sync.WaitGroup
 	for k := range m {
+		// Filter updatable fields
+		if ignoredUserField(k) {
+			continue
+		}
 		var value string
 		// Quota is a special case
 		if k == "Quota" {
@@ -206,7 +210,7 @@ func (u *Users) Update(user *types.UserDetails) error {
 		} else {
 			value = m[k].(string)
 		}
-		if !ignoredUserField(k) && value != "" {
+		if value != "" {
 			wg.Add(1)
 			// All other non ignored values are strings
 			go func(key string, value string) {
