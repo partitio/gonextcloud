@@ -351,11 +351,11 @@ func (u *Users) baseRequest(method string, ro *req.RequestOptions, subRoutes ...
 }
 
 func ignoredUserField(key string) bool {
-	keys := []string{"ID", "Quota", "Enabled", "Groups", "Language"}
+	keys := []string{"Email", "DisplayName", "Phone", "Address", "Website", "Twitter", "Quota"}
 	for _, k := range keys {
 		if key == k {
-			return true
+			return false
 		}
 	}
-	return false
+	return true
 }

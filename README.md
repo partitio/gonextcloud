@@ -41,7 +41,7 @@ func main() {
     }
     defer c.Logout()
 
-    users, err := c.Users.List()
+    users, err := c.Users().List()
     if err != nil {
         panic(err)
     }
