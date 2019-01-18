@@ -40,17 +40,16 @@ func (e *UserUpdateError) Error() string {
 	for k, e := range e.Errors {
 		errors = append(errors, fmt.Sprintf("%s: %v", k, e))
 	}
-	return strings.Join(errors, ",")
+	return strings.Join(errors, ", ")
 }
 
 //NewUpdateError returns an UpdateError based on an UpdateError channel
-func NewUpdateError(errors chan UpdateError) *UserUpdateError {
-	var ue UserUpdateError
+func NewUpdateError(errors chan *UpdateError) *UserUpdateError {
+	ue := UserUpdateError{map[string]error{}}
 	for e := range errors {
-		if ue.Errors == nil {
-			ue.Errors = map[string]error{e.Field: e.Error}
+		if e != nil {
+			ue.Errors[e.Field] = e.Error
 		}
-		ue.Errors[e.Field] = e.Error
 	}
 	if len(ue.Errors) > 0 {
 		return &ue

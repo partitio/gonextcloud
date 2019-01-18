@@ -191,7 +191,7 @@ func (u *Users) SendWelcomeEmail(name string) error {
 //Update takes a *types.Users struct to update the user's information
 func (u *Users) Update(user *types.UserDetails) error {
 	m := structs.Map(user)
-	errs := make(chan types.UpdateError)
+	errs := make(chan *types.UpdateError)
 	var wg sync.WaitGroup
 	for k := range m {
 		// Filter updatable fields
@@ -216,7 +216,7 @@ func (u *Users) Update(user *types.UserDetails) error {
 			go func(key string, value string) {
 				defer wg.Done()
 				if err := u.updateAttribute(user.ID, strings.ToLower(key), value); err != nil {
-					errs <- types.UpdateError{
+					errs <- &types.UpdateError{
 						Field: key,
 						Error: err,
 					}
@@ -228,7 +228,11 @@ func (u *Users) Update(user *types.UserDetails) error {
 		wg.Wait()
 		close(errs)
 	}()
-	return types.NewUpdateError(errs)
+	// Warning : we actually need to check the *err
+	if err := types.NewUpdateError(errs); err != nil {
+		return err
+	}
+	return nil
 }
 
 //UpdateEmail update the user's email
@@ -355,7 +359,7 @@ func (u *Users) baseRequest(method string, ro *req.RequestOptions, subRoutes ...
 }
 
 func ignoredUserField(key string) bool {
-	keys := []string{"Email", "DisplayName", "Phone", "Address", "Website", "Twitter", "Quota"}
+	keys := []string{"Email", "Displayname", "Phone", "Address", "Website", "Twitter", "Quota"}
 	for _, k := range keys {
 		if key == k {
 			return false

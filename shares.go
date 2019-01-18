@@ -95,13 +95,13 @@ func (s *Shares) Delete(shareID int) error {
 // Update update share details
 // expireDate expireDate expects a well formatted date string, e.g. ‘YYYY-MM-DD’
 func (s *Shares) Update(shareUpdate types.ShareUpdate) error {
-	errs := make(chan types.UpdateError)
+	errs := make(chan *types.UpdateError)
 	var wg sync.WaitGroup
 	wg.Add(4)
 	go func() {
 		defer wg.Done()
 		if err := s.UpdatePassword(shareUpdate.ShareID, shareUpdate.Password); err != nil {
-			errs <- types.UpdateError{
+			errs <- &types.UpdateError{
 				Field: "password",
 				Error: err,
 			}
@@ -110,7 +110,7 @@ func (s *Shares) Update(shareUpdate types.ShareUpdate) error {
 	go func() {
 		defer wg.Done()
 		if err := s.UpdateExpireDate(shareUpdate.ShareID, shareUpdate.ExpireDate); err != nil {
-			errs <- types.UpdateError{
+			errs <- &types.UpdateError{
 				Field: "expireDate",
 				Error: err,
 			}
@@ -119,7 +119,7 @@ func (s *Shares) Update(shareUpdate types.ShareUpdate) error {
 	go func() {
 		defer wg.Done()
 		if err := s.UpdatePermissions(shareUpdate.ShareID, shareUpdate.Permissions); err != nil {
-			errs <- types.UpdateError{
+			errs <- &types.UpdateError{
 				Field: "permissions",
 				Error: err,
 			}
@@ -128,7 +128,7 @@ func (s *Shares) Update(shareUpdate types.ShareUpdate) error {
 	go func() {
 		defer wg.Done()
 		if err := s.UpdatePublicUpload(shareUpdate.ShareID, shareUpdate.PublicUpload); err != nil {
-			errs <- types.UpdateError{
+			errs <- &types.UpdateError{
 				Field: "publicUpload",
 				Error: err,
 			}
@@ -138,7 +138,10 @@ func (s *Shares) Update(shareUpdate types.ShareUpdate) error {
 		wg.Wait()
 		close(errs)
 	}()
-	return types.NewUpdateError(errs)
+	if err := types.NewUpdateError(errs); err != nil {
+		return err
+	}
+	return nil
 }
 
 //UpdateExpireDate updates the share's expire date
