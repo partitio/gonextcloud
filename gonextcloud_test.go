@@ -543,7 +543,7 @@ func TestGroupListDetails(t *testing.T) {
 	if err := initClient(); err != nil {
 		t.Fatal(err)
 	}
-	gs, err := c.Groups().ListDetails()
+	gs, err := c.Groups().ListDetails("")
 	assert.NoError(t, err)
 	assert.NotEmpty(t, gs)
 }

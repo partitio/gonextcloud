@@ -42,7 +42,7 @@ type AppsConfig interface {
 //Groups available methods
 type Groups interface {
 	List() ([]string, error)
-	ListDetails() ([]Group, error)
+	ListDetails(search string) ([]Group, error)
 	Users(name string) ([]string, error)
 	Search(search string) ([]string, error)
 	Create(name string) error

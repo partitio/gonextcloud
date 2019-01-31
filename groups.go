@@ -23,8 +23,13 @@ func (g *Groups) List() ([]string, error) {
 }
 
 //ListDetails lists the Nextcloud groups
-func (g *Groups) ListDetails() ([]types.Group, error) {
-	res, err := g.c.baseRequest(http.MethodGet, routes.groups, nil, "details")
+func (g *Groups) ListDetails(search string) ([]types.Group, error) {
+	ro := &req.RequestOptions{
+		Params: map[string]string{
+			"search": search,
+		},
+	}
+	res, err := g.c.baseRequest(http.MethodGet, routes.groups, ro, "details")
 	if err != nil {
 		return nil, err
 	}

@@ -61,13 +61,13 @@ func (_m *Groups) List() ([]string, error) {
 	return r0, r1
 }
 
-// ListDetails provides a mock function with given fields:
-func (_m *Groups) ListDetails() ([]types.Group, error) {
-	ret := _m.Called()
+// ListDetails provides a mock function with given fields: search
+func (_m *Groups) ListDetails(search string) ([]types.Group, error) {
+	ret := _m.Called(search)
 
 	var r0 []types.Group
-	if rf, ok := ret.Get(0).(func() []types.Group); ok {
-		r0 = rf()
+	if rf, ok := ret.Get(0).(func(string) []types.Group); ok {
+		r0 = rf(search)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]types.Group)
@@ -75,8 +75,8 @@ func (_m *Groups) ListDetails() ([]types.Group, error) {
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func() error); ok {
-		r1 = rf()
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(search)
 	} else {
 		r1 = ret.Error(1)
 	}
