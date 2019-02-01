@@ -157,45 +157,6 @@ var (
 		//	},
 		//},
 		//
-		//{
-		//	"TestUserUpdate",
-		//	func(t *testing.T) {
-		//		if err := initClient(); err != nil {
-		//			return
-		//		}
-		//		username := fmt.Sprintf("%s-2", config.NotExistingUser)
-		//		err := c.Users().Create(username, password, nil)
-		//		assert.NoError(t, err)
-		//		user := &types.UserDetails{
-		//			ID:          username,
-		//			Displayname: strings.ToUpper(username),
-		//			Email:       "some@address.com",
-		//			Address:     "Main Street, City",
-		//			Twitter:     "@me",
-		//			Phone:       "42 42 242 424",
-		//			Website:     "my.site.com",
-		//			Quota: types.Quota{
-		//				// Unlimited
-		//				Quota: -3,
-		//			},
-		//		}
-		//		err = c.Users().Update(user)
-		//		assert.NoError(t, err)
-		//		u, err := c.Users().Get(username)
-		//		assert.NoError(t, err)
-		//		o := structs.Map(user)
-		//		r := structs.Map(u)
-		//		for k := range o {
-		//			if ignoredUserField(k) {
-		//				continue
-		//			}
-		//			assert.Equal(t, o[k], r[k])
-		//		}
-		//		// Clean up
-		//		err = c.Users().Delete(u.ID)
-		//		assert.NoError(t, err)
-		//	},
-		//},
 		{
 			"TestUserCreateExisting",
 			func(t *testing.T) {

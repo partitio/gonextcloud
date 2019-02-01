@@ -2,7 +2,6 @@ package gonextcloud
 
 import (
 	"encoding/json"
-	"github.com/fatih/structs"
 	req "github.com/levigross/grequests"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -189,41 +188,103 @@ func (u *Users) SendWelcomeEmail(name string) error {
 }
 
 //Update takes a *types.Users struct to update the user's information
+// Updatable fields: Email, Displayname, Phone, Address, Website, Twitter, Quota, Groups
 func (u *Users) Update(user *types.UserDetails) error {
-	m := structs.Map(user)
+	// Get user to update only modified fields
+	original, err := u.Get(user.ID)
+	if err != nil {
+		return err
+	}
+
 	errs := make(chan *types.UpdateError)
 	var wg sync.WaitGroup
-	for k := range m {
-		// Filter updatable fields
-		if ignoredUserField(k) {
-			continue
-		}
-		var value string
-		// Quota is a special case
-		if k == "Quota" {
-			// If empty
-			if user.Quota == (types.Quota{}) {
-				value = "default"
-			} else {
-				value = user.Quota.String()
+	update := func(key string, value string) {
+		defer wg.Done()
+		if err := u.updateAttribute(user.ID, strings.ToLower(key), value); err != nil {
+			errs <- &types.UpdateError{
+				Field: key,
+				Error: err,
 			}
-		} else {
-			value = m[k].(string)
 		}
-		if value != "" {
+		errs <- nil
+	}
+	//  Email
+	if user.Email != original.Email {
+		wg.Add(1)
+		go update("Email", user.Email)
+	}
+	//  Displayname
+	if user.Displayname != original.Displayname {
+		wg.Add(1)
+		go update("Displayname", user.Displayname)
+	}
+	//  Phone
+	if user.Phone != original.Phone {
+		wg.Add(1)
+		go update("Phone", user.Phone)
+	}
+	//  Address
+	if user.Address != original.Address {
+		wg.Add(1)
+		go update("Address", user.Address)
+	}
+	//  Website
+	if user.Website != original.Website {
+		wg.Add(1)
+		go update("Website", user.Website)
+	}
+	//  Twitter
+	if user.Twitter != original.Twitter {
+		wg.Add(1)
+		go update("Twitter", user.Twitter)
+	}
+	//  Quota
+	if user.Quota.Quota != original.Quota.Quota {
+		var value string
+		// If empty
+		if user.Quota == (types.Quota{}) {
+			value = "default"
+		} else {
+			value = user.Quota.String()
+		}
+		wg.Add(1)
+		go update("Quota", value)
+	}
+	// Groups
+	// Group removed
+	for _, g := range original.Groups {
+		if !contains(user.Groups, g) {
 			wg.Add(1)
-			// All other non ignored values are strings
-			go func(key string, value string) {
+			go func() {
 				defer wg.Done()
-				if err := u.updateAttribute(user.ID, strings.ToLower(key), value); err != nil {
+				if err := u.GroupRemove(user.ID, g); err != nil {
 					errs <- &types.UpdateError{
-						Field: key,
+						Field: "Groups/" + g,
 						Error: err,
 					}
 				}
-			}(k, value)
+				errs <- nil
+			}()
 		}
 	}
+
+	// Group Added
+	for _, g := range user.Groups {
+		if !contains(original.Groups, g) {
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				if err := u.GroupAdd(user.ID, g); err != nil {
+					errs <- &types.UpdateError{
+						Field: "Groups/" + g,
+						Error: err,
+					}
+				}
+				errs <- nil
+			}()
+		}
+	}
+
 	go func() {
 		wg.Wait()
 		close(errs)
@@ -359,11 +420,20 @@ func (u *Users) baseRequest(method string, ro *req.RequestOptions, subRoutes ...
 }
 
 func ignoredUserField(key string) bool {
-	keys := []string{"Email", "Displayname", "Phone", "Address", "Website", "Twitter", "Quota"}
+	keys := []string{"Email", "Displayname", "Phone", "Address", "Website", "Twitter", "Quota", "Groups"}
 	for _, k := range keys {
 		if key == k {
 			return false
 		}
 	}
 	return true
+}
+
+func contains(slice []string, e string) bool {
+	for _, s := range slice {
+		if e == s {
+			return true
+		}
+	}
+	return false
 }
