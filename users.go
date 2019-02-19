@@ -255,16 +255,16 @@ func (u *Users) Update(user *types.UserDetails) error {
 	for _, g := range original.Groups {
 		if !contains(user.Groups, g) {
 			wg.Add(1)
-			go func() {
+			go func(gr string) {
 				defer wg.Done()
-				if err := u.GroupRemove(user.ID, g); err != nil {
+				if err := u.GroupRemove(user.ID, gr); err != nil {
 					errs <- &types.UpdateError{
-						Field: "Groups/" + g,
+						Field: "Groups/" + gr,
 						Error: err,
 					}
 				}
 				errs <- nil
-			}()
+			}(g)
 		}
 	}
 
@@ -272,16 +272,16 @@ func (u *Users) Update(user *types.UserDetails) error {
 	for _, g := range user.Groups {
 		if !contains(original.Groups, g) {
 			wg.Add(1)
-			go func() {
+			go func(gr string) {
 				defer wg.Done()
-				if err := u.GroupAdd(user.ID, g); err != nil {
+				if err := u.GroupAdd(user.ID, gr); err != nil {
 					errs <- &types.UpdateError{
-						Field: "Groups/" + g,
+						Field: "Groups/" + gr,
 						Error: err,
 					}
 				}
 				errs <- nil
-			}()
+			}(g)
 		}
 	}
 
