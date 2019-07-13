@@ -11,13 +11,13 @@ lint: ## Lint the files
 	@golint -set_exit_status ${PKG_LIST}
 
 test: ## Run unittests
-	@go test -v .
+	@go test -mod=vendor -v .
 
 race: dep ## Run data race detector
-	@go test -v -race ${PKG_LIST}
+	@go test -mod=vendor -v -race ${PKG_LIST}
 
 msan: dep ## Run memory sanitizer
-	@go test -msan -short ${PKG_LIST}
+	@go test -mod=vendor -msan -short ${PKG_LIST}
 
 coverage: ## Generate global code coverage report
 	@mkdir -p cover
@@ -25,8 +25,7 @@ coverage: ## Generate global code coverage report
 	go tool cover -html=cover/${PROJECT_NAME}cov -o coverage.html
 
 dep: ## Get the dependencies
-	@mkdir -p vendor
-	@govendor add +external
+	@GO111MODULE=on go mod vendor
 
 push: dep lint test coverage ## Push to git repository
 	@git push origin master
