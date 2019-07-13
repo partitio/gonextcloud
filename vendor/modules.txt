@@ -1,0 +1,27 @@
+# github.com/davecgh/go-spew v1.1.1
+github.com/davecgh/go-spew/spew
+# github.com/fatih/structs v0.0.0-20180123065059-ebf56d35bba7
+github.com/fatih/structs
+# github.com/google/go-querystring v0.0.0-20170111101155-53e6ce116135
+github.com/google/go-querystring/query
+# github.com/konsorten/go-windows-terminal-sequences v1.0.1
+github.com/konsorten/go-windows-terminal-sequences
+# github.com/levigross/grequests v0.0.0-20171009010347-bf9788368aa0
+github.com/levigross/grequests
+# github.com/pkg/errors v0.0.0-20181023235946-059132a15dd0
+github.com/pkg/errors
+# github.com/pmezard/go-difflib v1.0.0
+github.com/pmezard/go-difflib/difflib
+# github.com/sirupsen/logrus v1.4.2
+github.com/sirupsen/logrus
+# github.com/stretchr/objx v0.1.1
+github.com/stretchr/objx
+# github.com/stretchr/testify v1.2.2
+github.com/stretchr/testify/mock
+github.com/stretchr/testify/assert
+# golang.org/x/net v0.0.0-20181129055619-fae4c4e3ad76
+golang.org/x/net/publicsuffix
+# golang.org/x/sys v0.0.0-20190422165155-953cdadca894
+golang.org/x/sys/unix
+# gopkg.in/yaml.v2 v2.2.1
+gopkg.in/yaml.v2
