@@ -11,18 +11,18 @@ lint: ## Lint the files
 	@golint -set_exit_status ${PKG_LIST}
 
 test: ## Run unittests
-	@go test -mod=vendor -v .
+	@GO111MODULE=on go test -mod=vendor -v .
 
 race: dep ## Run data race detector
-	@go test -mod=vendor -v -race ${PKG_LIST}
+	@GO111MODULE=on go test -mod=vendor -v -race ${PKG_LIST}
 
 msan: dep ## Run memory sanitizer
-	@go test -mod=vendor -msan -short ${PKG_LIST}
+	@GO111MODULE=on go test -mod=vendor -msan -short ${PKG_LIST}
 
 coverage: ## Generate global code coverage report
 	@mkdir -p cover
 	@touch cover/${PROJECT_NAME}cov
-	go tool cover -html=cover/${PROJECT_NAME}cov -o coverage.html
+	@go tool cover -html=cover/${PROJECT_NAME}cov -o coverage.html
 
 dep: ## Get the dependencies
 	@GO111MODULE=on go mod vendor
