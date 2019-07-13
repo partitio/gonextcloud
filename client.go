@@ -1,9 +1,12 @@
 package gonextcloud
 
 import (
-	req "github.com/levigross/grequests"
-	"gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud/types"
 	"net/url"
+
+	req "github.com/levigross/grequests"
+	"github.com/studio-b12/gowebdav"
+
+	"gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud/types"
 )
 
 // Client is the API client that performs all operations against a Nextcloud server.
@@ -23,6 +26,7 @@ type Client struct {
 	shares        *Shares
 	users         *Users
 	groups        *Groups
+	webdav        *gowebdav.Client
 }
 
 // NewClient create a new Client from the Nextcloud Instance URL
@@ -42,6 +46,7 @@ func NewClient(hostname string) (*Client, error) {
 			"Accept":         "application/json",
 		},
 	}
+
 	c.apps = &Apps{c}
 	c.appsConfig = &AppsConfig{c}
 	c.groupFolders = &GroupFolders{c}
@@ -49,6 +54,9 @@ func NewClient(hostname string) (*Client, error) {
 	c.shares = &Shares{c}
 	c.users = &Users{c}
 	c.groups = &Groups{c}
+	// Create empty webdav client
+	// It will be replaced after login
+	c.webdav = &gowebdav.Client{}
 	return c, nil
 }
 
@@ -85,4 +93,9 @@ func (c *Client) Users() types.Users {
 //Groups return the Groups client Interface
 func (c *Client) Groups() types.Groups {
 	return c.groups
+}
+
+// WebDav return the WebDav client Interface
+func (c *Client) WebDav() types.WebDav {
+	return c.webdav
 }

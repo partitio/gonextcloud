@@ -19,6 +19,8 @@ github.com/stretchr/objx
 # github.com/stretchr/testify v1.2.2
 github.com/stretchr/testify/mock
 github.com/stretchr/testify/assert
+# github.com/studio-b12/gowebdav v0.0.0-20190103184047-38f79aeaf1ac
+github.com/studio-b12/gowebdav
 # golang.org/x/net v0.0.0-20181129055619-fae4c4e3ad76
 golang.org/x/net/publicsuffix
 # golang.org/x/sys v0.0.0-20190422165155-953cdadca894
