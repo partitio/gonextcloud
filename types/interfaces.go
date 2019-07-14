@@ -9,6 +9,7 @@ type Client interface {
 	Shares() Shares
 	Users() Users
 	Groups() Groups
+	WebDav() WebDav
 	Login(username string, password string) error
 	Logout() error
 }
