@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	req "github.com/levigross/grequests"
-	"github.com/studio-b12/gowebdav"
 
 	"gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud/types"
 )
@@ -37,7 +36,7 @@ func (c *Client) Login(username string, password string) error {
 		return &e
 	}
 	// Create webdav client
-	c.webdav = gowebdav.NewClient(c.baseURL.String()+"/remote.php/webdav", c.username, c.password)
+	c.webdav = newWebDav(c.baseURL.String()+"/remote.php/webdav", c.username, c.password)
 	return nil
 }
 
