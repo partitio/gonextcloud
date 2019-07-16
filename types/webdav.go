@@ -3,6 +3,7 @@ package types
 import (
 	"io"
 	"os"
+	"path/filepath"
 )
 
 // WebDav available methods
@@ -31,4 +32,8 @@ type WebDav interface {
 	Write(path string, data []byte, _ os.FileMode) error
 	// WriteStream writes a stream
 	WriteStream(path string, stream io.Reader, _ os.FileMode) error
+
+	// Walk walks the file tree rooted at root, calling walkFn for each file or
+	// directory in the tree, including root.
+	Walk(path string, walkFunc filepath.WalkFunc) error
 }
