@@ -25,6 +25,7 @@ type Config struct {
 	ShareFolder      string `yaml:"share-folder"`
 	NotExistingUser  string `yaml:"not-existing-user"`
 	NotExistingGroup string `yaml:"not-existing-group"`
+	NotExistingFolder string `yaml:"not-existing-folder"`
 	Email            string `yaml:"email"`
 }
 

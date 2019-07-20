@@ -84,9 +84,7 @@ func (wd *webDav) readDirNames(dirname string) ([]string, error) {
 	}
 	var names []string
 	for _, i := range fs {
-		if i.IsDir() {
-			names = append(names, i.Name())
-		}
+		names = append(names, i.Name())
 	}
 	sort.Strings(names)
 	return names, nil

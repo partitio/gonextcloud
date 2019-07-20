@@ -5,4 +5,5 @@ app-name: testapp
 share-folder: /Documents
 not-existing-user: this-user-should-not-exist
 not-existing-group: this-group-should-not-exist
+not-existing-folder: this-folder-should-not-exist
 email: my@mail.com
