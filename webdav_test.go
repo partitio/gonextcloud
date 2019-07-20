@@ -2,6 +2,7 @@ package gonextcloud
 
 import (
 	"os"
+	"sort"
 	"strings"
 	"testing"
 
@@ -12,9 +13,21 @@ import (
 )
 
 var (
-	dir string
-	wd types.WebDav
-
+	dir     string
+	wd      types.WebDav
+	folders = []string{
+		"folder1",
+		"folder1/sub1",
+		"folder1/sub1/ssub1",
+		"folder1/sub2",
+		"folder1/sub2/ssub1",
+		"folder1/sub2/ssub2",
+		"folder2",
+		"folder2/sub2",
+		"folder2/sub3",
+		"folder2/sub3/ssub1",
+		"folder2/sub4",
+	}
 	wtests = []struct {
 		name string
 		test test
@@ -22,6 +35,10 @@ var (
 		{
 			name: "CreateFolder",
 			test: testCreateFolder,
+		},
+		{
+			name: "TestCreateSubFolders",
+			test: testCreateSubFolders,
 		},
 		{
 			name: "TestStat",
@@ -52,7 +69,7 @@ func TestWebDav(t *testing.T) {
 	}
 }
 
-func testCreateFolder(t *testing.T){
+func testCreateFolder(t *testing.T) {
 	err := wd.Mkdir(dir, 0777)
 	require.NoError(t, err)
 }
@@ -65,24 +82,37 @@ func testStat(t *testing.T) {
 	assert.True(t, i.IsDir())
 }
 
+func testCreateSubFolders(t *testing.T) {
+	sort.Strings(folders)
+	d := strings.TrimRight(dir, "/")
+	var ds []string
+	ds = append(ds, d)
+	for _, f := range folders {
+		p := d + "/" + f
+		err := wd.MkdirAll(p, 0777)
+		assert.NoError(t, err)
+		ds = append(ds, p)
+	}
+	folders = ds
+}
+
 func testWalk(t *testing.T) {
-	found := false
-	err := wd.Walk("/", func(path string, info os.FileInfo, err error) error {
+	err := wd.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		path = strings.Trim(path, "/")
 		assert.NoError(t, err)
+		// TODO : find a solution for info.Name() on directories
 		if path == dir {
-			found = true
+			return nil
 		}
 		p := strings.Split(path, "/")
 		assert.Equal(t, p[len(p)-1], info.Name())
+		assert.Contains(t, folders, path)
 		return nil
 	})
 	assert.NoError(t, err)
-	assert.True(t, found)
 }
 
 func testDelete(t *testing.T) {
 	err := wd.Remove(dir)
 	require.NoError(t, err)
 }
-
