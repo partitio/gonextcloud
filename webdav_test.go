@@ -60,7 +60,7 @@ func testCreateFolder(t *testing.T){
 func testStat(t *testing.T) {
 	i, err := wd.Stat(dir)
 	require.NoError(t, err)
-	// TODO : there is a problem with fileinfo's Name : find a fix
+	// TODO : there is a problem with fileinfo's Name for directories: find a fix
 	// assert.Equal(t, dir, i.Name())
 	assert.True(t, i.IsDir())
 }
@@ -73,9 +73,8 @@ func testWalk(t *testing.T) {
 		if path == dir {
 			found = true
 		}
-		// TODO : there is a problem with fileinfo's Name : find a fix
-		// p := strings.Split(path, "/")
-		// assert.Equal(t, p[len(p)-1], info.Name())
+		p := strings.Split(path, "/")
+		assert.Equal(t, p[len(p)-1], info.Name())
 		return nil
 	})
 	assert.NoError(t, err)

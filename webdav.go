@@ -43,7 +43,7 @@ func (wd *webDav) walk(path string, info os.FileInfo, walkFn filepath.WalkFunc) 
 	if !info.IsDir() {
 		return walkFn(path, info, nil)
 	}
-	names, err := wd.readDirNames(path)
+	fis, err := wd.readDir(path)
 	err1 := walkFn(path, info, err)
 	// If err != nil, walk can't walk into this directory.
 	// err1 != nil means walkFn want walk to skip this directory or stop walking.
@@ -56,36 +56,27 @@ func (wd *webDav) walk(path string, info os.FileInfo, walkFn filepath.WalkFunc) 
 		return err1
 	}
 
-	for _, name := range names {
-		filename := filepath.Join(path, name)
-		fileInfo, err := wd.Stat(filename)
+	for _, fi := range fis {
+		filename := filepath.Join(path, fi.Name())
+		err = wd.walk(filename, fi, walkFn)
 		if err != nil {
-			if err := walkFn(filename, fileInfo, err); err != nil && err != filepath.SkipDir {
+			if !fi.IsDir() || err != filepath.SkipDir {
 				return err
-			}
-		} else {
-			err = wd.walk(filename, fileInfo, walkFn)
-			if err != nil {
-				if !fileInfo.IsDir() || err != filepath.SkipDir {
-					return err
-				}
 			}
 		}
 	}
 	return nil
 }
 
-// readDirNames reads the directory named by dirname and returns
+// readDir reads the directory and returns
 // a sorted list of directory entries.
-func (wd *webDav) readDirNames(dirname string) ([]string, error) {
+func (wd *webDav) readDir(dirname string) ([]os.FileInfo, error) {
 	fs, err := wd.ReadDir(dirname)
 	if err != nil {
 		return nil, err
 	}
-	var names []string
-	for _, i := range fs {
-		names = append(names, i.Name())
-	}
-	sort.Strings(names)
-	return names, nil
+	sort.Slice(fs, func(i, j int) bool {
+		return sort.StringsAreSorted([]string{fs[i].Name(), fs[j].Name()})
+	})
+	return fs, nil
 }
