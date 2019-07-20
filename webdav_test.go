@@ -2,6 +2,7 @@ package gonextcloud
 
 import (
 	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 	"testing"
@@ -77,8 +78,7 @@ func testCreateFolder(t *testing.T) {
 func testStat(t *testing.T) {
 	i, err := wd.Stat(dir)
 	require.NoError(t, err)
-	// TODO : there is a problem with fileinfo's Name for directories: find a fix
-	// assert.Equal(t, dir, i.Name())
+	assert.Equal(t, dir, i.Name())
 	assert.True(t, i.IsDir())
 }
 
@@ -98,14 +98,8 @@ func testCreateSubFolders(t *testing.T) {
 
 func testWalk(t *testing.T) {
 	err := wd.Walk(dir, func(path string, info os.FileInfo, err error) error {
-		path = strings.Trim(path, "/")
 		assert.NoError(t, err)
-		// TODO : find a solution for info.Name() on directories
-		if path == dir {
-			return nil
-		}
-		p := strings.Split(path, "/")
-		assert.Equal(t, p[len(p)-1], info.Name())
+		assert.Equal(t, filepath.Base(path), info.Name())
 		assert.Contains(t, folders, path)
 		return nil
 	})

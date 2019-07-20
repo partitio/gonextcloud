@@ -4,7 +4,7 @@ import (
 	"net/url"
 
 	req "github.com/levigross/grequests"
-	"github.com/studio-b12/gowebdav"
+	"gitlab.bertha.cloud/adphi/gowebdav"
 
 	"gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud/types"
 )

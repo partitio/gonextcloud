@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"sort"
 
-	"github.com/studio-b12/gowebdav"
+	"gitlab.bertha.cloud/adphi/gowebdav"
 )
 
 type webDav struct {

@@ -19,11 +19,14 @@ github.com/stretchr/objx
 # github.com/stretchr/testify v1.2.2
 github.com/stretchr/testify/mock
 github.com/stretchr/testify/assert
+github.com/stretchr/testify/require
 # github.com/studio-b12/gowebdav v0.0.0-20190103184047-38f79aeaf1ac
 github.com/studio-b12/gowebdav
-# golang.org/x/net v0.0.0-20181129055619-fae4c4e3ad76
+# gitlab.bertha.cloud/adphi/gowebdav v0.0.0-20190720232020-771eec6e76d0
+gitlab.bertha.cloud/adphi/gowebdav
+# golang.org/x/net v0.0.0-20190628185345-da137c7871d7
 golang.org/x/net/publicsuffix
-# golang.org/x/sys v0.0.0-20190422165155-953cdadca894
+# golang.org/x/sys v0.0.0-20190712062909-fae7ac547cb7
 golang.org/x/sys/unix
 # gopkg.in/yaml.v2 v2.2.1
 gopkg.in/yaml.v2
