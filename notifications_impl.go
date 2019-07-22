@@ -2,19 +2,19 @@ package gonextcloud
 
 import (
 	"errors"
-	req "github.com/levigross/grequests"
-	"gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud/types"
 	"net/http"
 	"strconv"
+
+	req "github.com/levigross/grequests"
 )
 
-//Notifications contains all Notifications available actions
-type Notifications struct {
-	c *Client
+//notifications contains all notifications available actions
+type notifications struct {
+	c *client
 }
 
 //List returns all the notifications
-func (n *Notifications) List() ([]types.Notification, error) {
+func (n *notifications) List() ([]Notification, error) {
 	if err := n.Available(); err != nil {
 		return nil, err
 	}
@@ -22,27 +22,27 @@ func (n *Notifications) List() ([]types.Notification, error) {
 	if err != nil {
 		return nil, err
 	}
-	var r types.NotificationsListResponse
+	var r notificationsListResponse
 	res.JSON(&r)
 	return r.Ocs.Data, nil
 }
 
 //Get returns the notification corresponding to the id
-func (n *Notifications) Get(id int) (types.Notification, error) {
+func (n *notifications) Get(id int) (Notification, error) {
 	if err := n.Available(); err != nil {
-		return types.Notification{}, err
+		return Notification{}, err
 	}
 	res, err := n.c.baseRequest(http.MethodGet, routes.notifications, nil, strconv.Itoa(id))
 	if err != nil {
-		return types.Notification{}, err
+		return Notification{}, err
 	}
-	var r types.NotificationResponse
+	var r notificationResponse
 	res.JSON(&r)
 	return r.Ocs.Data, nil
 }
 
 //Delete deletes the notification corresponding to the id
-func (n *Notifications) Delete(id int) error {
+func (n *notifications) Delete(id int) error {
 	if err := n.Available(); err != nil {
 		return err
 	}
@@ -51,7 +51,7 @@ func (n *Notifications) Delete(id int) error {
 }
 
 //DeleteAll deletes all notifications
-func (n *Notifications) DeleteAll() error {
+func (n *notifications) DeleteAll() error {
 	if err := n.Available(); err != nil {
 		return err
 	}
@@ -60,7 +60,7 @@ func (n *Notifications) DeleteAll() error {
 }
 
 //Create creates a notification (if the user is an admin)
-func (n *Notifications) Create(userID, title, message string) error {
+func (n *notifications) Create(userID, title, message string) error {
 	if err := n.AdminAvailable(); err != nil {
 		return err
 	}
@@ -75,7 +75,7 @@ func (n *Notifications) Create(userID, title, message string) error {
 }
 
 //AdminAvailable returns an error if the admin-notifications app is not installed
-func (n *Notifications) AdminAvailable() error {
+func (n *notifications) AdminAvailable() error {
 	if len(n.c.capabilities.Notifications.AdminNotifications) == 0 {
 		return errors.New("'admin notifications' not available on this instance")
 	}
@@ -83,7 +83,7 @@ func (n *Notifications) AdminAvailable() error {
 }
 
 //Available returns an error if the notifications app is not installed
-func (n *Notifications) Available() error {
+func (n *notifications) Available() error {
 	if len(n.c.capabilities.Notifications.OcsEndpoints) == 0 {
 		return errors.New("notifications not available on this instance")
 	}

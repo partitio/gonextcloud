@@ -1,4 +1,4 @@
-package types
+package gonextcloud
 
 import (
 	"fmt"
@@ -11,8 +11,8 @@ type APIError struct {
 	Message string
 }
 
-//ErrorFromMeta return a types.APIError from the Response's types.Meta
-func ErrorFromMeta(meta Meta) *APIError {
+//errorFromMeta return a types.APIError from the Response's types.meta
+func errorFromMeta(meta meta) *APIError {
 	return &APIError{
 		meta.Statuscode,
 		meta.Message,
@@ -43,8 +43,8 @@ func (e *UserUpdateError) Error() string {
 	return strings.Join(errors, ", ")
 }
 
-//NewUpdateError returns an UpdateError based on an UpdateError channel
-func NewUpdateError(errors chan *UpdateError) *UserUpdateError {
+//newUpdateError returns an UpdateError based on an UpdateError channel
+func newUpdateError(errors chan *UpdateError) *UserUpdateError {
 	ue := UserUpdateError{map[string]error{}}
 	for e := range errors {
 		if e != nil {

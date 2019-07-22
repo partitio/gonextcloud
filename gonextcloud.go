@@ -1,6 +1,17 @@
-package types
+package gonextcloud
 
-//Client is the main client interface
+import (
+	"io"
+	"os"
+	"path/filepath"
+)
+
+// NewClient create a new client
+func NewClient(hostname string) (Client, error) {
+	return newClient(hostname)
+}
+
+// Client is the main client interface
 type Client interface {
 	Apps() Apps
 	AppsConfig() AppsConfig
@@ -10,6 +21,7 @@ type Client interface {
 	Users() Users
 	Groups() Groups
 	WebDav() WebDav
+	Monitoring() (*Monitoring, error)
 	Login(username string, password string) error
 	Logout() error
 }
@@ -19,7 +31,7 @@ type Auth interface {
 	Logout() error
 }
 
-//Apps available methods
+// Apps available methods
 type Apps interface {
 	List() ([]string, error)
 	ListEnabled() ([]string, error)
@@ -29,7 +41,7 @@ type Apps interface {
 	Disable(name string) error
 }
 
-//AppsConfig available methods
+// AppsConfig available methods
 type AppsConfig interface {
 	List() (apps []string, err error)
 	Keys(id string) (keys []string, err error)
@@ -40,7 +52,7 @@ type AppsConfig interface {
 	Details(appID string) (map[string]string, error)
 }
 
-//Groups available methods
+// Groups available methods
 type Groups interface {
 	List() ([]string, error)
 	ListDetails(search string) ([]Group, error)
@@ -51,7 +63,7 @@ type Groups interface {
 	SubAdminList(name string) ([]string, error)
 }
 
-//GroupFolders available methods
+// GroupFolders available methods
 type GroupFolders interface {
 	List() (map[int]GroupFolder, error)
 	Get(id int) (GroupFolder, error)
@@ -63,7 +75,7 @@ type GroupFolders interface {
 	SetQuota(folderID int, quota int) error
 }
 
-//Notifications available methods
+// Notifications available methods
 type Notifications interface {
 	List() ([]Notification, error)
 	Get(id int) (Notification, error)
@@ -74,7 +86,7 @@ type Notifications interface {
 	Available() error
 }
 
-//Shares available methods
+// Shares available methods
 type Shares interface {
 	List() ([]Share, error)
 	GetFromPath(path string, reshares bool, subfiles bool) ([]Share, error)
@@ -95,7 +107,7 @@ type Shares interface {
 	UpdatePermissions(shareID int, permissions SharePermission) error
 }
 
-//Users available methods
+// Users available methods
 type Users interface {
 	List() ([]string, error)
 	ListDetails() (map[string]UserDetails, error)
@@ -123,4 +135,36 @@ type Users interface {
 	GroupPromote(name string, group string) error
 	GroupDemote(name string, group string) error
 	GroupSubAdminList(name string) ([]string, error)
+}
+
+// WebDav available methods
+type WebDav interface {
+	// ReadDir reads the contents of a remote directory
+	ReadDir(path string) ([]os.FileInfo, error)
+	// Stat returns the file stats for a specified path
+	Stat(path string) (os.FileInfo, error)
+	// Remove removes a remote file
+	Remove(path string) error
+	// RemoveAll removes remote files
+	RemoveAll(path string) error
+	// Mkdir makes a directory
+	Mkdir(path string, _ os.FileMode) error
+	// MkdirAll like mkdir -p, but for webdav
+	MkdirAll(path string, _ os.FileMode) error
+	// Rename moves a file from A to B
+	Rename(oldpath, newpath string, overwrite bool) error
+	// Copy copies a file from A to B
+	Copy(oldpath, newpath string, overwrite bool) error
+	// Read reads the contents of a remote file
+	Read(path string) ([]byte, error)
+	// ReadStream reads the stream for a given path
+	ReadStream(path string) (io.ReadCloser, error)
+	// Write writes data to a given path
+	Write(path string, data []byte, _ os.FileMode) error
+	// WriteStream writes a stream
+	WriteStream(path string, stream io.Reader, _ os.FileMode) error
+
+	// Walk walks the file tree rooted at root, calling walkFn for each file or
+	// directory in the tree, including root.
+	Walk(path string, walkFunc filepath.WalkFunc) error
 }

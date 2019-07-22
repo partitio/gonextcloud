@@ -1,29 +1,29 @@
 package gonextcloud
 
 import (
-	req "github.com/levigross/grequests"
-	"gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud/types"
 	"net/http"
+
+	req "github.com/levigross/grequests"
 )
 
-//Groups contains all Groups available actions
-type Groups struct {
-	c *Client
+//groups contains all groups available actions
+type groups struct {
+	c *client
 }
 
 //List lists the Nextcloud groups
-func (g *Groups) List() ([]string, error) {
+func (g *groups) List() ([]string, error) {
 	res, err := g.c.baseRequest(http.MethodGet, routes.groups, nil)
 	if err != nil {
 		return nil, err
 	}
-	var r types.GroupListResponse
+	var r groupListResponse
 	res.JSON(&r)
 	return r.Ocs.Data.Groups, nil
 }
 
 //ListDetails lists the Nextcloud groups
-func (g *Groups) ListDetails(search string) ([]types.Group, error) {
+func (g *groups) ListDetails(search string) ([]Group, error) {
 	ro := &req.RequestOptions{
 		Params: map[string]string{
 			"search": search,
@@ -33,24 +33,24 @@ func (g *Groups) ListDetails(search string) ([]types.Group, error) {
 	if err != nil {
 		return nil, err
 	}
-	var r types.GroupListDetailsResponse
+	var r groupListDetailsResponse
 	res.JSON(&r)
 	return r.Ocs.Data.Groups, nil
 }
 
-//Users list the group's users
-func (g *Groups) Users(name string) ([]string, error) {
+//users list the group's users
+func (g *groups) Users(name string) ([]string, error) {
 	res, err := g.c.baseRequest(http.MethodGet, routes.groups, nil, name)
 	if err != nil {
 		return nil, err
 	}
-	var r types.UserListResponse
+	var r userListResponse
 	res.JSON(&r)
 	return r.Ocs.Data.Users, nil
 }
 
 //Search return the list of groups matching the search string
-func (g *Groups) Search(search string) ([]string, error) {
+func (g *groups) Search(search string) ([]string, error) {
 	ro := &req.RequestOptions{
 		Params: map[string]string{"search": search},
 	}
@@ -58,13 +58,13 @@ func (g *Groups) Search(search string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	var r types.GroupListResponse
+	var r groupListResponse
 	res.JSON(&r)
 	return r.Ocs.Data.Groups, nil
 }
 
 //Create creates a group
-func (g *Groups) Create(name string) error {
+func (g *groups) Create(name string) error {
 	ro := &req.RequestOptions{
 		Data: map[string]string{
 			"groupid": name,
@@ -74,22 +74,22 @@ func (g *Groups) Create(name string) error {
 }
 
 //Delete deletes the group
-func (g *Groups) Delete(name string) error {
+func (g *groups) Delete(name string) error {
 	return g.baseRequest(http.MethodDelete, nil, name)
 }
 
 //SubAdminList lists the group's subadmins
-func (g *Groups) SubAdminList(name string) ([]string, error) {
+func (g *groups) SubAdminList(name string) ([]string, error) {
 	res, err := g.c.baseRequest(http.MethodGet, routes.groups, nil, name, "subadmins")
 	if err != nil {
 		return nil, err
 	}
-	var r types.UserListResponse
+	var r userListResponse
 	res.JSON(&r)
 	return r.Ocs.Data.Users, nil
 }
 
-func (g *Groups) baseRequest(method string, ro *req.RequestOptions, subRoute ...string) error {
+func (g *groups) baseRequest(method string, ro *req.RequestOptions, subRoute ...string) error {
 	_, err := g.c.baseRequest(method, routes.groups, ro, subRoute...)
 	return err
 }

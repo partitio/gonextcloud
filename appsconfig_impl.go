@@ -1,52 +1,52 @@
 package gonextcloud
 
 import (
-	req "github.com/levigross/grequests"
-	"gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud/types"
 	"net/http"
 	"sync"
+
+	req "github.com/levigross/grequests"
 )
 
-//AppsConfig contains all Apps Configuration available actions
-type AppsConfig struct {
-	c *Client
+//appsConfig contains all apps Configuration available actions
+type appsConfig struct {
+	c *client
 }
 
 //List lists all the available apps
-func (a *AppsConfig) List() (apps []string, err error) {
+func (a *appsConfig) List() (apps []string, err error) {
 	res, err := a.c.baseRequest(http.MethodGet, routes.appsConfig, nil)
 	if err != nil {
 		return nil, err
 	}
-	var r types.AppConfigResponse
+	var r appConfigResponse
 	res.JSON(&r)
 	return r.Ocs.Data.Data, nil
 }
 
 //Keys returns the app's config keys
-func (a *AppsConfig) Keys(id string) (keys []string, err error) {
+func (a *appsConfig) Keys(id string) (keys []string, err error) {
 	res, err := a.c.baseRequest(http.MethodGet, routes.appsConfig, nil, id)
 	if err != nil {
 		return nil, err
 	}
-	var r types.AppConfigResponse
+	var r appConfigResponse
 	res.JSON(&r)
 	return r.Ocs.Data.Data, nil
 }
 
 //Value get the config value for the given app's key
-func (a *AppsConfig) Value(id, key string) (string, error) {
+func (a *appsConfig) Value(id, key string) (string, error) {
 	res, err := a.c.baseRequest(http.MethodGet, routes.appsConfig, nil, id, key)
 	if err != nil {
 		return "", err
 	}
-	var r types.AppcConfigValueResponse
+	var r appcConfigValueResponse
 	res.JSON(&r)
 	return r.Ocs.Data.Data, nil
 }
 
 //SetValue set the config value for the given app's key
-func (a *AppsConfig) SetValue(id, key, value string) error {
+func (a *appsConfig) SetValue(id, key, value string) error {
 	ro := &req.RequestOptions{
 		Data: map[string]string{
 			"value": value,
@@ -57,13 +57,13 @@ func (a *AppsConfig) SetValue(id, key, value string) error {
 }
 
 //DeleteValue delete the config value and (!! be careful !!) the key
-func (a *AppsConfig) DeleteValue(id, key, value string) error {
+func (a *appsConfig) DeleteValue(id, key, value string) error {
 	_, err := a.c.baseRequest(http.MethodDelete, routes.appsConfig, nil, id, key)
 	return err
 }
 
 //Get returns all apps AppConfigDetails
-func (a *AppsConfig) Get() (map[string]map[string]string, error) {
+func (a *appsConfig) Get() (map[string]map[string]string, error) {
 	config := map[string]map[string]string{}
 	m := sync.Mutex{}
 	appsIDs, err := a.List()
@@ -88,7 +88,7 @@ func (a *AppsConfig) Get() (map[string]map[string]string, error) {
 }
 
 //Details returns all the config's key, values pair of the app
-func (a *AppsConfig) Details(appID string) (map[string]string, error) {
+func (a *appsConfig) Details(appID string) (map[string]string, error) {
 	config := map[string]string{}
 	m := sync.Mutex{}
 	var err error

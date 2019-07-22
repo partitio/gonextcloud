@@ -4,14 +4,12 @@ import (
 	"fmt"
 
 	req "github.com/levigross/grequests"
-
-	"gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud/types"
 )
 
 var errUnauthorized = fmt.Errorf("login first")
 
 // Login perform login and create a session with the Nextcloud API.
-func (c *Client) Login(username string, password string) error {
+func (c *client) Login(username string, password string) error {
 	c.username = username
 	c.password = password
 	options := req.RequestOptions{
@@ -25,14 +23,14 @@ func (c *Client) Login(username string, password string) error {
 	if err != nil {
 		return err
 	}
-	var r types.CapabilitiesResponse
+	var r capabilitiesResponse
 	res.JSON(&r)
-	// No need to check for Ocs.Meta.StatusCode as capabilities are always returned
+	// No need to check for Ocs.meta.StatusCode as capabilities are always returned
 	c.capabilities = &r.Ocs.Data.Capabilities
 	c.version = &r.Ocs.Data.Version
 	// Check if authentication failed
 	if !c.loggedIn() {
-		e := types.APIError{Message: "authentication failed"}
+		e := APIError{Message: "authentication failed"}
 		return &e
 	}
 	// Create webdav client
@@ -41,7 +39,7 @@ func (c *Client) Login(username string, password string) error {
 }
 
 // Logout logs out from the Nextcloud API, close the session and delete session's cookie
-func (c *Client) Logout() error {
+func (c *client) Logout() error {
 	c.session.CloseIdleConnections()
 	c.session.HTTPClient.Jar = nil
 	// Clear capabilities as it is used to check for valid authentication
@@ -49,7 +47,7 @@ func (c *Client) Logout() error {
 	return nil
 }
 
-func (c *Client) loggedIn() bool {
+func (c *client) loggedIn() bool {
 	// When authentication failed, capabilities doesn't contains core information
 	if c.capabilities == nil {
 		return false

@@ -2,15 +2,15 @@ package gonextcloud
 
 import (
 	"encoding/json"
-	req "github.com/levigross/grequests"
-	"gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud/types"
 	"net/http"
 	"net/url"
 	"path"
 	"strings"
+
+	req "github.com/levigross/grequests"
 )
 
-func (c *Client) baseRequest(method string, route *url.URL, ro *req.RequestOptions, subRoutes ...string) (*req.Response, error) {
+func (c *client) baseRequest(method string, route *url.URL, ro *req.RequestOptions, subRoutes ...string) (*req.Response, error) {
 	if !c.loggedIn() {
 		return nil, errUnauthorized
 	}
@@ -40,12 +40,12 @@ func (c *Client) baseRequest(method string, route *url.URL, ro *req.RequestOptio
 	}
 	// As we cannot read the ReaderCloser twice, we use the string content
 	js := res.String()
-	var r types.BaseResponse
+	var r baseResponse
 	json.Unmarshal([]byte(js), &r)
 	if r.Ocs.Meta.Statuscode == 200 || r.Ocs.Meta.Statuscode == 100 {
 		return res, nil
 	}
-	err = types.ErrorFromMeta(r.Ocs.Meta)
+	err = errorFromMeta(r.Ocs.Meta)
 	return nil, err
 }
 

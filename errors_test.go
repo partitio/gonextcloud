@@ -1,11 +1,12 @@
-package types
+package gonextcloud
 
 import (
 	"errors"
-	"github.com/stretchr/testify/assert"
 	"strconv"
 	"sync"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestUserUpdateErrors(t *testing.T) {
@@ -24,7 +25,7 @@ func TestUserUpdateErrors(t *testing.T) {
 		}
 		close(errs)
 	}()
-	uerrs := NewUpdateError(errs)
+	uerrs := newUpdateError(errs)
 	assert.Equal(t, exp, uerrs.Errors)
 	assert.NotEmpty(t, uerrs.Error())
 }
@@ -41,6 +42,6 @@ func TestUserUpdateErrorsNil(t *testing.T) {
 		wg.Wait()
 		close(errs)
 	}()
-	uerrs := NewUpdateError(errs)
+	uerrs := newUpdateError(errs)
 	assert.Nil(t, uerrs)
 }

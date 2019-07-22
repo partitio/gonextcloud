@@ -1,140 +1,57 @@
 package gonextcloud
 
-import (
-	"fmt"
-	req "github.com/levigross/grequests"
-	"gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud/types"
-	"net/http"
-	"strconv"
-)
+import "strconv"
 
-//GroupFolders contains all Groups Folders available actions
-type GroupFolders struct {
-	c *Client
+type groupFolderBadFormatIDAndGroups struct {
+	ID         string            `json:"id"`
+	MountPoint string            `json:"mount_point"`
+	Groups     map[string]string `json:"groups"`
+	Quota      string            `json:"quota"`
+	Size       int               `json:"size"`
 }
 
-//List returns the groups folders
-func (g *GroupFolders) List() (map[int]types.GroupFolder, error) {
-	res, err := g.c.baseRequest(http.MethodGet, routes.groupfolders, nil)
-	if err != nil {
-		return nil, err
-	}
-	var r types.GroupFoldersListResponse
-	res.JSON(&r)
-	gfs := formatBadIDAndGroups(r.Ocs.Data)
-	return gfs, nil
+type groupFolderBadFormatGroups struct {
+	ID         int               `json:"id"`
+	MountPoint string            `json:"mount_point"`
+	Groups     map[string]string `json:"groups"`
+	Quota      string            `json:"quota"`
+	Size       int               `json:"size"`
 }
 
-//Get returns the group folder details
-func (g *GroupFolders) Get(id int) (types.GroupFolder, error) {
-	res, err := g.c.baseRequest(http.MethodGet, routes.groupfolders, nil, strconv.Itoa(id))
-	if err != nil {
-		return types.GroupFolder{}, err
-	}
-	var r types.GroupFoldersResponse
-	res.JSON(&r)
-	if r.Ocs.Data.ID == 0 {
-		return types.GroupFolder{}, fmt.Errorf("%d is not a valid groupfolder's id", id)
-	}
-	return r.Ocs.Data.FormatGroupFolder(), nil
+type GroupFolder struct {
+	ID         int                        `json:"id"`
+	MountPoint string                     `json:"mount_point"`
+	Groups     map[string]SharePermission `json:"groups"`
+	Quota      int                        `json:"quota"`
+	Size       int                        `json:"size"`
 }
 
-//Create creates a group folder
-func (g *GroupFolders) Create(name string) (id int, err error) {
-	// TODO: Validate Folder name
-	ro := &req.RequestOptions{
-		Data: map[string]string{
-			"mountpoint": name,
-		},
+func (gf *groupFolderBadFormatGroups) FormatGroupFolder() GroupFolder {
+	g := GroupFolder{}
+	g.ID = gf.ID
+	g.MountPoint = gf.MountPoint
+	g.Groups = map[string]SharePermission{}
+	for k, v := range gf.Groups {
+		p, _ := strconv.Atoi(v)
+		g.Groups[k] = SharePermission(p)
 	}
-	res, err := g.c.baseRequest(http.MethodPost, routes.groupfolders, ro)
-	if err != nil {
-		return 0, err
-	}
-	var r types.GroupFoldersCreateResponse
-	res.JSON(&r)
-	id, _ = strconv.Atoi(r.Ocs.Data.ID)
-	return id, nil
+	q, _ := strconv.Atoi(gf.Quota)
+	g.Quota = q
+	g.Size = gf.Size
+	return g
 }
 
-//Rename renames the group folder
-func (g *GroupFolders) Rename(groupID int, name string) error {
-	ro := &req.RequestOptions{
-		Data: map[string]string{
-			"mountpoint": name,
-		},
+func (gf *groupFolderBadFormatIDAndGroups) FormatGroupFolder() GroupFolder {
+	g := GroupFolder{}
+	g.ID, _ = strconv.Atoi(gf.ID)
+	g.MountPoint = gf.MountPoint
+	g.Groups = map[string]SharePermission{}
+	for k, v := range gf.Groups {
+		p, _ := strconv.Atoi(v)
+		g.Groups[k] = SharePermission(p)
 	}
-	// GroupFolders's response does not give any clues about success or failure
-	_, err := g.c.baseRequest(http.MethodPost, routes.groupfolders, ro, strconv.Itoa(groupID), "mountpoint")
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-//TODO func (c *Client) GroupFoldersDelete(id int) error {
-
-//AddGroup adds group to folder
-func (g *GroupFolders) AddGroup(folderID int, groupName string) error {
-	ro := &req.RequestOptions{
-		Data: map[string]string{
-			"group": groupName,
-		},
-	}
-	// GroupFolders's response does not give any clues about success or failure
-	_, err := g.c.baseRequest(http.MethodPost, routes.groupfolders, ro, strconv.Itoa(folderID), "groups")
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-//RemoveGroup remove a group from the group folder
-func (g *GroupFolders) RemoveGroup(folderID int, groupName string) error {
-	// GroupFolders's response does not give any clues about success or failure
-	_, err := g.c.baseRequest(http.MethodDelete, routes.groupfolders, nil, strconv.Itoa(folderID), "groups", groupName)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-//SetGroupPermissions set groups permissions
-func (g *GroupFolders) SetGroupPermissions(folderID int, groupName string, permission types.SharePermission) error {
-	ro := &req.RequestOptions{
-		Data: map[string]string{
-			"permissions": strconv.Itoa(int(permission)),
-		},
-	}
-	// GroupFolders's response does not give any clues about success or failure
-	_, err := g.c.baseRequest(http.MethodPost, routes.groupfolders, ro, strconv.Itoa(folderID), "groups", groupName)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-//SetQuota set quota on the group folder. quota in bytes, use -3 for unlimited
-func (g *GroupFolders) SetQuota(folderID int, quota int) error {
-	ro := &req.RequestOptions{
-		Data: map[string]string{
-			"quota": strconv.Itoa(int(quota)),
-		},
-	}
-	// GroupFolders's response does not give any clues about success or failure
-	_, err := g.c.baseRequest(http.MethodPost, routes.groupfolders, ro, strconv.Itoa(folderID), "quota")
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func formatBadIDAndGroups(g map[string]types.GroupFolderBadFormatIDAndGroups) map[int]types.GroupFolder {
-	var gfs = map[int]types.GroupFolder{}
-	for k := range g {
-		i, _ := strconv.Atoi(k)
-		d := g[k]
-		gfs[i] = d.FormatGroupFolder()
-	}
-	return gfs
+	q, _ := strconv.Atoi(gf.Quota)
+	g.Quota = q
+	g.Size = gf.Size
+	return g
 }

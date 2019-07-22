@@ -10,7 +10,6 @@ require (
 	github.com/pkg/errors v0.0.0-20181023235946-059132a15dd0
 	github.com/sirupsen/logrus v1.4.2
 	github.com/stretchr/testify v1.2.2
-	github.com/studio-b12/gowebdav v0.0.0-20190103184047-38f79aeaf1ac
 	gitlab.bertha.cloud/adphi/gowebdav v0.0.0-20190720232020-771eec6e76d0
 	golang.org/x/net v0.0.0-20190628185345-da137c7871d7 // indirect
 	golang.org/x/sys v0.0.0-20190712062909-fae7ac547cb7 // indirect

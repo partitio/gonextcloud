@@ -62,155 +62,168 @@ $ go test -v .
 #### type Client
 
 ```go
-type Client struct {
-	Apps          *Apps
-	AppsConfig    *AppsConfig
-	GroupFolders  *GroupFolders
-	Notifications *Notifications
-	Shares        *Shares
-	Users         *Users
-	Groups        *Groups
+type Client interface {
+	Apps() Apps
+	AppsConfig() AppsConfig
+	GroupFolders() GroupFolders
+	Notifications() Notifications
+	Shares() Shares
+	Users() Users
+	Groups() Groups
+	WebDav() WebDav
+	Monitoring() (*Monitoring, error)
+	Login(username string, password string) error
+	Logout() error
 }
 ```
 
-Client is the API client that performs all operations against a Nextcloud
-server.
+Client is the main client interface
 
 #### func  NewClient
 
 ```go
-func NewClient(hostname string) (*Client, error)
+func NewClient(hostname string) (Client, error)
 ```
-NewClient create a new Client from the Nextcloud Instance URL
+NewClient create a new client
 
-#### func (*Client) Login
+#### ShareType and SharePermission
 
 ```go
-func (c *Client) Login(username string, password string) error
-```
-Login perform login and create a session with the Nextcloud API.
+const (
+	UserShare           ShareType = 0
+	GroupShare          ShareType = 1
+	PublicLinkShare     ShareType = 3
+	FederatedCloudShare ShareType = 6
 
-#### func (*Client) Logout
+	ReadPermission    SharePermission = 1
+	UpdatePermission  SharePermission = 2
+	CreatePermission  SharePermission = 4
+	DeletePermission  SharePermission = 8
+	ReSharePermission SharePermission = 16
+	AllPermissions    SharePermission = 31
+)
+```
+
+#### type APIError
 
 ```go
-func (c *Client) Logout() error
+type APIError struct {
+	Code    int
+	Message string
+}
 ```
-Logout logs out from the Nextcloud API, close the session and delete session's
-cookie
+
+APIError contains the returned error code and message from the Nextcloud's API
+
+#### func (*APIError) Error
+
+```go
+func (e *APIError) Error() string
+```
+Error return the types.APIError string
+
+#### type ActiveUsers
+
+```go
+type ActiveUsers struct {
+	Last5Minutes int `json:"last5minutes"`
+	Last1Hour    int `json:"last1hour"`
+	Last24Hours  int `json:"last24hours"`
+}
+```
+
+
+#### type App
+
+```go
+type App struct {
+	ID            string   `json:"id"`
+	Ocsid         string   `json:"ocsid"`
+	Name          string   `json:"name"`
+	Summary       string   `json:"summary"`
+	Description   string   `json:"description"`
+	Licence       string   `json:"licence"`
+	Author        string   `json:"author"`
+	Version       string   `json:"version"`
+	Namespace     string   `json:"namespace"`
+	Types         []string `json:"types"`
+	Documentation struct {
+		Admin     string `json:"admin"`
+		Developer string `json:"developer"`
+		User      string `json:"user"`
+	} `json:"documentation"`
+	Category   []string `json:"category"`
+	Website    string   `json:"website"`
+	Bugs       string   `json:"bugs"`
+	Repository struct {
+		Attributes struct {
+			Type string `json:"type"`
+		} `json:"@attributes"`
+		Value string `json:"@value"`
+	} `json:"repository"`
+	Screenshot   []interface{} `json:"screenshot"`
+	Dependencies struct {
+		Owncloud struct {
+			Attributes struct {
+				MinVersion string `json:"min-version"`
+				MaxVersion string `json:"max-version"`
+			} `json:"@attributes"`
+		} `json:"owncloud"`
+		Nextcloud struct {
+			Attributes struct {
+				MinVersion string `json:"min-version"`
+				MaxVersion string `json:"max-version"`
+			} `json:"@attributes"`
+		} `json:"nextcloud"`
+	} `json:"dependencies"`
+	Settings struct {
+		Admin           []string      `json:"admin"`
+		AdminSection    []string      `json:"admin-section"`
+		Personal        []interface{} `json:"personal"`
+		PersonalSection []interface{} `json:"personal-section"`
+	} `json:"settings"`
+	Info        []interface{} `json:"info"`
+	Remote      []interface{} `json:"remote"`
+	Public      []interface{} `json:"public"`
+	RepairSteps struct {
+		Install       []interface{} `json:"install"`
+		PreMigration  []interface{} `json:"pre-migration"`
+		PostMigration []interface{} `json:"post-migration"`
+		LiveMigration []interface{} `json:"live-migration"`
+		Uninstall     []interface{} `json:"uninstall"`
+	} `json:"repair-steps"`
+	BackgroundJobs     []interface{} `json:"background-jobs"`
+	TwoFactorProviders []interface{} `json:"two-factor-providers"`
+	Commands           []interface{} `json:"commands"`
+	Activity           struct {
+		Filters   []interface{} `json:"filters"`
+		Settings  []interface{} `json:"settings"`
+		Providers []interface{} `json:"providers"`
+	} `json:"activity"`
+}
+```
+
+App
 
 #### type Apps
 
 ```go
-type Apps struct {
+type Apps interface {
+	List() ([]string, error)
+	ListEnabled() ([]string, error)
+	ListDisabled() ([]string, error)
+	Infos(name string) (App, error)
+	Enable(name string) error
+	Disable(name string) error
 }
 ```
 
-Apps contains all Apps available actions
-
-#### func (*Apps) Disable
-
-```go
-func (a *Apps) Disable(name string) error
-```
-Disable disables an app
-
-#### func (*Apps) Enable
-
-```go
-func (a *Apps) Enable(name string) error
-```
-Enable enables an app
-
-#### func (*Apps) Infos
-
-```go
-func (a *Apps) Infos(name string) (types.App, error)
-```
-Infos return the app's details
-
-#### func (*Apps) List
-
-```go
-func (a *Apps) List() ([]string, error)
-```
-List return the list of the Nextcloud Apps
-
-#### func (*Apps) ListDisabled
-
-```go
-func (a *Apps) ListDisabled() ([]string, error)
-```
-ListDisabled lists the disabled apps
-
-#### func (*Apps) ListEnabled
-
-```go
-func (a *Apps) ListEnabled() ([]string, error)
-```
-ListEnabled lists the enabled apps
+Apps available methods
 
 #### type AppsConfig
 
 ```go
-type AppsConfig struct {
-}
-```
-
-AppsConfig contains all Apps Configuration available actions
-
-#### func (*AppsConfig) DeleteValue
-
-```go
-func (a *AppsConfig) DeleteValue(id, key, value string) error
-```
-DeleteValue delete the config value and (!! be careful !!) the key
-
-#### func (*AppsConfig) Details
-
-```go
-func (a *AppsConfig) Details(appID string) (map[string]string, error)
-```
-Details returns all the config's key, values pair of the app
-
-#### func (*AppsConfig) Get
-
-```go
-func (a *AppsConfig) Get() (map[string]map[string]string, error)
-```
-Get returns all apps AppConfigDetails
-
-#### func (*AppsConfig) Keys
-
-```go
-func (a *AppsConfig) Keys(id string) (keys []string, err error)
-```
-Keys returns the app's config keys
-
-#### func (*AppsConfig) List
-
-```go
-func (a *AppsConfig) List() (apps []string, err error)
-```
-List lists all the available apps
-
-#### func (*AppsConfig) SetValue
-
-```go
-func (a *AppsConfig) SetValue(id, key, value string) error
-```
-SetValue set the config value for the given app's key
-
-#### func (*AppsConfig) Value
-
-```go
-func (a *AppsConfig) Value(id, key string) (string, error)
-```
-Value get the config value for the given app's key
-
-#### type AppsConfigI
-
-```go
-type AppsConfigI interface {
+type AppsConfig interface {
 	List() (apps []string, err error)
 	Keys(id string) (keys []string, err error)
 	Value(id, key string) (string, error)
@@ -221,175 +234,188 @@ type AppsConfigI interface {
 }
 ```
 
-AppsConfigI available methods
+AppsConfig available methods
 
-#### type AppsI
+#### type Auth
 
 ```go
-type AppsI interface {
-	List() ([]string, error)
-	ListEnabled() ([]string, error)
-	ListDisabled() ([]string, error)
-	Infos(name string) (types.App, error)
-	Enable(name string) error
-	Disable(name string) error
+type Auth interface {
+	Login(username string, password string) error
+	Logout() error
 }
 ```
-AppsI available methods
 
-#### func (*Client) Monitoring
+
+#### type Capabilities
 
 ```go
-func (c *Client) Monitoring() (*types.Monitoring, error)
+type Capabilities struct {
+	Core struct {
+		Pollinterval int    `json:"pollinterval"`
+		WebdavRoot   string `json:"webdav-root"`
+	} `json:"core"`
+	Bruteforce struct {
+		Delay int `json:"delay"`
+	} `json:"bruteforce"`
+	Activity struct {
+		Apiv2 []string `json:"apiv2"`
+	} `json:"activity"`
+	Ocm struct {
+		Enabled    bool   `json:"enabled"`
+		APIVersion string `json:"apiVersion"`
+		EndPoint   string `json:"endPoint"`
+		ShareTypes []struct {
+			Name      string `json:"name"`
+			Protocols struct {
+				Webdav string `json:"webdav"`
+			} `json:"protocols"`
+		} `json:"shareTypes"`
+	} `json:"ocm"`
+	Dav struct {
+		Chunking string `json:"chunking"`
+	} `json:"dav"`
+	FilesSharing struct {
+		APIEnabled bool `json:"api_enabled"`
+		Public     struct {
+			Enabled  bool `json:"enabled"`
+			Password struct {
+				Enforced bool `json:"enforced"`
+			} `json:"password"`
+			ExpireDate struct {
+				Enabled bool `json:"enabled"`
+			} `json:"expire_date"`
+			SendMail        bool `json:"send_mail"`
+			Upload          bool `json:"upload"`
+			UploadFilesDrop bool `json:"upload_files_drop"`
+		} `json:"public"`
+		Resharing bool `json:"resharing"`
+		User      struct {
+			SendMail   bool `json:"send_mail"`
+			ExpireDate struct {
+				Enabled bool `json:"enabled"`
+			} `json:"expire_date"`
+		} `json:"user"`
+		GroupSharing bool `json:"group_sharing"`
+		Group        struct {
+			Enabled    bool `json:"enabled"`
+			ExpireDate struct {
+				Enabled bool `json:"enabled"`
+			} `json:"expire_date"`
+		} `json:"group"`
+		DefaultPermissions int `json:"default_permissions"`
+		Federation         struct {
+			Outgoing   bool `json:"outgoing"`
+			Incoming   bool `json:"incoming"`
+			ExpireDate struct {
+				Enabled bool `json:"enabled"`
+			} `json:"expire_date"`
+		} `json:"federation"`
+		Sharebymail struct {
+			Enabled         bool `json:"enabled"`
+			UploadFilesDrop struct {
+				Enabled bool `json:"enabled"`
+			} `json:"upload_files_drop"`
+			Password struct {
+				Enabled bool `json:"enabled"`
+			} `json:"password"`
+			ExpireDate struct {
+				Enabled bool `json:"enabled"`
+			} `json:"expire_date"`
+		} `json:"sharebymail"`
+	} `json:"files_sharing"`
+	Notifications struct {
+		OcsEndpoints       []string `json:"ocs-endpoints"`
+		Push               []string `json:"push"`
+		AdminNotifications []string `json:"admin-notifications"`
+	} `json:"notifications"`
+	PasswordPolicy struct {
+		MinLength                int  `json:"minLength"`
+		EnforceNonCommonPassword bool `json:"enforceNonCommonPassword"`
+		EnforceNumericCharacters bool `json:"enforceNumericCharacters"`
+		EnforceSpecialCharacters bool `json:"enforceSpecialCharacters"`
+		EnforceUpperLowerCase    bool `json:"enforceUpperLowerCase"`
+	} `json:"password_policy"`
+	Theming struct {
+		Name              string `json:"name"`
+		URL               string `json:"url"`
+		Slogan            string `json:"slogan"`
+		Color             string `json:"color"`
+		ColorText         string `json:"color-text"`
+		ColorElement      string `json:"color-element"`
+		Logo              string `json:"logo"`
+		Background        string `json:"background"`
+		BackgroundPlain   bool   `json:"background-plain"`
+		BackgroundDefault bool   `json:"background-default"`
+	} `json:"theming"`
+	Files struct {
+		Bigfilechunking  bool     `json:"bigfilechunking"`
+		BlacklistedFiles []string `json:"blacklisted_files"`
+		Undelete         bool     `json:"undelete"`
+		Versioning       bool     `json:"versioning"`
+	} `json:"files"`
+	Registration struct {
+		Enabled  bool   `json:"enabled"`
+		APIRoot  string `json:"apiRoot"`
+		APILevel string `json:"apiLevel"`
+	} `json:"registration"`
+}
 ```
-Monitoring return nextcloud monitoring statistics
+
+Capabilities
+
+
+
+#### type Group
+
+```go
+type Group struct {
+	ID          string `json:"id"`
+	Displayname string `json:"displayname"`
+	UserCount   int    `json:"usercount"`
+	Disabled    int    `json:"disabled"`
+	CanAdd      bool   `json:"canAdd"`
+	CanRemove   bool   `json:"canRemove"`
+}
+```
+
+Group
+
+#### type GroupFolder
+
+```go
+type GroupFolder struct {
+	ID         int                        `json:"id"`
+	MountPoint string                     `json:"mount_point"`
+	Groups     map[string]SharePermission `json:"groups"`
+	Quota      int                        `json:"quota"`
+	Size       int                        `json:"size"`
+}
+```
+
 
 #### type GroupFolders
 
 ```go
-type GroupFolders struct {
-}
-```
-
-GroupFolders contains all Groups Folders available actions
-
-#### func (*GroupFolders) AddGroup
-
-```go
-func (g *GroupFolders) AddGroup(folderID int, groupName string) error
-```
-AddGroup adds group to folder
-
-#### func (*GroupFolders) Create
-
-```go
-func (g *GroupFolders) Create(name string) (id int, err error)
-```
-Create creates a group folder
-
-#### func (*GroupFolders) Get
-
-```go
-func (g *GroupFolders) Get(id int) (types.GroupFolder, error)
-```
-Get returns the group folder details
-
-#### func (*GroupFolders) List
-
-```go
-func (g *GroupFolders) List() (map[int]types.GroupFolder, error)
-```
-List returns the groups folders
-
-#### func (*GroupFolders) RemoveGroup
-
-```go
-func (g *GroupFolders) RemoveGroup(folderID int, groupName string) error
-```
-RemoveGroup remove a group from the group folder
-
-#### func (*GroupFolders) Rename
-
-```go
-func (g *GroupFolders) Rename(groupID int, name string) error
-```
-Rename renames the group folder
-
-#### func (*GroupFolders) SetGroupPermissions
-
-```go
-func (g *GroupFolders) SetGroupPermissions(folderID int, groupName string, permission types.SharePermission) error
-```
-SetGroupPermissions set groups permissions
-
-#### func (*GroupFolders) SetQuota
-
-```go
-func (g *GroupFolders) SetQuota(folderID int, quota int) error
-```
-SetQuota set quota on the group folder. quota in bytes, use -3 for unlimited
-
-#### type GroupFoldersI
-
-```go
-type GroupFoldersI interface {
-	List() (map[int]types.GroupFolder, error)
-	Get(id int) (types.GroupFolder, error)
+type GroupFolders interface {
+	List() (map[int]GroupFolder, error)
+	Get(id int) (GroupFolder, error)
 	Create(name string) (id int, err error)
 	Rename(groupID int, name string) error
 	AddGroup(folderID int, groupName string) error
 	RemoveGroup(folderID int, groupName string) error
-	SetGroupPermissions(folderID int, groupName string, permission types.SharePermission) error
+	SetGroupPermissions(folderID int, groupName string, permission SharePermission) error
 	SetQuota(folderID int, quota int) error
 }
 ```
 
-GroupFoldersI available methods
+GroupFolders available methods
 
 #### type Groups
 
 ```go
-type Groups struct {
-}
-```
-
-Groups contains all Groups available actions
-
-#### func (*Groups) Create
-
-```go
-func (g *Groups) Create(name string) error
-```
-Create creates a group
-
-#### func (*Groups) Delete
-
-```go
-func (g *Groups) Delete(name string) error
-```
-Delete deletes the group
-
-#### func (*Groups) List
-
-```go
-func (g *Groups) List() ([]string, error)
-```
-List lists the Nextcloud groups
-
-#### func (*Groups) ListDetails
-
-```go
-func (g *Groups) ListDetails() ([]types.Group, error)
-```
-ListDetails lists the Nextcloud groups
-
-#### func (*Groups) Search
-
-```go
-func (g *Groups) Search(search string) ([]string, error)
-```
-Search return the list of groups matching the search string
-
-#### func (*Groups) SubAdminList
-
-```go
-func (g *Groups) SubAdminList(name string) ([]string, error)
-```
-SubAdminList lists the group's subadmins
-
-#### func (*Groups) Users
-
-```go
-func (g *Groups) Users(name string) ([]string, error)
-```
-Users list the group's users
-
-#### type GroupsI
-
-```go
-type GroupsI interface {
+type Groups interface {
 	List() ([]string, error)
-	ListDetails() ([]types.Group, error)
+	ListDetails(search string) ([]Group, error)
 	Users(name string) ([]string, error)
 	Search(search string) ([]string, error)
 	Create(name string) error
@@ -398,72 +424,73 @@ type GroupsI interface {
 }
 ```
 
-GroupsI available methods
+Groups available methods
+
+#### type Monitoring
+
+```go
+type Monitoring struct {
+	Nextcloud struct {
+		System  System  `json:"system"`
+		Storage Storage `json:"storage"`
+		Shares  struct {
+			NumShares               int `json:"num_shares"`
+			NumSharesUser           int `json:"num_shares_user"`
+			NumSharesGroups         int `json:"num_shares_groups"`
+			NumSharesLink           int `json:"num_shares_link"`
+			NumSharesLinkNoPassword int `json:"num_shares_link_no_password"`
+			NumFedSharesSent        int `json:"num_fed_shares_sent"`
+			NumFedSharesReceived    int `json:"num_fed_shares_received"`
+		} `json:"shares"`
+	} `json:"nextcloud"`
+	Server struct {
+		Webserver string `json:"webserver"`
+		Php       struct {
+			Version           string `json:"version"`
+			MemoryLimit       int    `json:"memory_limit"`
+			MaxExecutionTime  int    `json:"max_execution_time"`
+			UploadMaxFilesize int    `json:"upload_max_filesize"`
+		} `json:"php"`
+		Database struct {
+			Type    string `json:"type"`
+			Version string `json:"version"`
+			Size    int    `json:"size"`
+		} `json:"database"`
+	} `json:"server"`
+	ActiveUsers ActiveUsers `json:"activeUsers"`
+}
+```
+
+
+#### type Notification
+
+```go
+type Notification struct {
+	NotificationID        int           `json:"notification_id"`
+	App                   string        `json:"app"`
+	User                  string        `json:"user"`
+	Datetime              time.Time     `json:"datetime"`
+	ObjectType            string        `json:"object_type"`
+	ObjectID              string        `json:"object_id"`
+	Subject               string        `json:"subject"`
+	Message               string        `json:"message"`
+	Link                  string        `json:"link"`
+	SubjectRich           string        `json:"subjectRich"`
+	SubjectRichParameters []interface{} `json:"subjectRichParameters"`
+	MessageRich           string        `json:"messageRich"`
+	MessageRichParameters []interface{} `json:"messageRichParameters"`
+	Icon                  string        `json:"icon"`
+	Actions               []interface{} `json:"actions"`
+}
+```
+
 
 #### type Notifications
 
 ```go
-type Notifications struct {
-}
-```
-
-Notifications contains all Notifications available actions
-
-#### func (*Notifications) AdminAvailable
-
-```go
-func (n *Notifications) AdminAvailable() error
-```
-AdminAvailable returns an error if the admin-notifications app is not installed
-
-#### func (*Notifications) Available
-
-```go
-func (n *Notifications) Available() error
-```
-Available returns an error if the notifications app is not installed
-
-#### func (*Notifications) Create
-
-```go
-func (n *Notifications) Create(userID, title, message string) error
-```
-Create creates a notification (if the user is an admin)
-
-#### func (*Notifications) Delete
-
-```go
-func (n *Notifications) Delete(id int) error
-```
-Delete deletes the notification corresponding to the id
-
-#### func (*Notifications) DeleteAll
-
-```go
-func (n *Notifications) DeleteAll() error
-```
-DeleteAll deletes all notifications
-
-#### func (*Notifications) Get
-
-```go
-func (n *Notifications) Get(id int) (types.Notification, error)
-```
-Get returns the notification corresponding to the id
-
-#### func (*Notifications) List
-
-```go
-func (n *Notifications) List() ([]types.Notification, error)
-```
-List returns all the notifications
-
-#### type NotificationsI
-
-```go
-type NotificationsI interface {
-	List() ([]types.Notification, error)
-	Get(id int) (types.Notification, error)
+type Notifications interface {
+	List() ([]Notification, error)
+	Get(id int) (Notification, error)
 	Delete(id int) error
 	DeleteAll() error
 	Create(userID, title, message string) error
@@ -472,332 +499,128 @@ type NotificationsI interface {
 }
 ```
 
-NotificationsI available methods
+Notifications available methods
 
-#### type Routes
+#### type Quota
 
 ```go
-type Routes struct {
+type Quota struct {
+	Free     int64   `json:"free"`
+	Used     int64   `json:"used"`
+	Total    int64   `json:"total"`
+	Relative float64 `json:"relative"`
+	Quota    int64   `json:"quota"`
 }
 ```
 
-Routes references the available routes
+
+#### func (*Quota) String
+
+```go
+func (q *Quota) String() string
+```
+
+#### type Share
+
+```go
+type Share struct {
+	ID                   string      `json:"id"`
+	ShareType            int         `json:"share_type"`
+	UIDOwner             string      `json:"uid_owner"`
+	DisplaynameOwner     string      `json:"displayname_owner"`
+	Permissions          int         `json:"permissions"`
+	Stime                int         `json:"stime"`
+	Parent               interface{} `json:"parent"`
+	Expiration           string      `json:"expiration"`
+	Token                string      `json:"token"`
+	UIDFileOwner         string      `json:"uid_file_owner"`
+	DisplaynameFileOwner string      `json:"displayname_file_owner"`
+	Path                 string      `json:"path"`
+	ItemType             string      `json:"item_type"`
+	Mimetype             string      `json:"mimetype"`
+	StorageID            string      `json:"storage_id"`
+	Storage              int         `json:"storage"`
+	ItemSource           int         `json:"item_source"`
+	FileSource           int         `json:"file_source"`
+	FileParent           int         `json:"file_parent"`
+	FileTarget           string      `json:"file_target"`
+	ShareWith            string      `json:"share_with"`
+	ShareWithDisplayname string      `json:"share_with_displayname"`
+	MailSend             int         `json:"mail_send"`
+	Tags                 []string    `json:"tags"`
+}
+```
+
+
+#### type SharePermission
+
+```go
+type SharePermission int
+```
+
+
+#### type ShareType
+
+```go
+type ShareType int
+```
+
+
+#### type ShareUpdate
+
+```go
+type ShareUpdate struct {
+	ShareID      int
+	Permissions  SharePermission
+	Password     string
+	PublicUpload bool
+	ExpireDate   string
+}
+```
+
 
 #### type Shares
 
 ```go
-type Shares struct {
-}
-```
-
-Shares contains all Shares available actions
-
-#### func (*Shares) Create
-
-```go
-func (s *Shares) Create(
-	path string,
-	shareType types.ShareType,
-	permission types.SharePermission,
-	shareWith string,
-	publicUpload bool,
-	password string,
-) (types.Share, error)
-```
-Create create a share
-
-#### func (*Shares) Delete
-
-```go
-func (s *Shares) Delete(shareID int) error
-```
-Delete Remove the given share.
-
-#### func (*Shares) Get
-
-```go
-func (s *Shares) Get(shareID string) (types.Share, error)
-```
-Get information about a known Share
-
-#### func (*Shares) GetFromPath
-
-```go
-func (s *Shares) GetFromPath(path string, reshares bool, subfiles bool) ([]types.Share, error)
-```
-GetFromPath return shares from a specific file or folder
-
-#### func (*Shares) List
-
-```go
-func (s *Shares) List() ([]types.Share, error)
-```
-List list all shares of the logged in user
-
-#### func (*Shares) Update
-
-```go
-func (s *Shares) Update(shareUpdate types.ShareUpdate) error
-```
-Update update share details expireDate expireDate expects a well formatted date
-string, e.g. ‘YYYY-MM-DD’
-
-#### func (*Shares) UpdateExpireDate
-
-```go
-func (s *Shares) UpdateExpireDate(shareID int, expireDate string) error
-```
-UpdateExpireDate updates the share's expire date expireDate expects a well
-formatted date string, e.g. ‘YYYY-MM-DD’
-
-#### func (*Shares) UpdatePassword
-
-```go
-func (s *Shares) UpdatePassword(shareID int, password string) error
-```
-UpdatePassword updates share password
-
-#### func (*Shares) UpdatePermissions
-
-```go
-func (s *Shares) UpdatePermissions(shareID int, permissions types.SharePermission) error
-```
-UpdatePermissions update permissions
-
-#### func (*Shares) UpdatePublicUpload
-
-```go
-func (s *Shares) UpdatePublicUpload(shareID int, public bool) error
-```
-UpdatePublicUpload enable or disable public upload
-
-#### type SharesI
-
-```go
-type SharesI interface {
-	List() ([]types.Share, error)
-	GetFromPath(path string, reshares bool, subfiles bool) ([]types.Share, error)
-	Get(shareID string) (types.Share, error)
+type Shares interface {
+	List() ([]Share, error)
+	GetFromPath(path string, reshares bool, subfiles bool) ([]Share, error)
+	Get(shareID string) (Share, error)
 	Create(
 		path string,
-		shareType types.ShareType,
-		permission types.SharePermission,
+		shareType ShareType,
+		permission SharePermission,
 		shareWith string,
 		publicUpload bool,
 		password string,
-	) (types.Share, error)
+	) (Share, error)
 	Delete(shareID int) error
-	Update(shareUpdate types.ShareUpdate) error
+	Update(shareUpdate ShareUpdate) error
 	UpdateExpireDate(shareID int, expireDate string) error
 	UpdatePublicUpload(shareID int, public bool) error
 	UpdatePassword(shareID int, password string) error
-	UpdatePermissions(shareID int, permissions types.SharePermission) error
+	UpdatePermissions(shareID int, permissions SharePermission) error
 }
 ```
 
-SharesI available methods
+```
 
 #### type Users
 
 ```go
-type Users struct {
-}
-```
-
-Users contains all Users available actions
-
-#### func (*Users) Create
-
-```go
-func (u *Users) Create(username string, password string, user *types.User) error
-```
-Create create a new user
-
-#### func (*Users) CreateWithoutPassword
-
-```go
-func (u *Users) CreateWithoutPassword(username, email, displayName string) error
-```
-CreateWithoutPassword create a user without provisioning a password, the email
-address must be provided to send an init password email
-
-#### func (*Users) Delete
-
-```go
-func (u *Users) Delete(name string) error
-```
-Delete delete the user
-
-#### func (*Users) Disable
-
-```go
-func (u *Users) Disable(name string) error
-```
-Disable disables the user
-
-#### func (*Users) Enable
-
-```go
-func (u *Users) Enable(name string) error
-```
-Enable enables the user
-
-#### func (*Users) Get
-
-```go
-func (u *Users) Get(name string) (*types.User, error)
-```
-Get return the details about the specified user
-
-#### func (*Users) GroupAdd
-
-```go
-func (u *Users) GroupAdd(name string, group string) error
-```
-GroupAdd adds a the user to the group
-
-#### func (*Users) GroupDemote
-
-```go
-func (u *Users) GroupDemote(name string, group string) error
-```
-GroupDemote demotes the user
-
-#### func (*Users) GroupList
-
-```go
-func (u *Users) GroupList(name string) ([]string, error)
-```
-GroupList lists the user's groups
-
-#### func (*Users) GroupPromote
-
-```go
-func (u *Users) GroupPromote(name string, group string) error
-```
-GroupPromote promotes the user as group admin
-
-#### func (*Users) GroupRemove
-
-```go
-func (u *Users) GroupRemove(name string, group string) error
-```
-GroupRemove removes the user from the group
-
-#### func (*Users) GroupSubAdminList
-
-```go
-func (u *Users) GroupSubAdminList(name string) ([]string, error)
-```
-GroupSubAdminList lists the groups where he is subadmin
-
-#### func (*Users) List
-
-```go
-func (u *Users) List() ([]string, error)
-```
-List return the Nextcloud'user list
-
-#### func (*Users) ListDetails
-
-```go
-func (u *Users) ListDetails() (map[string]types.User, error)
-```
-ListDetails return a map of user with details
-
-#### func (*Users) Search
-
-```go
-func (u *Users) Search(search string) ([]string, error)
-```
-Search returns the users whose name match the search string
-
-#### func (*Users) SendWelcomeEmail
-
-```go
-func (u *Users) SendWelcomeEmail(name string) error
-```
-SendWelcomeEmail (re)send the welcome mail to the user (return an error if the
-user has not configured his email)
-
-#### func (*Users) Update
-
-```go
-func (u *Users) Update(user *types.User) error
-```
-Update takes a *types.Users struct to update the user's information
-
-#### func (*Users) UpdateAddress
-
-```go
-func (u *Users) UpdateAddress(name string, address string) error
-```
-UpdateAddress update the user's address
-
-#### func (*Users) UpdateDisplayName
-
-```go
-func (u *Users) UpdateDisplayName(name string, displayName string) error
-```
-UpdateDisplayName update the user's display name
-
-#### func (*Users) UpdateEmail
-
-```go
-func (u *Users) UpdateEmail(name string, email string) error
-```
-UpdateEmail update the user's email
-
-#### func (*Users) UpdatePassword
-
-```go
-func (u *Users) UpdatePassword(name string, password string) error
-```
-UpdatePassword update the user's password
-
-#### func (*Users) UpdatePhone
-
-```go
-func (u *Users) UpdatePhone(name string, phone string) error
-```
-UpdatePhone update the user's phone
-
-#### func (*Users) UpdateQuota
-
-```go
-func (u *Users) UpdateQuota(name string, quota int) error
-```
-UpdateQuota update the user's quota (bytes)
-
-#### func (*Users) UpdateTwitter
-
-```go
-func (u *Users) UpdateTwitter(name string, twitter string) error
-```
-UpdateTwitter update the user's twitter
-
-#### func (*Users) UpdateWebSite
-
-```go
-func (u *Users) UpdateWebSite(name string, website string) error
-```
-UpdateWebSite update the user's website
-
-#### type UsersI
-
-```go
-type UsersI interface {
+type Users interface {
 	List() ([]string, error)
-	ListDetails() (map[string]types.User, error)
-	Get(name string) (*types.User, error)
+	ListDetails() (map[string]UserDetails, error)
+	Get(name string) (*UserDetails, error)
 	Search(search string) ([]string, error)
-	Create(username string, password string, user *types.User) error
-	CreateWithoutPassword(username, email, displayName string) error
+	Create(username string, password string, user *UserDetails) error
+	CreateWithoutPassword(username, email, displayName, quota, language string, groups ...string) error
+	CreateBatchWithoutPassword(users []User) error
 	Delete(name string) error
 	Enable(name string) error
 	Disable(name string) error
 	SendWelcomeEmail(name string) error
-	Update(user *types.User) error
+	Update(user *UserDetails) error
 	UpdateEmail(name string, email string) error
 	UpdateDisplayName(name string, displayName string) error
 	UpdatePhone(name string, phone string) error
@@ -805,7 +628,7 @@ type UsersI interface {
 	UpdateWebSite(name string, website string) error
 	UpdateTwitter(name string, twitter string) error
 	UpdatePassword(name string, password string) error
-	UpdateQuota(name string, quota int) error
+	UpdateQuota(name string, quota int64) error
 	GroupList(name string) ([]string, error)
 	GroupAdd(name string, group string) error
 	GroupRemove(name string, group string) error
@@ -815,5 +638,160 @@ type UsersI interface {
 }
 ```
 
-UsersI available methods
+Users available methods
 
+#### type Version
+
+```go
+type Version struct {
+	Major   int    `json:"major"`
+	Minor   int    `json:"minor"`
+	Micro   int    `json:"micro"`
+	String  string `json:"string"`
+	Edition string `json:"edition"`
+}
+```
+
+
+#### type WebDav
+
+```go
+type WebDav interface {
+	// ReadDir reads the contents of a remote directory
+	ReadDir(path string) ([]os.FileInfo, error)
+	// Stat returns the file stats for a specified path
+	Stat(path string) (os.FileInfo, error)
+	// Remove removes a remote file
+	Remove(path string) error
+	// RemoveAll removes remote files
+	RemoveAll(path string) error
+	// Mkdir makes a directory
+	Mkdir(path string, _ os.FileMode) error
+	// MkdirAll like mkdir -p, but for webdav
+	MkdirAll(path string, _ os.FileMode) error
+	// Rename moves a file from A to B
+	Rename(oldpath, newpath string, overwrite bool) error
+	// Copy copies a file from A to B
+	Copy(oldpath, newpath string, overwrite bool) error
+	// Read reads the contents of a remote file
+	Read(path string) ([]byte, error)
+	// ReadStream reads the stream for a given path
+	ReadStream(path string) (io.ReadCloser, error)
+	// Write writes data to a given path
+	Write(path string, data []byte, _ os.FileMode) error
+	// WriteStream writes a stream
+	WriteStream(path string, stream io.Reader, _ os.FileMode) error
+
+	// Walk walks the file tree rooted at root, calling walkFn for each file or
+	// directory in the tree, including root.
+	Walk(path string, walkFunc filepath.WalkFunc) error
+}
+```
+
+WebDav available methods
+
+
+#### type Storage
+
+```go
+type Storage struct {
+	NumUsers         int `json:"num_users"`
+	NumFiles         int `json:"num_files"`
+	NumStorages      int `json:"num_storages"`
+	NumStoragesLocal int `json:"num_storages_local"`
+	NumStoragesHome  int `json:"num_storages_home"`
+	NumStoragesOther int `json:"num_storages_other"`
+}
+```
+
+
+#### type System
+
+```go
+type System struct {
+	Version             string    `json:"version"`
+	Theme               string    `json:"theme"`
+	EnableAvatars       string    `json:"enable_avatars"`
+	EnablePreviews      string    `json:"enable_previews"`
+	MemcacheLocal       string    `json:"memcache.local"`
+	MemcacheDistributed string    `json:"memcache.distributed"`
+	FilelockingEnabled  string    `json:"filelocking.enabled"`
+	MemcacheLocking     string    `json:"memcache.locking"`
+	Debug               string    `json:"debug"`
+	Freespace           int64     `json:"freespace"`
+	Cpuload             []float32 `json:"cpuload"`
+	MemTotal            int       `json:"mem_total"`
+	MemFree             int       `json:"mem_free"`
+	SwapTotal           int       `json:"swap_total"`
+	SwapFree            int       `json:"swap_free"`
+}
+```
+
+
+#### type UpdateError
+
+```go
+type UpdateError struct {
+	Field string
+	Error error
+}
+```
+
+UpdateError contains the user's field and corresponding error
+
+#### type User
+
+```go
+type User struct {
+	Username    string
+	Email       string
+	DisplayName string
+	Quota       string
+	Language    string
+	Groups      []string
+}
+```
+
+User encapsulate the data needed to create a new Nextcloud's User
+
+#### type UserDetails
+
+```go
+type UserDetails struct {
+	Enabled     bool     `json:"enabled"`
+	ID          string   `json:"id"`
+	Quota       Quota    `json:"quota"`
+	Email       string   `json:"email"`
+	Displayname string   `json:"displayname"`
+	Phone       string   `json:"phone"`
+	Address     string   `json:"address"`
+	Website     string   `json:"website"`
+	Twitter     string   `json:"twitter"`
+	Groups      []string `json:"groups"`
+	Language    string   `json:"language,omitempty"`
+
+	StorageLocation string        `json:"storageLocation,omitempty"`
+	LastLogin       int64         `json:"lastLogin,omitempty"`
+	Backend         string        `json:"backend,omitempty"`
+	Subadmin        []interface{} `json:"subadmin,omitempty"`
+	Locale          string        `json:"locale,omitempty"`
+}
+```
+
+UserDetails is the raw Nextcloud User response
+
+#### type UserUpdateError
+
+```go
+type UserUpdateError struct {
+	Errors map[string]error
+}
+```
+
+UpdateError contains the errors resulting from a UserUpdate or a UserCreateFull
+call
+
+#### func (*UserUpdateError) Error
+
+```go
+func (e *UserUpdateError) Error() string
