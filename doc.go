@@ -1,5 +1,5 @@
 /*
-Package gonextcloud is a Go client for the Nextcloud Provisioning API.
+A simple Go Client for Nextcloud's API.
 
 For more information about the Provisioning API, see the documentation:
 https://docs.nextcloud.com/server/13/admin_manual/configuration_user/user_provisioning_api.html
