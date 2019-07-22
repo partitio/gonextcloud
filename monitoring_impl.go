@@ -10,7 +10,7 @@ func (c *client) Monitoring() (*Monitoring, error) {
 	if err != nil {
 		return nil, err
 	}
-	var m MonitoringResponse
+	var m monitoringResponse
 	res.JSON(&m)
 	return &m.Ocs.Data, nil
 }

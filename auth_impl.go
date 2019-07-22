@@ -23,9 +23,9 @@ func (c *client) Login(username string, password string) error {
 	if err != nil {
 		return err
 	}
-	var r CapabilitiesResponse
+	var r capabilitiesResponse
 	res.JSON(&r)
-	// No need to check for Ocs.Meta.StatusCode as capabilities are always returned
+	// No need to check for Ocs.meta.StatusCode as capabilities are always returned
 	c.capabilities = &r.Ocs.Data.Capabilities
 	c.version = &r.Ocs.Data.Version
 	// Check if authentication failed

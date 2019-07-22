@@ -19,7 +19,7 @@ func (g *groupFolders) List() (map[int]GroupFolder, error) {
 	if err != nil {
 		return nil, err
 	}
-	var r GroupFoldersListResponse
+	var r groupFoldersListResponse
 	res.JSON(&r)
 	gfs := formatBadIDAndGroups(r.Ocs.Data)
 	return gfs, nil
@@ -31,7 +31,7 @@ func (g *groupFolders) Get(id int) (GroupFolder, error) {
 	if err != nil {
 		return GroupFolder{}, err
 	}
-	var r GroupFoldersResponse
+	var r groupFoldersResponse
 	res.JSON(&r)
 	if r.Ocs.Data.ID == 0 {
 		return GroupFolder{}, fmt.Errorf("%d is not a valid groupfolder's id", id)
@@ -51,7 +51,7 @@ func (g *groupFolders) Create(name string) (id int, err error) {
 	if err != nil {
 		return 0, err
 	}
-	var r GroupFoldersCreateResponse
+	var r groupFoldersCreateResponse
 	res.JSON(&r)
 	id, _ = strconv.Atoi(r.Ocs.Data.ID)
 	return id, nil
@@ -129,7 +129,7 @@ func (g *groupFolders) SetQuota(folderID int, quota int) error {
 	return nil
 }
 
-func formatBadIDAndGroups(g map[string]GroupFolderBadFormatIDAndGroups) map[int]GroupFolder {
+func formatBadIDAndGroups(g map[string]groupFolderBadFormatIDAndGroups) map[int]GroupFolder {
 	var gfs = map[int]GroupFolder{}
 	for k := range g {
 		i, _ := strconv.Atoi(k)

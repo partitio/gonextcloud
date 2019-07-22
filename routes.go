@@ -2,8 +2,8 @@ package gonextcloud
 
 import "net/url"
 
-// Routes references the available routes
-type Routes struct {
+// apiRoutes references the available routes
+type apiRoutes struct {
 	capabilities       *url.URL
 	users              *url.URL
 	groups             *url.URL
@@ -20,7 +20,7 @@ const badRequest = 998
 
 var (
 	apiPath = &url.URL{Path: "/ocs/v2.php"}
-	routes  = Routes{
+	routes  = apiRoutes{
 		capabilities:       &url.URL{Path: apiPath.Path + "/cloud/capabilities"},
 		users:              &url.URL{Path: apiPath.Path + "/cloud/users"},
 		groups:             &url.URL{Path: apiPath.Path + "/cloud/groups"},

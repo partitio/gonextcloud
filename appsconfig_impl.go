@@ -18,7 +18,7 @@ func (a *appsConfig) List() (apps []string, err error) {
 	if err != nil {
 		return nil, err
 	}
-	var r AppConfigResponse
+	var r appConfigResponse
 	res.JSON(&r)
 	return r.Ocs.Data.Data, nil
 }
@@ -29,7 +29,7 @@ func (a *appsConfig) Keys(id string) (keys []string, err error) {
 	if err != nil {
 		return nil, err
 	}
-	var r AppConfigResponse
+	var r appConfigResponse
 	res.JSON(&r)
 	return r.Ocs.Data.Data, nil
 }
@@ -40,7 +40,7 @@ func (a *appsConfig) Value(id, key string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	var r AppcConfigValueResponse
+	var r appcConfigValueResponse
 	res.JSON(&r)
 	return r.Ocs.Data.Data, nil
 }

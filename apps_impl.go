@@ -17,7 +17,7 @@ func (a *apps) List() ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	var r AppListResponse
+	var r appListResponse
 	res.JSON(&r)
 	return r.Ocs.Data.Apps, nil
 }
@@ -31,7 +31,7 @@ func (a *apps) ListEnabled() ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	var r AppListResponse
+	var r appListResponse
 	res.JSON(&r)
 	return r.Ocs.Data.Apps, nil
 }
@@ -45,7 +45,7 @@ func (a *apps) ListDisabled() ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	var r AppListResponse
+	var r appListResponse
 	res.JSON(&r)
 	return r.Ocs.Data.Apps, nil
 }
@@ -56,7 +56,7 @@ func (a *apps) Infos(name string) (App, error) {
 	if err != nil {
 		return App{}, err
 	}
-	var r AppResponse
+	var r appResponse
 	res.JSON(&r)
 	return r.Ocs.Data, nil
 }

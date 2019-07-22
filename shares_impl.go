@@ -20,7 +20,7 @@ func (s *shares) List() ([]Share, error) {
 	if err != nil {
 		return nil, err
 	}
-	var r SharesListResponse
+	var r sharesListResponse
 	res.JSON(&r)
 	return r.Ocs.Data, nil
 }
@@ -38,7 +38,7 @@ func (s *shares) GetFromPath(path string, reshares bool, subfiles bool) ([]Share
 	if err != nil {
 		return nil, err
 	}
-	var r SharesListResponse
+	var r sharesListResponse
 	res.JSON(&r)
 	return r.Ocs.Data, nil
 }
@@ -49,7 +49,7 @@ func (s *shares) Get(shareID string) (Share, error) {
 	if err != nil {
 		return Share{}, err
 	}
-	var r SharesListResponse
+	var r sharesListResponse
 	res.JSON(&r)
 	return r.Ocs.Data[0], nil
 }
@@ -81,7 +81,7 @@ func (s *shares) Create(
 	if err != nil {
 		return Share{}, err
 	}
-	var r SharesResponse
+	var r sharesResponse
 	res.JSON(&r)
 	return r.Ocs.Data, nil
 }
@@ -138,7 +138,7 @@ func (s *shares) Update(shareUpdate ShareUpdate) error {
 		wg.Wait()
 		close(errs)
 	}()
-	if err := NewUpdateError(errs); err != nil {
+	if err := newUpdateError(errs); err != nil {
 		return err
 	}
 	return nil

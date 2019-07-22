@@ -25,7 +25,7 @@ func (u *users) List() ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	var r UserListResponse
+	var r userListResponse
 	res.JSON(&r)
 	return r.Ocs.Data.Users, nil
 }
@@ -37,7 +37,7 @@ func (u *users) ListDetails() (map[string]UserDetails, error) {
 	if err != nil {
 		return nil, err
 	}
-	var r UserListDetailsResponse
+	var r userListDetailsResponse
 	res.JSON(&r)
 	return r.Ocs.Data.Users, nil
 }
@@ -51,7 +51,7 @@ func (u *users) Get(name string) (*UserDetails, error) {
 	if err != nil {
 		return nil, err
 	}
-	var r UserResponse
+	var r userResponse
 	js := res.String()
 	// Nextcloud does not encode JSON properly
 	js = reformatJSON(js)
@@ -70,7 +70,7 @@ func (u *users) Search(search string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	var r UserListResponse
+	var r userListResponse
 	res.JSON(&r)
 	return r.Ocs.Data.Users, nil
 }
@@ -290,7 +290,7 @@ func (u *users) Update(user *UserDetails) error {
 		close(errs)
 	}()
 	// Warning : we actually need to check the *err
-	if err := NewUpdateError(errs); err != nil {
+	if err := newUpdateError(errs); err != nil {
 		return err
 	}
 	return nil
@@ -343,7 +343,7 @@ func (u *users) GroupList(name string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	var r GroupListResponse
+	var r groupListResponse
 	res.JSON(&r)
 	return r.Ocs.Data.Groups, nil
 }
@@ -399,7 +399,7 @@ func (u *users) GroupSubAdminList(name string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	var r BaseResponse
+	var r baseResponse
 	res.JSON(&r)
 	return r.Ocs.Data, nil
 }

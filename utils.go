@@ -40,12 +40,12 @@ func (c *client) baseRequest(method string, route *url.URL, ro *req.RequestOptio
 	}
 	// As we cannot read the ReaderCloser twice, we use the string content
 	js := res.String()
-	var r BaseResponse
+	var r baseResponse
 	json.Unmarshal([]byte(js), &r)
 	if r.Ocs.Meta.Statuscode == 200 || r.Ocs.Meta.Statuscode == 100 {
 		return res, nil
 	}
-	err = ErrorFromMeta(r.Ocs.Meta)
+	err = errorFromMeta(r.Ocs.Meta)
 	return nil, err
 }
 

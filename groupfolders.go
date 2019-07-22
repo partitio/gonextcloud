@@ -2,7 +2,7 @@ package gonextcloud
 
 import "strconv"
 
-type GroupFolderBadFormatIDAndGroups struct {
+type groupFolderBadFormatIDAndGroups struct {
 	ID         string            `json:"id"`
 	MountPoint string            `json:"mount_point"`
 	Groups     map[string]string `json:"groups"`
@@ -10,7 +10,7 @@ type GroupFolderBadFormatIDAndGroups struct {
 	Size       int               `json:"size"`
 }
 
-type GroupFolderBadFormatGroups struct {
+type groupFolderBadFormatGroups struct {
 	ID         int               `json:"id"`
 	MountPoint string            `json:"mount_point"`
 	Groups     map[string]string `json:"groups"`
@@ -26,7 +26,7 @@ type GroupFolder struct {
 	Size       int                        `json:"size"`
 }
 
-func (gf *GroupFolderBadFormatGroups) FormatGroupFolder() GroupFolder {
+func (gf *groupFolderBadFormatGroups) FormatGroupFolder() GroupFolder {
 	g := GroupFolder{}
 	g.ID = gf.ID
 	g.MountPoint = gf.MountPoint
@@ -41,7 +41,7 @@ func (gf *GroupFolderBadFormatGroups) FormatGroupFolder() GroupFolder {
 	return g
 }
 
-func (gf *GroupFolderBadFormatIDAndGroups) FormatGroupFolder() GroupFolder {
+func (gf *groupFolderBadFormatIDAndGroups) FormatGroupFolder() GroupFolder {
 	g := GroupFolder{}
 	g.ID, _ = strconv.Atoi(gf.ID)
 	g.MountPoint = gf.MountPoint

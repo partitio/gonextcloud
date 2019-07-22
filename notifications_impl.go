@@ -22,7 +22,7 @@ func (n *notifications) List() ([]Notification, error) {
 	if err != nil {
 		return nil, err
 	}
-	var r NotificationsListResponse
+	var r notificationsListResponse
 	res.JSON(&r)
 	return r.Ocs.Data, nil
 }
@@ -36,7 +36,7 @@ func (n *notifications) Get(id int) (Notification, error) {
 	if err != nil {
 		return Notification{}, err
 	}
-	var r NotificationResponse
+	var r notificationResponse
 	res.JSON(&r)
 	return r.Ocs.Data, nil
 }

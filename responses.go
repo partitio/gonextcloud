@@ -1,7 +1,7 @@
 package gonextcloud
 
-//Meta
-type Meta struct {
+//meta
+type meta struct {
 	Status       string `json:"status"`
 	Statuscode   int    `json:"statuscode"`
 	Message      string `json:"message"`
@@ -9,109 +9,109 @@ type Meta struct {
 	Itemsperpage string `json:"itemsperpage"`
 }
 
-//ErrorResponse
-type ErrorResponse struct {
+//errorResponse
+type errorResponse struct {
 	Ocs struct {
-		Meta Meta          `json:"meta"`
+		Meta meta          `json:"meta"`
 		Data []interface{} `json:"data"`
 	} `json:"ocs"`
 }
 
-//UserListResponse
-type UserListResponse struct {
+//userListResponse
+type userListResponse struct {
 	Ocs struct {
-		Meta Meta `json:"meta"`
+		Meta meta `json:"meta"`
 		Data struct {
 			Users []string `json:"users"`
 		} `json:"data"`
 	} `json:"ocs"`
 }
 
-type UserListDetailsResponse struct {
+type userListDetailsResponse struct {
 	Ocs struct {
-		Meta Meta `json:"meta"`
+		Meta meta `json:"meta"`
 		Data struct {
 			Users map[string]UserDetails `json:"users"`
 		} `json:"data"`
 	} `json:"ocs"`
 }
 
-//UserResponse
-type UserResponse struct {
+//userResponse
+type userResponse struct {
 	Ocs struct {
-		Meta Meta        `json:"meta"`
+		Meta meta        `json:"meta"`
 		Data UserDetails `json:"data"`
 	} `json:"ocs"`
 }
 
-//BaseResponse
-type BaseResponse struct {
+//baseResponse
+type baseResponse struct {
 	Ocs struct {
-		Meta Meta     `json:"meta"`
+		Meta meta     `json:"meta"`
 		Data []string `json:"data"`
 	} `json:"ocs"`
 }
 
-//GroupListResponse
-type GroupListResponse struct {
+//groupListResponse
+type groupListResponse struct {
 	Ocs struct {
-		Meta Meta `json:"meta"`
+		Meta meta `json:"meta"`
 		Data struct {
 			Groups []string `json:"groups"`
 		} `json:"data"`
 	} `json:"ocs"`
 }
 
-//GroupListDetailsResponse
-type GroupListDetailsResponse struct {
+//groupListDetailsResponse
+type groupListDetailsResponse struct {
 	Ocs struct {
-		Meta Meta `json:"meta"`
+		Meta meta `json:"meta"`
 		Data struct {
 			Groups []Group `json:"groups"`
 		} `json:"data"`
 	} `json:"ocs"`
 }
 
-//AppListResponse
-type AppListResponse struct {
+//appListResponse
+type appListResponse struct {
 	Ocs struct {
-		Meta Meta `json:"meta"`
+		Meta meta `json:"meta"`
 		Data struct {
 			Apps []string `json:"apps"`
 		} `json:"data"`
 	} `json:"ocs"`
 }
 
-//AppResponse
-type AppResponse struct {
+//appResponse
+type appResponse struct {
 	Ocs struct {
-		Meta Meta `json:"meta"`
+		Meta meta `json:"meta"`
 		Data App  `json:"data"`
 	} `json:"ocs"`
 }
 
-type AppConfigResponse struct {
+type appConfigResponse struct {
 	Ocs struct {
-		Meta Meta `json:"meta"`
+		Meta meta `json:"meta"`
 		Data struct {
 			Data []string `json:"data"`
 		} `json:"data"`
 	} `json:"ocs"`
 }
 
-type AppcConfigValueResponse struct {
+type appcConfigValueResponse struct {
 	Ocs struct {
-		Meta Meta `json:"meta"`
+		Meta meta `json:"meta"`
 		Data struct {
 			Data string `json:"data"`
 		} `json:"data"`
 	} `json:"ocs"`
 }
 
-//CapabilitiesResponse
-type CapabilitiesResponse struct {
+//capabilitiesResponse
+type capabilitiesResponse struct {
 	Ocs struct {
-		Meta Meta `json:"meta"`
+		Meta meta `json:"meta"`
 		Data struct {
 			Version      Version      `json:"version"`
 			Capabilities Capabilities `json:"capabilities"`
@@ -127,58 +127,58 @@ type Version struct {
 	Edition string `json:"edition"`
 }
 
-type MonitoringResponse struct {
+type monitoringResponse struct {
 	Ocs struct {
-		Meta Meta       `json:"meta"`
+		Meta meta       `json:"meta"`
 		Data Monitoring `json:"data"`
 	} `json:"ocs"`
 }
 
-type SharesListResponse struct {
+type sharesListResponse struct {
 	Ocs struct {
-		Meta Meta    `json:"meta"`
+		Meta meta    `json:"meta"`
 		Data []Share `json:"data"`
 	} `json:"ocs"`
 }
 
-type SharesResponse struct {
+type sharesResponse struct {
 	Ocs struct {
-		Meta Meta  `json:"meta"`
+		Meta meta  `json:"meta"`
 		Data Share `json:"data"`
 	} `json:"ocs"`
 }
 
-type GroupFoldersListResponse struct {
+type groupFoldersListResponse struct {
 	Ocs struct {
-		Meta Meta                                       `json:"meta"`
-		Data map[string]GroupFolderBadFormatIDAndGroups `json:"data"`
+		Meta meta                                       `json:"meta"`
+		Data map[string]groupFolderBadFormatIDAndGroups `json:"data"`
 	} `json:"ocs"`
 }
 
-type GroupFoldersCreateResponse struct {
+type groupFoldersCreateResponse struct {
 	Ocs struct {
-		Meta Meta                            `json:"meta"`
-		Data GroupFolderBadFormatIDAndGroups `json:"data"`
+		Meta meta                            `json:"meta"`
+		Data groupFolderBadFormatIDAndGroups `json:"data"`
 	} `json:"ocs"`
 }
 
-type GroupFoldersResponse struct {
+type groupFoldersResponse struct {
 	Ocs struct {
-		Meta Meta                       `json:"meta"`
-		Data GroupFolderBadFormatGroups `json:"data"`
+		Meta meta                       `json:"meta"`
+		Data groupFolderBadFormatGroups `json:"data"`
 	} `json:"ocs"`
 }
 
-type NotificationsListResponse struct {
+type notificationsListResponse struct {
 	Ocs struct {
-		Meta Meta           `json:"meta"`
+		Meta meta           `json:"meta"`
 		Data []Notification `json:"data"`
 	} `json:"ocs"`
 }
 
-type NotificationResponse struct {
+type notificationResponse struct {
 	Ocs struct {
-		Meta Meta         `json:"meta"`
+		Meta meta         `json:"meta"`
 		Data Notification `json:"data"`
 	} `json:"ocs"`
 }

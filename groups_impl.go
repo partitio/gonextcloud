@@ -17,7 +17,7 @@ func (g *groups) List() ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	var r GroupListResponse
+	var r groupListResponse
 	res.JSON(&r)
 	return r.Ocs.Data.Groups, nil
 }
@@ -33,7 +33,7 @@ func (g *groups) ListDetails(search string) ([]Group, error) {
 	if err != nil {
 		return nil, err
 	}
-	var r GroupListDetailsResponse
+	var r groupListDetailsResponse
 	res.JSON(&r)
 	return r.Ocs.Data.Groups, nil
 }
@@ -44,7 +44,7 @@ func (g *groups) Users(name string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	var r UserListResponse
+	var r userListResponse
 	res.JSON(&r)
 	return r.Ocs.Data.Users, nil
 }
@@ -58,7 +58,7 @@ func (g *groups) Search(search string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	var r GroupListResponse
+	var r groupListResponse
 	res.JSON(&r)
 	return r.Ocs.Data.Groups, nil
 }
@@ -84,7 +84,7 @@ func (g *groups) SubAdminList(name string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	var r UserListResponse
+	var r userListResponse
 	res.JSON(&r)
 	return r.Ocs.Data.Users, nil
 }
