@@ -1,6 +1,11 @@
-package types
+package gonextcloud
 
-//Client is the main client interface
+// NewClient create a new client
+func NewClient(hostname string) (Client, error) {
+	return newClient(hostname)
+}
+
+// Client is the main client interface
 type Client interface {
 	Apps() Apps
 	AppsConfig() AppsConfig
@@ -10,6 +15,7 @@ type Client interface {
 	Users() Users
 	Groups() Groups
 	WebDav() WebDav
+	Monitoring() (*Monitoring, error)
 	Login(username string, password string) error
 	Logout() error
 }
@@ -19,7 +25,7 @@ type Auth interface {
 	Logout() error
 }
 
-//Apps available methods
+// Apps available methods
 type Apps interface {
 	List() ([]string, error)
 	ListEnabled() ([]string, error)
@@ -29,7 +35,7 @@ type Apps interface {
 	Disable(name string) error
 }
 
-//AppsConfig available methods
+// AppsConfig available methods
 type AppsConfig interface {
 	List() (apps []string, err error)
 	Keys(id string) (keys []string, err error)
@@ -40,7 +46,7 @@ type AppsConfig interface {
 	Details(appID string) (map[string]string, error)
 }
 
-//Groups available methods
+// Groups available methods
 type Groups interface {
 	List() ([]string, error)
 	ListDetails(search string) ([]Group, error)
@@ -51,7 +57,7 @@ type Groups interface {
 	SubAdminList(name string) ([]string, error)
 }
 
-//GroupFolders available methods
+// GroupFolders available methods
 type GroupFolders interface {
 	List() (map[int]GroupFolder, error)
 	Get(id int) (GroupFolder, error)
@@ -63,7 +69,7 @@ type GroupFolders interface {
 	SetQuota(folderID int, quota int) error
 }
 
-//Notifications available methods
+// Notifications available methods
 type Notifications interface {
 	List() ([]Notification, error)
 	Get(id int) (Notification, error)
@@ -74,7 +80,7 @@ type Notifications interface {
 	Available() error
 }
 
-//Shares available methods
+// Shares available methods
 type Shares interface {
 	List() ([]Share, error)
 	GetFromPath(path string, reshares bool, subfiles bool) ([]Share, error)
@@ -95,7 +101,7 @@ type Shares interface {
 	UpdatePermissions(shareID int, permissions SharePermission) error
 }
 
-//Users available methods
+// Users available methods
 type Users interface {
 	List() ([]string, error)
 	ListDetails() (map[string]UserDetails, error)

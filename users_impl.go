@@ -2,56 +2,56 @@ package gonextcloud
 
 import (
 	"encoding/json"
-	req "github.com/levigross/grequests"
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
-	"gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud/types"
 	"net/http"
 	"net/url"
 	"path"
 	"strings"
 	"sync"
+
+	req "github.com/levigross/grequests"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
-//Users contains all Users available actions
-type Users struct {
-	c *Client
+//users contains all users available actions
+type users struct {
+	c *client
 }
 
 // List return the Nextcloud'user list
-func (u *Users) List() ([]string, error) {
+func (u *users) List() ([]string, error) {
 	res, err := u.c.baseRequest(http.MethodGet, routes.users, nil)
 	//res, err := c.session.Get(u.String(), nil)
 	if err != nil {
 		return nil, err
 	}
-	var r types.UserListResponse
+	var r UserListResponse
 	res.JSON(&r)
 	return r.Ocs.Data.Users, nil
 }
 
 //ListDetails return a map of user with details
-func (u *Users) ListDetails() (map[string]types.UserDetails, error) {
+func (u *users) ListDetails() (map[string]UserDetails, error) {
 	res, err := u.c.baseRequest(http.MethodGet, routes.users, nil, "details")
 	//res, err := c.session.Get(u.String(), nil)
 	if err != nil {
 		return nil, err
 	}
-	var r types.UserListDetailsResponse
+	var r UserListDetailsResponse
 	res.JSON(&r)
 	return r.Ocs.Data.Users, nil
 }
 
 // Get return the details about the specified user
-func (u *Users) Get(name string) (*types.UserDetails, error) {
+func (u *users) Get(name string) (*UserDetails, error) {
 	if name == "" {
-		return nil, &types.APIError{Message: "name cannot be empty"}
+		return nil, &APIError{Message: "name cannot be empty"}
 	}
 	res, err := u.c.baseRequest(http.MethodGet, routes.users, nil, name)
 	if err != nil {
 		return nil, err
 	}
-	var r types.UserResponse
+	var r UserResponse
 	js := res.String()
 	// Nextcloud does not encode JSON properly
 	js = reformatJSON(js)
@@ -62,7 +62,7 @@ func (u *Users) Get(name string) (*types.UserDetails, error) {
 }
 
 // Search returns the users whose name match the search string
-func (u *Users) Search(search string) ([]string, error) {
+func (u *users) Search(search string) ([]string, error) {
 	ro := &req.RequestOptions{
 		Params: map[string]string{"search": search},
 	}
@@ -70,14 +70,14 @@ func (u *Users) Search(search string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	var r types.UserListResponse
+	var r UserListResponse
 	res.JSON(&r)
 	return r.Ocs.Data.Users, nil
 }
 
 // Create create a new user
-func (u *Users) Create(username string, password string, user *types.UserDetails) error {
-	// Create base Users
+func (u *users) Create(username string, password string, user *UserDetails) error {
+	// Create base users
 	ro := &req.RequestOptions{
 		Data: map[string]string{
 			"userid":   username,
@@ -97,7 +97,7 @@ func (u *Users) Create(username string, password string, user *types.UserDetails
 
 // CreateWithoutPassword create a user without provisioning a password, the email address must be provided to send
 // an init password email
-func (u *Users) CreateWithoutPassword(username, email, displayName, quota, language string, groups ...string) error {
+func (u *users) CreateWithoutPassword(username, email, displayName, quota, language string, groups ...string) error {
 	if u.c.version.Major < 14 {
 		return errors.New("unsupported method: requires Nextcloud 14+")
 	}
@@ -132,12 +132,12 @@ func (u *Users) CreateWithoutPassword(username, email, displayName, quota, langu
 }
 
 //CreateBatchWithoutPassword create multiple users and send them the init password email
-func (u *Users) CreateBatchWithoutPassword(users []types.User) error {
+func (u *users) CreateBatchWithoutPassword(users []User) error {
 	var wg sync.WaitGroup
 	errs := make(chan error)
 	for _, us := range users {
 		wg.Add(1)
-		go func(user types.User) {
+		go func(user User) {
 			logrus.Debugf("creating user %s", user.Username)
 			defer wg.Done()
 			if err := u.CreateWithoutPassword(
@@ -162,12 +162,12 @@ func (u *Users) CreateBatchWithoutPassword(users []types.User) error {
 }
 
 //Delete delete the user
-func (u *Users) Delete(name string) error {
+func (u *users) Delete(name string) error {
 	return u.baseRequest(http.MethodDelete, nil, name)
 }
 
 //Enable enables the user
-func (u *Users) Enable(name string) error {
+func (u *users) Enable(name string) error {
 	ro := &req.RequestOptions{
 		Data: map[string]string{},
 	}
@@ -175,7 +175,7 @@ func (u *Users) Enable(name string) error {
 }
 
 //Disable disables the user
-func (u *Users) Disable(name string) error {
+func (u *users) Disable(name string) error {
 	ro := &req.RequestOptions{
 		Data: map[string]string{},
 	}
@@ -183,25 +183,25 @@ func (u *Users) Disable(name string) error {
 }
 
 //SendWelcomeEmail (re)send the welcome mail to the user (return an error if the user has not configured his email)
-func (u *Users) SendWelcomeEmail(name string) error {
+func (u *users) SendWelcomeEmail(name string) error {
 	return u.baseRequest(http.MethodPost, nil, name, "welcome")
 }
 
-//Update takes a *types.Users struct to update the user's information
-// Updatable fields: Email, Displayname, Phone, Address, Website, Twitter, Quota, Groups
-func (u *Users) Update(user *types.UserDetails) error {
+//Update takes a *types.users struct to update the user's information
+// Updatable fields: Email, Displayname, Phone, Address, Website, Twitter, Quota, groups
+func (u *users) Update(user *UserDetails) error {
 	// Get user to update only modified fields
 	original, err := u.Get(user.ID)
 	if err != nil {
 		return err
 	}
 
-	errs := make(chan *types.UpdateError)
+	errs := make(chan *UpdateError)
 	var wg sync.WaitGroup
 	update := func(key string, value string) {
 		defer wg.Done()
 		if err := u.updateAttribute(user.ID, strings.ToLower(key), value); err != nil {
-			errs <- &types.UpdateError{
+			errs <- &UpdateError{
 				Field: key,
 				Error: err,
 			}
@@ -242,7 +242,7 @@ func (u *Users) Update(user *types.UserDetails) error {
 	if user.Quota.Quota != original.Quota.Quota {
 		var value string
 		// If empty
-		if user.Quota == (types.Quota{}) {
+		if user.Quota == (Quota{}) {
 			value = "default"
 		} else {
 			value = user.Quota.String()
@@ -250,7 +250,7 @@ func (u *Users) Update(user *types.UserDetails) error {
 		wg.Add(1)
 		go update("Quota", value)
 	}
-	// Groups
+	// groups
 	// Group removed
 	for _, g := range original.Groups {
 		if !contains(user.Groups, g) {
@@ -258,8 +258,8 @@ func (u *Users) Update(user *types.UserDetails) error {
 			go func(gr string) {
 				defer wg.Done()
 				if err := u.GroupRemove(user.ID, gr); err != nil {
-					errs <- &types.UpdateError{
-						Field: "Groups/" + gr,
+					errs <- &UpdateError{
+						Field: "groups/" + gr,
 						Error: err,
 					}
 				}
@@ -275,8 +275,8 @@ func (u *Users) Update(user *types.UserDetails) error {
 			go func(gr string) {
 				defer wg.Done()
 				if err := u.GroupAdd(user.ID, gr); err != nil {
-					errs <- &types.UpdateError{
-						Field: "Groups/" + gr,
+					errs <- &UpdateError{
+						Field: "groups/" + gr,
 						Error: err,
 					}
 				}
@@ -290,66 +290,66 @@ func (u *Users) Update(user *types.UserDetails) error {
 		close(errs)
 	}()
 	// Warning : we actually need to check the *err
-	if err := types.NewUpdateError(errs); err != nil {
+	if err := NewUpdateError(errs); err != nil {
 		return err
 	}
 	return nil
 }
 
 //UpdateEmail update the user's email
-func (u *Users) UpdateEmail(name string, email string) error {
+func (u *users) UpdateEmail(name string, email string) error {
 	return u.updateAttribute(name, "email", email)
 }
 
 //UpdateDisplayName update the user's display name
-func (u *Users) UpdateDisplayName(name string, displayName string) error {
+func (u *users) UpdateDisplayName(name string, displayName string) error {
 	return u.updateAttribute(name, "displayname", displayName)
 }
 
 //UpdatePhone update the user's phone
-func (u *Users) UpdatePhone(name string, phone string) error {
+func (u *users) UpdatePhone(name string, phone string) error {
 	return u.updateAttribute(name, "phone", phone)
 }
 
 //UpdateAddress update the user's address
-func (u *Users) UpdateAddress(name string, address string) error {
+func (u *users) UpdateAddress(name string, address string) error {
 	return u.updateAttribute(name, "address", address)
 }
 
 //UpdateWebSite update the user's website
-func (u *Users) UpdateWebSite(name string, website string) error {
+func (u *users) UpdateWebSite(name string, website string) error {
 	return u.updateAttribute(name, "website", website)
 }
 
 //UpdateTwitter update the user's twitter
-func (u *Users) UpdateTwitter(name string, twitter string) error {
+func (u *users) UpdateTwitter(name string, twitter string) error {
 	return u.updateAttribute(name, "twitter", twitter)
 }
 
 //UpdatePassword update the user's password
-func (u *Users) UpdatePassword(name string, password string) error {
+func (u *users) UpdatePassword(name string, password string) error {
 	return u.updateAttribute(name, "password", password)
 }
 
 //UpdateQuota update the user's quota (bytes). Set negative quota for unlimited
-func (u *Users) UpdateQuota(name string, quota int64) error {
-	q := types.Quota{Quota: quota}
+func (u *users) UpdateQuota(name string, quota int64) error {
+	q := Quota{Quota: quota}
 	return u.updateAttribute(name, "quota", q.String())
 }
 
 //GroupList lists the user's groups
-func (u *Users) GroupList(name string) ([]string, error) {
+func (u *users) GroupList(name string) ([]string, error) {
 	res, err := u.c.baseRequest(http.MethodGet, routes.users, nil, name, "groups")
 	if err != nil {
 		return nil, err
 	}
-	var r types.GroupListResponse
+	var r GroupListResponse
 	res.JSON(&r)
 	return r.Ocs.Data.Groups, nil
 }
 
 //GroupAdd adds a the user to the group
-func (u *Users) GroupAdd(name string, group string) error {
+func (u *users) GroupAdd(name string, group string) error {
 	ro := &req.RequestOptions{
 		Data: map[string]string{
 			"groupid": group,
@@ -359,7 +359,7 @@ func (u *Users) GroupAdd(name string, group string) error {
 }
 
 //GroupRemove removes the user from the group
-func (u *Users) GroupRemove(name string, group string) error {
+func (u *users) GroupRemove(name string, group string) error {
 	ro := &req.RequestOptions{
 		Data: map[string]string{
 			"groupid": group,
@@ -369,7 +369,7 @@ func (u *Users) GroupRemove(name string, group string) error {
 }
 
 //GroupPromote promotes the user as group admin
-func (u *Users) GroupPromote(name string, group string) error {
+func (u *users) GroupPromote(name string, group string) error {
 	ro := &req.RequestOptions{
 		Data: map[string]string{
 			"groupid": group,
@@ -379,7 +379,7 @@ func (u *Users) GroupPromote(name string, group string) error {
 }
 
 //GroupDemote demotes the user
-func (u *Users) GroupDemote(name string, group string) error {
+func (u *users) GroupDemote(name string, group string) error {
 	ro := &req.RequestOptions{
 		Data: map[string]string{
 			"groupid": group,
@@ -389,7 +389,7 @@ func (u *Users) GroupDemote(name string, group string) error {
 }
 
 //GroupSubAdminList lists the groups where he is subadmin
-func (u *Users) GroupSubAdminList(name string) ([]string, error) {
+func (u *users) GroupSubAdminList(name string) ([]string, error) {
 	if !u.c.loggedIn() {
 		return nil, errUnauthorized
 	}
@@ -399,12 +399,12 @@ func (u *Users) GroupSubAdminList(name string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	var r types.BaseResponse
+	var r BaseResponse
 	res.JSON(&r)
 	return r.Ocs.Data, nil
 }
 
-func (u *Users) updateAttribute(name string, key string, value string) error {
+func (u *users) updateAttribute(name string, key string, value string) error {
 	ro := &req.RequestOptions{
 		Data: map[string]string{
 			"key":   key,
@@ -414,13 +414,13 @@ func (u *Users) updateAttribute(name string, key string, value string) error {
 	return u.baseRequest(http.MethodPut, ro, name)
 }
 
-func (u *Users) baseRequest(method string, ro *req.RequestOptions, subRoutes ...string) error {
+func (u *users) baseRequest(method string, ro *req.RequestOptions, subRoutes ...string) error {
 	_, err := u.c.baseRequest(method, routes.users, ro, subRoutes...)
 	return err
 }
 
 func ignoredUserField(key string) bool {
-	keys := []string{"Email", "Displayname", "Phone", "Address", "Website", "Twitter", "Quota", "Groups"}
+	keys := []string{"Email", "Displayname", "Phone", "Address", "Website", "Twitter", "Quota", "groups"}
 	for _, k := range keys {
 		if key == k {
 			return false

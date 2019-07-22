@@ -2,12 +2,12 @@ package gonextcloud
 
 import (
 	"fmt"
-	"github.com/fatih/structs"
-	"github.com/stretchr/testify/assert"
-	"gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud/types"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/fatih/structs"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestUserUpdate(t *testing.T) {
@@ -23,11 +23,11 @@ func TestUserUpdate(t *testing.T) {
 	if err != nil {
 		t.FailNow()
 	}
-	user := &types.UserDetails{
+	user := &UserDetails{
 		ID:          username,
 		Displayname: strings.ToUpper(username),
 		Email:       "some@mail.com",
-		Quota: types.Quota{
+		Quota: Quota{
 			// Unlimited
 			Quota: -3,
 		},

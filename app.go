@@ -1,4 +1,4 @@
-package types
+package gonextcloud
 
 //App
 type App struct {

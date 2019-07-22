@@ -1,9 +1,9 @@
 package gonextcloud
 
 import (
-	"github.com/stretchr/testify/assert"
-	"gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud/types"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 var (
@@ -53,7 +53,7 @@ var (
 		{
 			"TestGroupFoldersSetGroupPermissions",
 			func(t *testing.T) {
-				err := c.GroupFolders().SetGroupPermissions(groupID, "admin", types.ReadPermission)
+				err := c.GroupFolders().SetGroupPermissions(groupID, "admin", ReadPermission)
 				assert.NoError(t, err)
 			},
 		},

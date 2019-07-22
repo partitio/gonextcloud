@@ -1,4 +1,4 @@
-package types
+package gonextcloud
 
 //Group
 type Group struct {

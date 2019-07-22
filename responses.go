@@ -1,4 +1,4 @@
-package types
+package gonextcloud
 
 //Meta
 type Meta struct {

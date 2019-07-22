@@ -1,29 +1,29 @@
 package gonextcloud
 
 import (
-	req "github.com/levigross/grequests"
-	"gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud/types"
 	"net/http"
+
+	req "github.com/levigross/grequests"
 )
 
-//Apps contains all Apps available actions
-type Apps struct {
-	c *Client
+//apps contains all apps available actions
+type apps struct {
+	c *client
 }
 
-//List return the list of the Nextcloud Apps
-func (a *Apps) List() ([]string, error) {
+//List return the list of the Nextcloud apps
+func (a *apps) List() ([]string, error) {
 	res, err := a.c.baseRequest(http.MethodGet, routes.apps, nil)
 	if err != nil {
 		return nil, err
 	}
-	var r types.AppListResponse
+	var r AppListResponse
 	res.JSON(&r)
 	return r.Ocs.Data.Apps, nil
 }
 
 //ListEnabled lists the enabled apps
-func (a *Apps) ListEnabled() ([]string, error) {
+func (a *apps) ListEnabled() ([]string, error) {
 	ro := &req.RequestOptions{
 		Params: map[string]string{"filter": "enabled"},
 	}
@@ -31,13 +31,13 @@ func (a *Apps) ListEnabled() ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	var r types.AppListResponse
+	var r AppListResponse
 	res.JSON(&r)
 	return r.Ocs.Data.Apps, nil
 }
 
 //ListDisabled lists the disabled apps
-func (a *Apps) ListDisabled() ([]string, error) {
+func (a *apps) ListDisabled() ([]string, error) {
 	ro := &req.RequestOptions{
 		Params: map[string]string{"filter": "disabled"},
 	}
@@ -45,30 +45,30 @@ func (a *Apps) ListDisabled() ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	var r types.AppListResponse
+	var r AppListResponse
 	res.JSON(&r)
 	return r.Ocs.Data.Apps, nil
 }
 
 //Infos return the app's details
-func (a *Apps) Infos(name string) (types.App, error) {
+func (a *apps) Infos(name string) (App, error) {
 	res, err := a.c.baseRequest(http.MethodGet, routes.apps, nil, name)
 	if err != nil {
-		return types.App{}, err
+		return App{}, err
 	}
-	var r types.AppResponse
+	var r AppResponse
 	res.JSON(&r)
 	return r.Ocs.Data, nil
 }
 
 //Enable enables an app
-func (a *Apps) Enable(name string) error {
+func (a *apps) Enable(name string) error {
 	_, err := a.c.baseRequest(http.MethodPost, routes.apps, nil, name)
 	return err
 }
 
 //Disable disables an app
-func (a *Apps) Disable(name string) error {
+func (a *apps) Disable(name string) error {
 	_, err := a.c.baseRequest(http.MethodDelete, routes.apps, nil, name)
 	return err
 }

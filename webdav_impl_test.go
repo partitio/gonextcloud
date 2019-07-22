@@ -9,14 +9,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud/types"
 )
 
 var (
 	dir     string
-	wd      types.WebDav
-	folders = []string{
+	wd      WebDav
+	folders  = []string{
 		"folder1",
 		"folder1/sub1",
 		"folder1/sub1/ssub1",

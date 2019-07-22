@@ -2,9 +2,6 @@ package gonextcloud
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/assert"
-	"gitlab.bertha.cloud/partitio/Nextcloud-Partitio/gonextcloud/types"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
@@ -15,6 +12,9 @@ import (
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
+	"gopkg.in/yaml.v2"
 )
 
 type Config struct {
@@ -35,7 +35,7 @@ type test = func(t *testing.T)
 
 var (
 	config             = Config{}
-	c                  *Client
+	c                  *client
 	groupID            = 37
 	provisionningTests = []struct {
 		string
@@ -52,7 +52,7 @@ var (
 			"create client",
 			func(t *testing.T) {
 				var err error
-				c, err = NewClient(config.URL)
+				c, err = newClient(config.URL)
 				assert.NoError(t, err, "aie")
 			},
 		},
@@ -131,7 +131,7 @@ var (
 		//			return
 		//		}
 		//		username := fmt.Sprintf("%s-2", config.NotExistingUser)
-		//		user := &types.Users{
+		//		user := &types.users{
 		//			ID:          username,
 		//			Displayname: strings.ToUpper(username),
 		//			Email:       "some@address.com",
@@ -140,9 +140,9 @@ var (
 		//			Phone:       "42 42 242 424",
 		//			Website:     "my.site.com",
 		//		}
-		//		err := c.Users().Create(username, password, user)
+		//		err := c.users().Create(username, password, user)
 		//		assert.NoError(t, err)
-		//		u, err := c.Users().Get(username)
+		//		u, err := c.users().Get(username)
 		//		assert.NoError(t, err)
 		//		o := structs.Map(user)
 		//		r := structs.Map(u)
@@ -153,7 +153,7 @@ var (
 		//			assert.Equal(t, o[k], r[k])
 		//		}
 		//		// Clean up
-		//		err = c.Users().Delete(u.ID)
+		//		err = c.users().Delete(u.ID)
 		//		assert.NoError(t, err)
 		//	},
 		//},
@@ -283,8 +283,8 @@ var (
 				quota := int64(1024 * 1024 * 1024)
 				err := c.Users().UpdateQuota(config.NotExistingUser, quota)
 				assert.NoError(t, err)
-				// TODO : Find better verification : A never connected Users does not have quota available
-				//u, err := c.Users(config.NotExistingUser)
+				// TODO : Find better verification : A never connected users does not have quota available
+				//u, err := c.users(config.NotExistingUser)
 				//assert.NoError(t, err)
 				//assert.Equal(t, quota, u.Quota.Quota)
 			},
@@ -407,15 +407,15 @@ var (
 		{
 			"TestLoggedIn",
 			func(t *testing.T) {
-				c := &Client{}
-				c.capabilities = &types.Capabilities{}
+				c := &client{}
+				c.capabilities = &Capabilities{}
 				assert.False(t, c.loggedIn())
 			},
 		},
 		{
 			"TestLoginInvalidURL",
 			func(t *testing.T) {
-				c, _ = NewClient("")
+				c, _ = newClient("")
 				err := c.Login("", "")
 				assert.Error(t, err)
 			},
@@ -423,7 +423,7 @@ var (
 		{
 			"TestBaseRequest",
 			func(t *testing.T) {
-				c, _ = NewClient("")
+				c, _ = newClient("")
 				_, err := c.baseRequest(http.MethodGet, routes.capabilities, nil, "admin", "invalid")
 				assert.Error(t, err)
 			},
@@ -463,10 +463,10 @@ func TestUserCreateBatchWithoutPassword(t *testing.T) {
 	if c.version.Major < 14 {
 		t.SkipNow()
 	}
-	var us []types.User
+	var us []User
 	for i := 0; i < 5; i++ {
 		u := fmt.Sprintf(config.NotExistingUser+"_%d", i)
-		us = append(us, types.User{
+		us = append(us, User{
 			Username:    u,
 			DisplayName: strings.Title(u),
 			Groups:      []string{"admin"},
@@ -547,7 +547,7 @@ func initClient() error {
 			return err
 		}
 		var err error
-		c, err = NewClient(config.URL)
+		c, err = newClient(config.URL)
 		if err != nil {
 			return err
 		}

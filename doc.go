@@ -21,7 +21,7 @@ For example, to list all the Nextcloud's instance users:
 		url := "https://www.mynextcloud.com"
 		username := "admin"
 		password := "password"
-		c, err := gonextcloud.NewClient(url)
+		c, err := gonextcloud.newClient(url)
 		if err != nil {
 			panic(err)
 		}
@@ -30,11 +30,11 @@ For example, to list all the Nextcloud's instance users:
 		}
 		defer c.Logout()
 
-		users, err := c.Users().List()
+		users, err := c.users().List()
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println("Users :", users)
+		fmt.Println("users :", users)
 	}
 */
 package gonextcloud
