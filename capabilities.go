@@ -1,6 +1,6 @@
 package gonextcloud
 
-//Capabilities
+// Capabilities is the capabilities provided by the Nextcloud server
 type Capabilities struct {
 	Core struct {
 		Pollinterval int    `json:"pollinterval"`

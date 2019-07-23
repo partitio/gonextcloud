@@ -18,6 +18,7 @@ type groupFolderBadFormatGroups struct {
 	Size       int               `json:"size"`
 }
 
+// GroupFolder is group shared folder from groupfolders application
 type GroupFolder struct {
 	ID         int                        `json:"id"`
 	MountPoint string                     `json:"mount_point"`

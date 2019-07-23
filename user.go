@@ -2,7 +2,7 @@ package gonextcloud
 
 import "strconv"
 
-//User encapsulate the data needed to create a new Nextcloud's User
+// User encapsulate the data needed to create a new Nextcloud's User
 type User struct {
 	Username    string
 	Email       string
@@ -12,7 +12,7 @@ type User struct {
 	Groups      []string
 }
 
-//UserDetails is the raw Nextcloud User response
+// UserDetails is the raw Nextcloud User response
 type UserDetails struct {
 	Enabled     bool     `json:"enabled"`
 	ID          string   `json:"id"`
@@ -33,6 +33,7 @@ type UserDetails struct {
 	Locale          string        `json:"locale,omitempty"`
 }
 
+// Quota is a use storage Quota
 type Quota struct {
 	Free     int64   `json:"free"`
 	Used     int64   `json:"used"`

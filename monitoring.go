@@ -1,5 +1,6 @@
 package gonextcloud
 
+// System contains the operating system statistics
 type System struct {
 	Version             string    `json:"version"`
 	Theme               string    `json:"theme"`
@@ -18,7 +19,9 @@ type System struct {
 	SwapFree            int       `json:"swap_free"`
 }
 
+// Monitoring contains the nextcloud monitoring statistics
 type Monitoring struct {
+	// Nextcloud Statistics
 	Nextcloud struct {
 		System  System  `json:"system"`
 		Storage Storage `json:"storage"`
@@ -32,6 +35,7 @@ type Monitoring struct {
 			NumFedSharesReceived    int `json:"num_fed_shares_received"`
 		} `json:"shares"`
 	} `json:"nextcloud"`
+	// Server statistics
 	Server struct {
 		Webserver string `json:"webserver"`
 		Php       struct {
@@ -46,15 +50,18 @@ type Monitoring struct {
 			Size    int    `json:"size"`
 		} `json:"database"`
 	} `json:"server"`
+	// Active users statistics
 	ActiveUsers ActiveUsers `json:"activeUsers"`
 }
 
+// ActiveUsers contains the active users statistics
 type ActiveUsers struct {
 	Last5Minutes int `json:"last5minutes"`
 	Last1Hour    int `json:"last1hour"`
 	Last24Hours  int `json:"last24hours"`
 }
 
+// Storage contains the storage statistics
 type Storage struct {
 	NumUsers         int `json:"num_users"`
 	NumFiles         int `json:"num_files"`

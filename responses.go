@@ -119,6 +119,7 @@ type capabilitiesResponse struct {
 	} `json:"ocs"`
 }
 
+// Version contains the nextcloud version informations
 type Version struct {
 	Major   int    `json:"major"`
 	Minor   int    `json:"minor"`

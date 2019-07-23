@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-//APIError contains the returned error code and message from the Nextcloud's API
+// APIError contains the returned error code and message from the Nextcloud's API
 type APIError struct {
 	Code    int
 	Message string
@@ -19,18 +19,18 @@ func errorFromMeta(meta meta) *APIError {
 	}
 }
 
-//Error return the types.APIError string
+// Error return the types.APIError string
 func (e *APIError) Error() string {
 	return fmt.Sprintf("%d : %s", e.Code, e.Message)
 }
 
-//UpdateError contains the user's field and corresponding error
+// UpdateError contains the user's field and corresponding error
 type UpdateError struct {
 	Field string
 	Error error
 }
 
-//UpdateError contains the errors resulting from a UserUpdate or a UserCreateFull call
+// UserUpdateError contains the errors resulting from a UserUpdate or a UserCreateFull call
 type UserUpdateError struct {
 	Errors map[string]error
 }

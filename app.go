@@ -1,6 +1,6 @@
 package gonextcloud
 
-//App
+// App is a nextcloud application (plugin)
 type App struct {
 	ID            string   `json:"id"`
 	Ocsid         string   `json:"ocsid"`

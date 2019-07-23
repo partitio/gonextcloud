@@ -1,22 +1,36 @@
 package gonextcloud
 
+// ShareType is the nextcloud shares types enum :
 type ShareType int
+
+// SharePermission is the nextcloud share permissions enum
 type SharePermission int
 
 const (
-	UserShare           ShareType = 0
-	GroupShare          ShareType = 1
-	PublicLinkShare     ShareType = 3
+	// UserShare is a file or folder shared with other user(s)
+	UserShare ShareType = 0
+	// GroupShare is a file or folder shared with a group
+	GroupShare ShareType = 1
+	// PublicLinkShare is a file or folder shared through public link
+	PublicLinkShare ShareType = 3
+	// FederatedCloudShare is a file or folder shared through federated cloud
 	FederatedCloudShare ShareType = 6
 
-	ReadPermission    SharePermission = 1
-	UpdatePermission  SharePermission = 2
-	CreatePermission  SharePermission = 4
-	DeletePermission  SharePermission = 8
+	// ReadPermission grant read permission
+	ReadPermission SharePermission = 1
+	// UpdatePermission grant update permission
+	UpdatePermission SharePermission = 2
+	// CreatePermission grant create permission
+	CreatePermission SharePermission = 4
+	// DeletePermission grant delete permission
+	DeletePermission SharePermission = 8
+	// ReSharePermission grant resharing permission
 	ReSharePermission SharePermission = 16
-	AllPermissions    SharePermission = 31
+	// AllPermissions grant all permissions
+	AllPermissions SharePermission = 31
 )
 
+// ShareUpdate contains the data required in order to update a nextcloud share
 type ShareUpdate struct {
 	ShareID      int
 	Permissions  SharePermission
@@ -25,6 +39,7 @@ type ShareUpdate struct {
 	ExpireDate   string
 }
 
+// Share is a nextcloud share
 type Share struct {
 	ID                   string      `json:"id"`
 	ShareType            int         `json:"share_type"`

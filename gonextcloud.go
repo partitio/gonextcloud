@@ -13,19 +13,31 @@ func NewClient(hostname string) (Client, error) {
 
 // Client is the main client interface
 type Client interface {
+	// Nextcloud Apps client
 	Apps() Apps
+	// Nextcloud App Config client
 	AppsConfig() AppsConfig
+	// Nextcloud Group Folders client
 	GroupFolders() GroupFolders
+	// Nextcloud Notifications client
 	Notifications() Notifications
+	// Nextcloud Shares client
 	Shares() Shares
+	// Nextcloud Users client
 	Users() Users
+	// Nextcloud Groups client
 	Groups() Groups
+	// Nextcloud WebDav (files) client
 	WebDav() WebDav
+	// Nextcloud Monitoring client
 	Monitoring() (*Monitoring, error)
+	// Login authorize client
 	Login(username string, password string) error
+	// Logout clear connetion and session
 	Logout() error
 }
 
+// Auth is the standard auth methods
 type Auth interface {
 	Login(username string, password string) error
 	Logout() error

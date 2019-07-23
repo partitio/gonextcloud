@@ -1,6 +1,6 @@
 package gonextcloud
 
-//Group
+// Group is a Nextcloud group
 type Group struct {
 	ID          string `json:"id"`
 	Displayname string `json:"displayname"`

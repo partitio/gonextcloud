@@ -2,6 +2,7 @@ package gonextcloud
 
 import "time"
 
+// Notification is a nextcloud notification (from notification app)
 type Notification struct {
 	NotificationID        int           `json:"notification_id"`
 	App                   string        `json:"app"`
