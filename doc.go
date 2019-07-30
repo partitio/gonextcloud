@@ -30,7 +30,7 @@ For example, to list all the Nextcloud's instance users:
 		}
 		defer c.Logout()
 
-		users, err := c.users().List()
+		users, err := c.Users().List()
 		if err != nil {
 			panic(err)
 		}
