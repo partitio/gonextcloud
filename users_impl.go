@@ -20,7 +20,7 @@ type users struct {
 
 // List return the Nextcloud'user list
 func (u *users) List() ([]string, error) {
-	res, err := u.c.baseRequest(http.MethodGet, routes.users, nil)
+	res, err := u.c.baseOcsRequest(http.MethodGet, routes.users, nil)
 	//res, err := c.session.Get(u.String(), nil)
 	if err != nil {
 		return nil, err
@@ -32,7 +32,7 @@ func (u *users) List() ([]string, error) {
 
 //ListDetails return a map of user with details
 func (u *users) ListDetails() (map[string]UserDetails, error) {
-	res, err := u.c.baseRequest(http.MethodGet, routes.users, nil, "details")
+	res, err := u.c.baseOcsRequest(http.MethodGet, routes.users, nil, "details")
 	//res, err := c.session.Get(u.String(), nil)
 	if err != nil {
 		return nil, err
@@ -47,7 +47,7 @@ func (u *users) Get(name string) (*UserDetails, error) {
 	if name == "" {
 		return nil, &APIError{Message: "name cannot be empty"}
 	}
-	res, err := u.c.baseRequest(http.MethodGet, routes.users, nil, name)
+	res, err := u.c.baseOcsRequest(http.MethodGet, routes.users, nil, name)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +66,7 @@ func (u *users) Search(search string) ([]string, error) {
 	ro := &req.RequestOptions{
 		Params: map[string]string{"search": search},
 	}
-	res, err := u.c.baseRequest(http.MethodGet, routes.users, ro)
+	res, err := u.c.baseOcsRequest(http.MethodGet, routes.users, ro)
 	if err != nil {
 		return nil, err
 	}
@@ -339,7 +339,7 @@ func (u *users) UpdateQuota(name string, quota int64) error {
 
 //GroupList lists the user's groups
 func (u *users) GroupList(name string) ([]string, error) {
-	res, err := u.c.baseRequest(http.MethodGet, routes.users, nil, name, "groups")
+	res, err := u.c.baseOcsRequest(http.MethodGet, routes.users, nil, name, "groups")
 	if err != nil {
 		return nil, err
 	}
@@ -415,7 +415,7 @@ func (u *users) updateAttribute(name string, key string, value string) error {
 }
 
 func (u *users) baseRequest(method string, ro *req.RequestOptions, subRoutes ...string) error {
-	_, err := u.c.baseRequest(method, routes.users, ro, subRoutes...)
+	_, err := u.c.baseOcsRequest(method, routes.users, ro, subRoutes...)
 	return err
 }
 

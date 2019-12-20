@@ -380,7 +380,7 @@ var (
 			"TestInvalidBaseRequest",
 			func(t *testing.T) {
 				c.baseURL = &url.URL{}
-				_, err := c.baseRequest(http.MethodGet, routes.capabilities, nil, "admin", "invalid")
+				_, err := c.baseOcsRequest(http.MethodGet, routes.capabilities, nil, "admin", "invalid")
 				c = nil
 				assert.Error(t, err)
 			},
@@ -424,7 +424,7 @@ var (
 			"TestBaseRequest",
 			func(t *testing.T) {
 				c, _ = newClient("")
-				_, err := c.baseRequest(http.MethodGet, routes.capabilities, nil, "admin", "invalid")
+				_, err := c.baseOcsRequest(http.MethodGet, routes.capabilities, nil, "admin", "invalid")
 				assert.Error(t, err)
 			},
 		},

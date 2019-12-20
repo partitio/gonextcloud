@@ -16,7 +16,7 @@ type shares struct {
 
 //List list all shares of the logged in user
 func (s *shares) List() ([]Share, error) {
-	res, err := s.c.baseRequest(http.MethodGet, routes.shares, nil)
+	res, err := s.c.baseOcsRequest(http.MethodGet, routes.shares, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func (s *shares) GetFromPath(path string, reshares bool, subfiles bool) ([]Share
 			"subfiles": strconv.FormatBool(subfiles),
 		},
 	}
-	res, err := s.c.baseRequest(http.MethodGet, routes.shares, ro)
+	res, err := s.c.baseOcsRequest(http.MethodGet, routes.shares, ro)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func (s *shares) GetFromPath(path string, reshares bool, subfiles bool) ([]Share
 
 //Get information about a known Share
 func (s *shares) Get(shareID string) (Share, error) {
-	res, err := s.c.baseRequest(http.MethodGet, routes.shares, nil, shareID)
+	res, err := s.c.baseOcsRequest(http.MethodGet, routes.shares, nil, shareID)
 	if err != nil {
 		return Share{}, err
 	}
@@ -77,7 +77,7 @@ func (s *shares) Create(
 			"permissions":  strconv.Itoa(int(permission)),
 		},
 	}
-	res, err := s.c.baseRequest(http.MethodPost, routes.shares, ro)
+	res, err := s.c.baseOcsRequest(http.MethodPost, routes.shares, ro)
 	if err != nil {
 		return Share{}, err
 	}
@@ -88,7 +88,7 @@ func (s *shares) Create(
 
 //Delete Remove the given share.
 func (s *shares) Delete(shareID int) error {
-	_, err := s.c.baseRequest(http.MethodDelete, routes.shares, nil, strconv.Itoa(shareID))
+	_, err := s.c.baseOcsRequest(http.MethodDelete, routes.shares, nil, strconv.Itoa(shareID))
 	return err
 }
 
@@ -169,6 +169,6 @@ func (s *shares) baseShareUpdate(shareID string, key string, value string) error
 	ro := &req.RequestOptions{
 		Data: map[string]string{key: value},
 	}
-	_, err := s.c.baseRequest(http.MethodPut, routes.shares, ro, shareID)
+	_, err := s.c.baseOcsRequest(http.MethodPut, routes.shares, ro, shareID)
 	return err
 }

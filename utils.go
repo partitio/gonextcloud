@@ -10,6 +10,22 @@ import (
 	req "github.com/levigross/grequests"
 )
 
+func (c *client) baseOcsRequest(method string, route *url.URL, ro *req.RequestOptions, subRoutes ...string) (*req.Response, error) {
+	res, err := c.baseRequest(method, route, ro, subRoutes...)
+	if err != nil {
+		return nil, err
+	}
+	// As we cannot read the ReaderCloser twice, we use the string content
+	js := res.String()
+	var r baseResponse
+	json.Unmarshal([]byte(js), &r)
+	if r.Ocs.Meta.Statuscode == 200 || r.Ocs.Meta.Statuscode == 100 {
+		return res, nil
+	}
+	err = errorFromMeta(r.Ocs.Meta)
+	return nil, err
+}
+
 func (c *client) baseRequest(method string, route *url.URL, ro *req.RequestOptions, subRoutes ...string) (*req.Response, error) {
 	if !c.loggedIn() {
 		return nil, errUnauthorized
@@ -38,15 +54,7 @@ func (c *client) baseRequest(method string, route *url.URL, ro *req.RequestOptio
 	if err != nil {
 		return nil, err
 	}
-	// As we cannot read the ReaderCloser twice, we use the string content
-	js := res.String()
-	var r baseResponse
-	json.Unmarshal([]byte(js), &r)
-	if r.Ocs.Meta.Statuscode == 200 || r.Ocs.Meta.Statuscode == 100 {
-		return res, nil
-	}
-	err = errorFromMeta(r.Ocs.Meta)
-	return nil, err
+	return res, nil
 }
 
 func reformatJSON(json string) string {

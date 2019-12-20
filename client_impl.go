@@ -25,6 +25,7 @@ type client struct {
 	users         *users
 	groups        *groups
 	webdav        *webDav
+	passwords      *passwords
 }
 
 // newClient create a new client from the Nextcloud Instance URL
@@ -52,6 +53,7 @@ func newClient(hostname string) (*client, error) {
 	c.shares = &shares{c}
 	c.users = &users{c}
 	c.groups = &groups{c}
+	c.passwords = &passwords{c}
 	// Create empty webdav client
 	// It will be replaced after login
 	c.webdav = &webDav{Client: &gowebdav.Client{}}
@@ -96,4 +98,9 @@ func (c *client) Groups() Groups {
 // WebDav return the WebDav client Interface
 func (c *client) WebDav() WebDav {
 	return c.webdav
+}
+
+// Password return the Password client Interface
+func (c *client) Passwords() Passwords {
+	return c.passwords
 }

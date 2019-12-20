@@ -31,6 +31,8 @@ type Client interface {
 	WebDav() WebDav
 	// Nextcloud Monitoring client
 	Monitoring() (*Monitoring, error)
+	// Nextcloud Password app client
+	Passwords() Passwords
 	// Login authorize client
 	Login(username string, password string) error
 	// Logout clear connetion and session
@@ -179,4 +181,8 @@ type WebDav interface {
 	// Walk walks the file tree rooted at root, calling walkFn for each file or
 	// directory in the tree, including root.
 	Walk(path string, walkFunc filepath.WalkFunc) error
+}
+
+type Passwords interface {
+	List() ([]Password, error)
 }

@@ -14,6 +14,7 @@ type apiRoutes struct {
 	appsConfig         *url.URL
 	notifications      *url.URL
 	adminNotifications *url.URL
+	passwords		   *url.URL
 }
 
 const badRequest = 998
@@ -31,5 +32,6 @@ var (
 		appsConfig:         &url.URL{Path: apiPath.Path + "/apps/provisioning_api/api/v1/config/apps"},
 		notifications:      &url.URL{Path: apiPath.Path + "/apps/notifications/api/v2/notifications"},
 		adminNotifications: &url.URL{Path: apiPath.Path + "/apps/admin_notifications/api/v2/notifications"},
+		passwords:			&url.URL{Path: "/index.php/apps/passwords/api/1.0/password/list"},
 	}
 )

@@ -18,7 +18,7 @@ func (n *notifications) List() ([]Notification, error) {
 	if err := n.Available(); err != nil {
 		return nil, err
 	}
-	res, err := n.c.baseRequest(http.MethodGet, routes.notifications, nil)
+	res, err := n.c.baseOcsRequest(http.MethodGet, routes.notifications, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +32,7 @@ func (n *notifications) Get(id int) (Notification, error) {
 	if err := n.Available(); err != nil {
 		return Notification{}, err
 	}
-	res, err := n.c.baseRequest(http.MethodGet, routes.notifications, nil, strconv.Itoa(id))
+	res, err := n.c.baseOcsRequest(http.MethodGet, routes.notifications, nil, strconv.Itoa(id))
 	if err != nil {
 		return Notification{}, err
 	}
@@ -46,7 +46,7 @@ func (n *notifications) Delete(id int) error {
 	if err := n.Available(); err != nil {
 		return err
 	}
-	_, err := n.c.baseRequest(http.MethodDelete, routes.notifications, nil, strconv.Itoa(id))
+	_, err := n.c.baseOcsRequest(http.MethodDelete, routes.notifications, nil, strconv.Itoa(id))
 	return err
 }
 
@@ -55,7 +55,7 @@ func (n *notifications) DeleteAll() error {
 	if err := n.Available(); err != nil {
 		return err
 	}
-	_, err := n.c.baseRequest(http.MethodDelete, routes.notifications, nil)
+	_, err := n.c.baseOcsRequest(http.MethodDelete, routes.notifications, nil)
 	return err
 }
 
@@ -70,7 +70,7 @@ func (n *notifications) Create(userID, title, message string) error {
 			"longMessage":  message,
 		},
 	}
-	_, err := n.c.baseRequest(http.MethodPost, routes.adminNotifications, ro, userID)
+	_, err := n.c.baseOcsRequest(http.MethodPost, routes.adminNotifications, ro, userID)
 	return err
 }
 

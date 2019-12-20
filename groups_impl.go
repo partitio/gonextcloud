@@ -13,7 +13,7 @@ type groups struct {
 
 //List lists the Nextcloud groups
 func (g *groups) List() ([]string, error) {
-	res, err := g.c.baseRequest(http.MethodGet, routes.groups, nil)
+	res, err := g.c.baseOcsRequest(http.MethodGet, routes.groups, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +29,7 @@ func (g *groups) ListDetails(search string) ([]Group, error) {
 			"search": search,
 		},
 	}
-	res, err := g.c.baseRequest(http.MethodGet, routes.groups, ro, "details")
+	res, err := g.c.baseOcsRequest(http.MethodGet, routes.groups, ro, "details")
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +40,7 @@ func (g *groups) ListDetails(search string) ([]Group, error) {
 
 //users list the group's users
 func (g *groups) Users(name string) ([]string, error) {
-	res, err := g.c.baseRequest(http.MethodGet, routes.groups, nil, name)
+	res, err := g.c.baseOcsRequest(http.MethodGet, routes.groups, nil, name)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +54,7 @@ func (g *groups) Search(search string) ([]string, error) {
 	ro := &req.RequestOptions{
 		Params: map[string]string{"search": search},
 	}
-	res, err := g.c.baseRequest(http.MethodGet, routes.groups, ro)
+	res, err := g.c.baseOcsRequest(http.MethodGet, routes.groups, ro)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func (g *groups) Delete(name string) error {
 
 //SubAdminList lists the group's subadmins
 func (g *groups) SubAdminList(name string) ([]string, error) {
-	res, err := g.c.baseRequest(http.MethodGet, routes.groups, nil, name, "subadmins")
+	res, err := g.c.baseOcsRequest(http.MethodGet, routes.groups, nil, name, "subadmins")
 	if err != nil {
 		return nil, err
 	}
@@ -90,6 +90,6 @@ func (g *groups) SubAdminList(name string) ([]string, error) {
 }
 
 func (g *groups) baseRequest(method string, ro *req.RequestOptions, subRoute ...string) error {
-	_, err := g.c.baseRequest(method, routes.groups, ro, subRoute...)
+	_, err := g.c.baseOcsRequest(method, routes.groups, ro, subRoute...)
 	return err
 }

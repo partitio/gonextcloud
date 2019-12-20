@@ -14,7 +14,7 @@ type appsConfig struct {
 
 //List lists all the available apps
 func (a *appsConfig) List() (apps []string, err error) {
-	res, err := a.c.baseRequest(http.MethodGet, routes.appsConfig, nil)
+	res, err := a.c.baseOcsRequest(http.MethodGet, routes.appsConfig, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -25,7 +25,7 @@ func (a *appsConfig) List() (apps []string, err error) {
 
 //Keys returns the app's config keys
 func (a *appsConfig) Keys(id string) (keys []string, err error) {
-	res, err := a.c.baseRequest(http.MethodGet, routes.appsConfig, nil, id)
+	res, err := a.c.baseOcsRequest(http.MethodGet, routes.appsConfig, nil, id)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +36,7 @@ func (a *appsConfig) Keys(id string) (keys []string, err error) {
 
 //Value get the config value for the given app's key
 func (a *appsConfig) Value(id, key string) (string, error) {
-	res, err := a.c.baseRequest(http.MethodGet, routes.appsConfig, nil, id, key)
+	res, err := a.c.baseOcsRequest(http.MethodGet, routes.appsConfig, nil, id, key)
 	if err != nil {
 		return "", err
 	}
@@ -52,13 +52,13 @@ func (a *appsConfig) SetValue(id, key, value string) error {
 			"value": value,
 		},
 	}
-	_, err := a.c.baseRequest(http.MethodPost, routes.appsConfig, ro, id, key)
+	_, err := a.c.baseOcsRequest(http.MethodPost, routes.appsConfig, ro, id, key)
 	return err
 }
 
 //DeleteValue delete the config value and (!! be careful !!) the key
 func (a *appsConfig) DeleteValue(id, key, value string) error {
-	_, err := a.c.baseRequest(http.MethodDelete, routes.appsConfig, nil, id, key)
+	_, err := a.c.baseOcsRequest(http.MethodDelete, routes.appsConfig, nil, id, key)
 	return err
 }
 

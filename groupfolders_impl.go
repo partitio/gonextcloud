@@ -15,7 +15,7 @@ type groupFolders struct {
 
 //List returns the groups folders
 func (g *groupFolders) List() (map[int]GroupFolder, error) {
-	res, err := g.c.baseRequest(http.MethodGet, routes.groupfolders, nil)
+	res, err := g.c.baseOcsRequest(http.MethodGet, routes.groupfolders, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -27,7 +27,7 @@ func (g *groupFolders) List() (map[int]GroupFolder, error) {
 
 //Get returns the group folder details
 func (g *groupFolders) Get(id int) (GroupFolder, error) {
-	res, err := g.c.baseRequest(http.MethodGet, routes.groupfolders, nil, strconv.Itoa(id))
+	res, err := g.c.baseOcsRequest(http.MethodGet, routes.groupfolders, nil, strconv.Itoa(id))
 	if err != nil {
 		return GroupFolder{}, err
 	}
@@ -47,7 +47,7 @@ func (g *groupFolders) Create(name string) (id int, err error) {
 			"mountpoint": name,
 		},
 	}
-	res, err := g.c.baseRequest(http.MethodPost, routes.groupfolders, ro)
+	res, err := g.c.baseOcsRequest(http.MethodPost, routes.groupfolders, ro)
 	if err != nil {
 		return 0, err
 	}
@@ -65,7 +65,7 @@ func (g *groupFolders) Rename(groupID int, name string) error {
 		},
 	}
 	// groupFolders's response does not give any clues about success or failure
-	_, err := g.c.baseRequest(http.MethodPost, routes.groupfolders, ro, strconv.Itoa(groupID), "mountpoint")
+	_, err := g.c.baseOcsRequest(http.MethodPost, routes.groupfolders, ro, strconv.Itoa(groupID), "mountpoint")
 	if err != nil {
 		return err
 	}
@@ -82,7 +82,7 @@ func (g *groupFolders) AddGroup(folderID int, groupName string) error {
 		},
 	}
 	// groupFolders's response does not give any clues about success or failure
-	_, err := g.c.baseRequest(http.MethodPost, routes.groupfolders, ro, strconv.Itoa(folderID), "groups")
+	_, err := g.c.baseOcsRequest(http.MethodPost, routes.groupfolders, ro, strconv.Itoa(folderID), "groups")
 	if err != nil {
 		return err
 	}
@@ -92,7 +92,7 @@ func (g *groupFolders) AddGroup(folderID int, groupName string) error {
 //RemoveGroup remove a group from the group folder
 func (g *groupFolders) RemoveGroup(folderID int, groupName string) error {
 	// groupFolders's response does not give any clues about success or failure
-	_, err := g.c.baseRequest(http.MethodDelete, routes.groupfolders, nil, strconv.Itoa(folderID), "groups", groupName)
+	_, err := g.c.baseOcsRequest(http.MethodDelete, routes.groupfolders, nil, strconv.Itoa(folderID), "groups", groupName)
 	if err != nil {
 		return err
 	}
@@ -107,7 +107,7 @@ func (g *groupFolders) SetGroupPermissions(folderID int, groupName string, permi
 		},
 	}
 	// groupFolders's response does not give any clues about success or failure
-	_, err := g.c.baseRequest(http.MethodPost, routes.groupfolders, ro, strconv.Itoa(folderID), "groups", groupName)
+	_, err := g.c.baseOcsRequest(http.MethodPost, routes.groupfolders, ro, strconv.Itoa(folderID), "groups", groupName)
 	if err != nil {
 		return err
 	}
@@ -122,7 +122,7 @@ func (g *groupFolders) SetQuota(folderID int, quota int) error {
 		},
 	}
 	// groupFolders's response does not give any clues about success or failure
-	_, err := g.c.baseRequest(http.MethodPost, routes.groupfolders, ro, strconv.Itoa(folderID), "quota")
+	_, err := g.c.baseOcsRequest(http.MethodPost, routes.groupfolders, ro, strconv.Itoa(folderID), "quota")
 	if err != nil {
 		return err
 	}
